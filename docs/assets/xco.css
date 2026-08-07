@@ -13,9 +13,17 @@
   --midtone: #F27F3D;     /* orange — STRUCTURE on paper: rules, borders, underlines.
                              Only 2.67:1 on white, so never use it for text on paper.
                              On navy it is 5.66:1 and safe for text. */
-  --midtone-ink: #C7510D; /* orange — TEXT on paper. Same hue (21.9°) and saturation as
-                             --midtone, darkened to 4.55:1 on white so it passes WCAG AA. */
-  --highlight: #FFFFFF;   /* paper */
+  --midtone-ink: #C34F0D; /* orange — TEXT on paper. Same hue (21.8°) and saturation as
+                             --midtone, darkened to 4.60:1 on --highlight so it passes
+                             WCAG AA for body text. */
+
+  /* Paper is deliberately NOT pure #FFFFFF. It carries a trace of the brand navy hue
+     (OKLCH 99.1% 0.0025 264) — a chroma far too small to read as a colour, but enough
+     to stop the page feeling like a blank browser default and to tie the surface to the
+     palette. Hex first so old browsers get a correct value; OKLCH second for browsers
+     that support it. Never make the OKLCH line load-bearing. */
+  --highlight: #FBFCFE;
+  --highlight: oklch(99.1% 0.0025 264);
 
   --page-pad: 55px;
   --measure: 760px;       /* reading measure */
@@ -165,7 +173,20 @@ main { padding: 0; }
 .quote-block p { max-width: 1060px; margin: 0; }
 
 /* cards ------------------------------------------------------------------ */
+/* A fixed 2-up grid repeated down a long page is the "identical card grids" failure —
+   same shape, same rhythm, section after section, until the eye stops registering it.
+   The 2-up stays the default because it is right most of the time; these modifiers exist
+   so a page can VARY its rhythm rather than defaulting into monotony.
+     .aside-grid--wide  : one emphatic full-width card (a claim, a warning, a summary)
+     .aside-grid--auto  : lets the item count decide the columns
+     .aside-grid--three : a denser 3-up for short parallel items
+   Rule of use: don't run the same variant twice in a row. */
 .aside-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); margin: var(--s3) 0 var(--s4) 0; max-width: 1060px; }
+.aside-grid--wide { grid-template-columns: 1fr; }
+.aside-grid--auto { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.aside-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1240px; }
+/* Let one card in a default grid span both columns to break the run. */
+.aside-grid .card--span { grid-column: 1 / -1; }
 .card { border: 1.5px solid var(--shadow); padding: var(--s2); min-height: 160px; position: relative; background: var(--highlight); min-width: 0; overflow-wrap: break-word; }
 .aside-grid > * { min-width: 0; }
 .card .label { display: block; font-size: 12px; line-height: 1.4; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--s2); }
@@ -292,6 +313,7 @@ tr:last-child td { border-bottom: 0; }
      narrow cards read better than one very wide one at tablet width. */
   .hero, .section, .document-meta { grid-template-columns: 1fr; gap: var(--s3); }
   .aside-grid { gap: var(--s2); }
+  .aside-grid--three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero { min-height: auto; padding-top: var(--s5); }
   .section-label { position: static; }
   .document-meta { max-width: none; }
@@ -301,7 +323,7 @@ tr:last-child td { border-bottom: 0; }
 
 /* Below this a two-up card grid stops being readable — one column, full width. */
 @media (max-width: 720px) {
-  .aside-grid { grid-template-columns: 1fr; }
+  .aside-grid, .aside-grid--three, .aside-grid--auto { grid-template-columns: 1fr; }
   .stat-grid { grid-template-columns: 1fr; }
 }
 

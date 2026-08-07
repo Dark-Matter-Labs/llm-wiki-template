@@ -20,6 +20,25 @@ The single most important instruction in this skill: **do not translate markdown
 Re-compose the argument into a designed page.** A dumped page is a failure even if every
 tag is valid.
 
+## Before you design: load the context
+
+1. **Read `.impeccable.md` at the repo root.** It holds the project's Design Context —
+   audience, brand personality, aesthetic direction, and the design principles that govern
+   every page. Do not design from your own taste when a recorded principle applies.
+2. **Invoke the `impeccable:frontend-design` skill** for any page that is more than a
+   routine text page — anything with a bespoke layout, an interactive element, a diagram,
+   or a deck. It is the craft standard; this skill is the house style that constrains it.
+3. **Where the two conflict, `.impeccable.md`'s "House exceptions" table decides.** That
+   table records — with reasons — the handful of places where the brand deliberately
+   overrides the general skill (Inter, mono labels, one-side accent rules, hex-over-OKLCH).
+   **Anything not listed there, frontend-design wins.**
+
+The distinction that matters: frontend-design exists to stop generic, templated,
+AI-looking output. The xCO system is a real brand with real provenance — it is not
+generic, and conforming it to a general skill's defaults would be a brand break, not an
+improvement. But the *craft* underneath the skill — spatial rhythm, typographic
+discipline, motion restraint, progressive disclosure, honest UX writing — applies in full.
+
 ---
 
 ## Step 0 — Editorial pass, before any HTML
@@ -43,6 +62,29 @@ Do this in your head (or in notes) *first*. It determines everything downstream.
 **The scannability test — apply it at the end.** Read *only* the eyebrow, `h1`, subtitle,
 section labels, lead, and pull-quotes. Do you get the argument? If not, the page fails for
 the majority of real readers, however good the prose is.
+
+---
+
+## Choosing the register — light or dark
+
+Two registers are in active use and both are correct. **Choosing between them is a rule,
+not a mood.** Decide before you write any HTML, because it changes the composition.
+
+| Register | Stylesheet | Use for | Why |
+| --- | --- | --- | --- |
+| **Light** | `assets/xco.css` | concept papers, essays, summaries, process notes, reflections | Long-form reading. Serif on paper is the most legible thing the system does. |
+| **Dark — "Dusk Tritone"** | `assets/xco-dusk.css` | instruments, atlases, prospectuses, canvases, decks | Presentation and inspection rather than reading. Dark ground makes diagrams, node canvases and data structures read as objects. |
+
+Rules:
+- **One register per page.** Never mix stylesheets on a page.
+- **If the page is mostly prose, it is light.** Length is not the deciding factor; the act
+  is — reading vs. examining.
+- The dark register is *not* "dark mode". It is a different document type. Neither
+  stylesheet responds to `prefers-color-scheme`, and neither should be made to without a
+  deliberate decision — a prospectus that flips to light on a colleague's laptop is broken,
+  not adaptive.
+- Orange is safe as **text** on the dark register (5.66:1) and unsafe on light (2.60:1).
+  See the colour section.
 
 ---
 
@@ -219,13 +261,19 @@ Resist the urge to fill it. Space above a claim is what makes it read as a claim
 
 Three colours. **Navy is everything; orange is punctuation; white is air.**
 
-- `--shadow` `#192640` — text and structure. 15.08:1 on white. The workhorse.
+- `--highlight` `#FBFCFE` — paper. **Deliberately not pure white.** It carries a trace of
+  the brand navy hue (OKLCH `99.1% 0.0025 264`) — too little to read as a colour, enough to
+  stop the page looking like a blank browser default. Ships hex-first with an OKLCH line
+  after it; never make the OKLCH line load-bearing (institutional readers run old browsers).
+- `--shadow` `#192640` — text and structure. 14.69:1 on paper. The workhorse.
 - `--midtone` `#F27F3D` — **structure only on paper**: rules, borders, underlines, the
   left edge of a `.quote-block`, the `::before` tick on a section label.
-  **It is 2.67:1 on white — it FAILS WCAG AA for text.** Never set body or label text in it
-  on a white background.
-- `--midtone-ink` `#C7510D` — **text on paper.** Same hue and saturation, darkened to
-  4.55:1 so it passes AA. Use this whenever orange must be *read* on white.
+  **It is 2.60:1 on paper — it FAILS WCAG AA for text.** Never set body or label text in it
+  on the light register.
+- `--midtone-ink` `#C34F0D` — **text on paper.** Same hue and saturation, darkened to
+  4.60:1 so it passes AA. Use this whenever orange must be *read* on paper.
+  *(It was recalibrated when the paper was tinted: the tint cost 0.11 of contrast and
+  pushed the previous value below 4.5. If you ever change the paper, re-derive the ink.)*
 - On navy panels (`.footer`, `.dark-card`, `.slide-dark`, `.hn-*`) `--midtone` is 5.66:1 and
   is correct for text — keep using it there.
 
@@ -249,6 +297,10 @@ been prose. Choose by the *shape of the information*:
 | A single strong assertion opening a section | `.lead` | a bold paragraph |
 | A quotable line, or a sourced quotation | `.quote-block` | `<blockquote>` unstyled |
 | 2–6 **parallel** items of similar weight | `.aside-grid` + `.card` | a bulleted list |
+| Short parallel items, 3+ | `.aside-grid--three` | cramming them 2-up |
+| A varying number of items | `.aside-grid--auto` | forcing a fixed column count |
+| One emphatic card among several | `.card--span` (spans the grid) | colour or bold |
+| A single full-width statement card | `.aside-grid--wide` | a wide empty 2-up row |
 | One item needing emphasis among cards | `.accent-card` / `.dark-card` | colour on text |
 | A matrix — items × attributes | `.table-wrap` + `table` | prose describing the matrix |
 | 2–4 headline numbers | `.stat-grid` + `.stat` | numbers buried in a sentence |
@@ -260,6 +312,10 @@ been prose. Choose by the *shape of the information*:
 **Rules of use:**
 - **Cards must be parallel and similar in length.** A grid where one card is 3× another looks
   broken. Rewrite to balance, or use prose.
+- **Never run the same grid shape twice in a row.** A fixed 2-up repeating down a long page
+  is the classic "identical card grids" failure — after the second one the eye stops reading
+  them as content. Vary with `--three`, `--auto`, `--wide`, or a `card--span`, or break the
+  run with prose or a table.
 - **A list of 2 is not a grid** — write it as a sentence.
 - **Tables need a real header row** with `<th scope="col">`, and a `.caption` above or below
   saying what the table shows.
@@ -342,6 +398,19 @@ Source review does not catch layout, contrast, or overflow errors. **Look at the
    clear hierarchy — one dominant headline, distinct section blocks, a visible rhythm of
    texture. If it reads as a uniform grey slab, the page is under-designed.
 7. **The scannability test** from Step 0.
+8. **The AI-slop test** (from `impeccable:frontend-design`). Look at the screenshot and ask:
+   *if someone said "an AI made this", would you believe them immediately?* If yes, that is
+   the problem. Check the specific tells:
+   - identical card grids repeating down the page — the most likely failure here;
+   - everything wrapped in a card, or cards nested in cards;
+   - the same padding everywhere, with no tight/generous contrast;
+   - a hero-metric template (big number, small label, supporting stats);
+   - decorative accent colour doing no work;
+   - centred text, or an icon above every heading.
+
+   The system's own defences are already good — no glassmorphism, no gradient text, no
+   neon-on-dark, a committed palette — so failures here are almost always **monotony**:
+   correct components, applied without rhythm.
 
 A quick programmatic check for overflow and structure:
 
