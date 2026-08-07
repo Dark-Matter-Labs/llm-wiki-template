@@ -1,0 +1,75 @@
+name: Export shared mirror
+
+# Publishes the SHAREABLE cut of the wiki (public + unlisted pages only) to a
+# separate, colleague-readable repo. This is the access boundary: private pages and
+# raw/ sources never enter that repo — not their bodies, titles, or links to them.
+#
+# Nothing is published until BOTH the schema check and the private-leak test pass.
+# If the shared-repo secret/variable aren't set, the job still builds + tests the cut
+# but skips publishing (so this is safe to merge before the shared repo exists).
+#
+# Setup: see SHARING-AND-ACCESS.md. Requires repo variable SHARED_REPO
+# (e.g. YOUR-ORG/YOUR-WIKI-shared) and secret SHARED_REPO_TOKEN
+# (a token with write access to that repo). Only trusted inputs are used below
+# (a repo variable and a secret, both via env) — no event-provided text.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "wiki/**"
+      - "tools/export.py"
+      - "tools/export_shared.py"
+      - "tools/test_export_shared.py"
+      - ".github/workflows/export-shared.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: export-shared
+  cancel-in-progress: true
+
+jobs:
+  export-shared:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source wiki
+        uses: actions/checkout@v4
+
+      - name: Validate, leak-test, and build the shared cut
+        run: |
+          set -euo pipefail
+          python3 tools/export.py --check          # frontmatter schema gate
+          python3 tools/scan_public_leaks.py       # never-public terms tripwire (public + unlisted)
+          python3 tools/test_export_shared.py      # HARD private-leak invariant — blocks publish on failure
+          python3 tools/export_shared.py --out shared_out
+          echo "Built shared cut:"; ls -R shared_out | head -50
+
+      - name: Publish to the shared repo
+        env:
+          TOKEN: ${{ secrets.SHARED_REPO_TOKEN }}
+          SHARED_REPO: ${{ vars.SHARED_REPO }}
+        run: |
+          set -euo pipefail
+          if [ -z "${TOKEN}" ] || [ -z "${SHARED_REPO}" ]; then
+            echo "SHARED_REPO_TOKEN / SHARED_REPO not configured — build + leak-test ran, skipping publish."
+            exit 0
+          fi
+          git clone --depth 1 "https://x-access-token:${TOKEN}@github.com/${SHARED_REPO}.git" target
+          # Replace only the managed content, so deletions propagate and nothing else is touched.
+          rm -rf target/wiki
+          cp -r shared_out/wiki target/wiki
+          cp shared_out/README.md target/README.md
+          cd target
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Shared mirror already up to date — nothing to push."
+            exit 0
+          fi
+          git commit -m "sync: shared wiki mirror ($(date -u +%Y-%m-%dT%H:%MZ))"
+          git push
+          echo "Published shared mirror to ${SHARED_REPO}."

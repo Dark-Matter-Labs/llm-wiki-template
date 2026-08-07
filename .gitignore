@@ -1,0 +1,57 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local Claude Code settings (machine-specific paths and permissions — never share these)
+.claude/settings.local.json
+
+# ---------------------------------------------------------------------------
+# Source documents (raw/)
+# ---------------------------------------------------------------------------
+# By default source files stay LOCAL and are not versioned — they are often large,
+# licensed, or confidential, and the wiki cites them by filename rather than needing
+# the bytes. Claude reads them in-session; the citation still resolves for a human.
+#
+# If you WANT a source versioned (e.g. it was pasted in-session and has no original
+# anywhere else, so losing it would break the citation), add a negation line at the
+# bottom of this block:
+#     !raw/my-important-source.md
+#
+# Think before you do: negating a file commits it to history permanently. Do not
+# version anything you would not want every future collaborator on this repo to read.
+raw/**/*.pdf
+raw/**/*.png
+raw/**/*.jpg
+raw/**/*.jpeg
+raw/**/*.docx
+raw/**/*.pptx
+raw/**/*.xlsx
+raw/**/*.txt
+raw/**/*.html
+raw/*.md
+
+# Keep the scaffolding that ships with the template:
+!raw/README.md
+!raw/EXAMPLE-sample-source.md
+
+# --- your versioned sources go below ---
+
+
+# ---------------------------------------------------------------------------
+# Generated output — built by CI, never committed to main
+# ---------------------------------------------------------------------------
+# Export graph, force-pushed to the orphan `export` branch (keeps main clean).
+export/
+
+# Shared-mirror build output, published to a separate repo by CI.
+shared/
+shared_out/

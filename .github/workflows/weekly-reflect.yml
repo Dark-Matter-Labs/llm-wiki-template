@@ -1,0 +1,91 @@
+name: Weekly reflection
+
+# Fridays 15:00 UTC (and on demand). Runs the `reflect` skill for the past week, then
+# the `joker` method on the two largest deviations, and opens a PR with the results.
+# The owner reviews and merges; merging fires the export workflow and updates the interface.
+#
+# Cost note: this step calls the Claude API and consumes API credits billed OUTSIDE
+# the Claude Team plan (requires the ANTHROPIC_API_KEY secret). The export workflow is
+# free; this one is not. Remove the schedule to make reflections manual-only.
+on:
+  schedule:
+    - cron: "0 15 * * 5"   # 15:00 UTC every Friday
+  workflow_dispatch:
+
+permissions:
+  contents: write        # create the reflection branch
+  pull-requests: write   # open the PR
+  issues: write
+  id-token: write        # required by claude-code-action for OIDC auth
+
+concurrency:
+  group: weekly-reflect
+  cancel-in-progress: false
+
+jobs:
+  reflect:
+    runs-on: ubuntu-latest
+    steps:
+      # Skip cleanly when no API key is configured, rather than failing every Friday.
+      # A weekly red X trains people to ignore CI, which is worse than no reflection.
+      # Set ANTHROPIC_API_KEY (see SETUP.md) to switch this on.
+      - name: Check for API key
+        id: guard
+        env:
+          KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::ANTHROPIC_API_KEY is not set - skipping the weekly reflection."
+            echo "Set it in Settings > Secrets and variables > Actions to enable this job."
+            echo "Note: it consumes Claude API credits billed outside your Claude plan."
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.guard.outputs.enabled == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # reflect reads git history for the week
+
+      - name: Run reflect + joker (writes files only)
+        if: steps.guard.outputs.enabled == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # The action does not auto-open PRs in prompt mode, and its default tool
+          # policy blocks git/file ops — so grant the tools reflect needs and let the
+          # next step do the branch+PR deterministically.
+          claude_args: |
+            --allowedTools Bash,Read,Edit,Write,Glob,Grep,WebSearch,WebFetch
+          prompt: |
+            Run the reflect skill for the past week, then run the joker method on the
+            two largest deviations. WRITE the results into the working tree only:
+            the weekly reflection to wiki/reflections/ (visibility: unlisted), any joker
+            briefs to wiki/challenges/ (visibility: private), and update wiki/index.md
+            and the current month's log file (wiki/log/YYYY-MM.md). Do NOT git commit, push, or open a PR, and do NOT run gh —
+            the workflow's next step commits your changes and opens the PR.
+
+      - name: Commit changes and open the reflection PR
+        if: steps.guard.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Nothing produced (uncommitted or committed by the model)? Exit cleanly.
+          if [ -z "$(git status --porcelain)" ] && git diff --quiet origin/main..HEAD; then
+            echo "No reflection output this run — nothing to PR."
+            exit 0
+          fi
+          BRANCH="reflection/$(date -u +%Y%m%d-%H%M%S)"
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "reflect: weekly reflection + joker briefs" || echo "(already committed by the model)"
+          # The Claude action reconfigures git auth during its run, so the checkout's
+          # push credentials are gone by now. Push with an explicit token URL instead.
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${BRANCH}"
+          gh pr create --base main --head "$BRANCH" \
+            --title "Weekly reflection — $(date -u +%Y-%m-%d)" \
+            --body "Automated weekly reflection (reflect + joker). Review and merge; nothing was pushed to main. Reflections are unlisted, joker briefs private."

@@ -1,0 +1,67 @@
+name: Export wiki graph
+
+# Deterministic, no LLM, free. On every push to main that changes the wiki (or the
+# exporter), validate frontmatter, rebuild the JSON graph, and publish ONLY the
+# private-stripped public graph (wiki.public.json) to an orphan `export` branch that
+# contains nothing else — then optionally ping the lens to rebuild. The full graph
+# (wiki.json, which includes private pages) is built for local use but never pushed.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "wiki/**"
+      - "tools/export.py"
+      - ".github/workflows/export.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write   # to force-push the export branch
+
+concurrency:
+  group: export
+  cancel-in-progress: true
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_HOOK_URL }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate frontmatter (schema check)
+        run: python tools/export.py --check
+
+      - name: Build the export graph
+        run: python tools/export.py
+
+      - name: Publish ONLY the public graph to an orphan export branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # SECURITY: the export branch must contain NOTHING but the private-stripped
+          # public graph — never the repo tree, never the full (private) wiki.json.
+          # (A previous version did `git checkout -B export` from main, which mirrored
+          # the entire private repo + all private page bodies to a branch any colleague
+          # with repo access could read.) We build a clean, single-file orphan branch.
+          mkdir -p _publish
+          cp export/wiki.public.json _publish/wiki.public.json
+          cd _publish
+          git init -q
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add wiki.public.json
+          git commit -q -m "chore(export): public graph [skip ci]"
+          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/export
+          echo "Published wiki.public.json to the export branch (public graph only)."
+
+      - name: Trigger lens rebuild (only if a deploy hook is configured)
+        if: ${{ env.DEPLOY_HOOK_URL != '' }}
+        run: curl -fsS -X POST "$DEPLOY_HOOK_URL"
