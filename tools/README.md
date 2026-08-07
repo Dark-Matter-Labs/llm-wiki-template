@@ -86,3 +86,16 @@ python3 tools/test_export.py          # private never reaches the public graph
 python3 tools/test_export_shared.py   # private never reaches the colleague mirror
 python3 tools/test_internal_tier.py   # internal reaches the mirror, never the web
 ```
+
+### make_social_card.py
+Generates `docs/assets/social-card.png` — the Open Graph link-preview image every published
+page points at. Published pages are shared as URLs, so this card is the first thing most
+people see; without it a shared link renders as a bare text row.
+
+```
+python3 tools/make_social_card.py --eyebrow "ACME · RESEARCH" \
+  --line1 "Your one-line" --line2 "statement here." --url "acme.github.io/wiki"
+```
+
+It ships one shared, generic card rather than per-page images — deliberately, so that an
+`unlisted` page's title never leaks into a chat preview. Requires Pillow.

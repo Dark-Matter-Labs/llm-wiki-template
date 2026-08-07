@@ -10,7 +10,11 @@
 
 :root {
   --shadow: #192640;      /* deep navy — text + structure */
-  --midtone: #F27F3D;     /* orange — accent only */
+  --midtone: #F27F3D;     /* orange — STRUCTURE on paper: rules, borders, underlines.
+                             Only 2.67:1 on white, so never use it for text on paper.
+                             On navy it is 5.66:1 and safe for text. */
+  --midtone-ink: #C7510D; /* orange — TEXT on paper. Same hue (21.9°) and saturation as
+                             --midtone, darkened to 4.55:1 on white so it passes WCAG AA. */
   --highlight: #FFFFFF;   /* paper */
 
   --page-pad: 55px;
@@ -41,7 +45,7 @@ body {
 }
 
 a { color: var(--shadow); text-decoration-color: var(--midtone); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
-a:hover { color: var(--midtone); }
+a:hover { color: var(--midtone-ink); }
 
 h1, h2, h3, .display, .nav-title { font-family: var(--sans); font-weight: 500; letter-spacing: -0.025em; line-height: 1.05; margin: 0; }
 h1 { font-size: clamp(48px, 8vw, 108px); max-width: 1120px; }
@@ -61,6 +65,50 @@ hr { border: 0; border-top: 1.5px solid var(--shadow); margin: var(--s4) 0; max-
 
 /* term: an internal wiki concept not (yet) published as its own page */
 .term { font-family: var(--sans); font-weight: 500; letter-spacing: -0.01em; border-bottom: 1.5px dotted var(--midtone); }
+
+/* focus, skip link, motion ------------------------------------------------
+   Keyboard and assistive-tech affordances. These are not decoration: without a
+   visible focus ring a keyboard user cannot tell where they are on the page. */
+
+/* :focus-visible only — so a mouse click doesn't leave a ring behind, but every
+   keyboard tab does. The 3px offset keeps the ring clear of the text itself. */
+:focus-visible {
+  outline: 3px solid var(--midtone-ink);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+/* On navy panels the ring must switch to paper to stay visible. */
+.footer :focus-visible,
+.dark-card :focus-visible,
+.slide-dark :focus-visible,
+.hn-poster :focus-visible,
+.hn-commit :focus-visible {
+  outline-color: var(--highlight);
+}
+
+/* Skip link: first tab stop, hidden until focused. Every page should carry
+   <a class="skip-link" href="#main">Skip to content</a> as the first body child. */
+.skip-link {
+  position: absolute; left: var(--s1); top: -100px; z-index: 100;
+  background: var(--shadow); color: var(--highlight);
+  font-family: var(--mono); font-size: 14px; letter-spacing: 0.04em;
+  text-transform: uppercase; text-decoration: none;
+  padding: var(--s1) var(--s2);
+  transition: top .12s ease;
+}
+.skip-link:focus { top: var(--s2); color: var(--highlight); }
+
+/* Respect a stated preference for less motion. The smooth-scroll on <html> and
+   the card lift are the only motion in the system; both are disabled here. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 /* structure ------------------------------------------------------------- */
 .page-shell { min-height: 100vh; border-left: 13px solid var(--shadow); }
@@ -188,7 +236,7 @@ tr:last-child td { border-bottom: 0; }
   text-transform: uppercase; letter-spacing: 0.04em;
   border: 1.5px solid var(--shadow); padding: 8px 13px; white-space: nowrap;
 }
-.chain i { font-style: normal; color: var(--midtone); padding: 0 10px; font-family: var(--mono); font-size: 15px; }
+.chain i { font-style: normal; color: var(--midtone-ink); padding: 0 10px; font-family: var(--mono); font-size: 15px; }
 .chain .loop { border-style: dashed; }
 .slide-dark .chain span { border-color: var(--highlight); }
 
@@ -212,7 +260,7 @@ tr:last-child td { border-bottom: 0; }
 .formula .eq { font-style: italic; }
 .formula var { font-style: italic; font-family: var(--serif); }
 .formula sub, .formula sup { font-style: normal; font-size: 0.72em; font-family: var(--mono); }
-.formula .op { font-style: normal; color: var(--midtone); padding: 0 0.25em; }
+.formula .op { font-style: normal; color: var(--midtone-ink); padding: 0 0.25em; }
 .formula .gloss { display: block; margin-top: 8px; font-family: var(--mono); font-size: 13px; line-height: 1.5; letter-spacing: -0.01em; font-style: normal; color: var(--shadow); }
 .formula .stack { display: block; margin: 4px 0; }
 .slide-dark .formula { background: rgba(255, 255, 255, 0.05); }
@@ -220,12 +268,18 @@ tr:last-child td { border-bottom: 0; }
 /* def-list: term → definition pairs (e.g. link derivations, decision sequence) */
 .def-list { max-width: 1060px; margin: var(--s2) 0 var(--s3) 0; }
 .def-list .def { border-top: 1.5px solid var(--shadow); padding: var(--s1) 0 var(--s2) 0; }
-.def-list .def-key { font-family: var(--mono); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--midtone); display: block; margin-bottom: 6px; }
+.def-list .def-key { font-family: var(--mono); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--midtone-ink); display: block; margin-bottom: 6px; }
 .def-list .def-key b { color: var(--shadow); font-weight: 500; }
 .def-list .def p { margin-bottom: 8px; }
 .def-list .falsifier { font-family: var(--mono); font-size: 13px; line-height: 1.5; letter-spacing: -0.01em; color: var(--shadow); opacity: 0.75; }
 
 /* responsive ------------------------------------------------------------- */
+/* Intermediate step. The page gutter was jumping 55px -> 24px in one move at 980px;
+   this gives the tablet range a proportionate margin instead of a desktop one. */
+@media (max-width: 1200px) {
+  :root { --page-pad: 34px; }
+}
+
 @media (max-width: 980px) {
   .slide { min-height: auto; padding: var(--s4) var(--page-pad); }
   .stat-grid { grid-template-columns: 1fr 1fr; }
@@ -234,12 +288,21 @@ tr:last-child td { border-bottom: 0; }
   :root { --page-pad: 24px; }
   .page-shell { border-left-width: 8px; }
   .chain span { white-space: normal; }
-  .hero, .section, .document-meta, .aside-grid { grid-template-columns: 1fr; gap: var(--s3); }
+  /* .aside-grid deliberately NOT collapsed here — see the 720px rule below. Two
+     narrow cards read better than one very wide one at tablet width. */
+  .hero, .section, .document-meta { grid-template-columns: 1fr; gap: var(--s3); }
+  .aside-grid { gap: var(--s2); }
   .hero { min-height: auto; padding-top: var(--s5); }
   .section-label { position: static; }
   .document-meta { max-width: none; }
-  .document-meta div { border-right: 0; border-bottom: 1.5px solid var(--shadow); }
+  .document-meta div { border-right: 0; border-bottom: 1.5px solid var(--shadow); min-height: 0; }
   .document-meta div:last-child { border-bottom: 0; }
+}
+
+/* Below this a two-up card grid stops being readable — one column, full width. */
+@media (max-width: 720px) {
+  .aside-grid { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: 1fr; }
 }
 
 @media print {
