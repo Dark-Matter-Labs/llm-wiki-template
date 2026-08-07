@@ -140,6 +140,16 @@ h1 { font-size: clamp(3.4rem, 8vw, 7rem); max-width: 12ch; }
 
 /* cards -------------------------------------------------------------------- */
 .aside-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); margin: var(--s3) 0; max-width: 1060px; }
+/* Rhythm variants — must mirror xco.css or a page that varies its grids on the dusk
+   register silently falls back to the 2-up and the variation does nothing.
+     --wide  : one emphatic full-width card
+     --auto  : let the item count decide the columns
+     --three : denser 3-up for short parallel items
+   Rule of use: don't run the same shape more than twice in a row. */
+.aside-grid--wide { grid-template-columns: 1fr; }
+.aside-grid--auto { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.aside-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1240px; }
+.aside-grid .card--span { grid-column: 1 / -1; }
 .card {
   border: 1.5px solid var(--shadow); padding: var(--s2); min-height: 180px;
   display: flex; flex-direction: column; gap: 13px;
@@ -230,9 +240,46 @@ td { font-size: 1.02rem; line-height: 1.5; }
 svg .flow { animation: dashflow 1.4s linear infinite; }
 @keyframes dashflow { to { stroke-dashoffset: -22; } }
 
+/* focus, skip link, motion ------------------------------------------------
+   These were missing entirely from this register: 23 published pages use it, and
+   without a focus ring a keyboard user cannot tell where they are. Mirrors xco.css.
+
+   The ring is parchment (8.25:1 on the dusk ground), not the coral accent — coral
+   is only 3.24:1, which technically clears the 3:1 UI-component bar but is far too
+   easy to lose against a dark ground for something that must be unmissable. */
+:focus-visible {
+  outline: 3px solid var(--highlight);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+/* On the parchment sheets the ring must invert to stay visible. */
+.sheet :focus-visible,
+.paper :focus-visible {
+  outline-color: var(--shadow);
+}
+
+.skip-link {
+  position: absolute; left: var(--s1); top: -100px; z-index: 100;
+  background: var(--highlight); color: var(--shadow);
+  font-family: var(--mono); font-size: 14px; letter-spacing: 0.04em;
+  text-transform: uppercase; text-decoration: none;
+  padding: var(--s1) var(--s2);
+  transition: top .12s ease;
+}
+.skip-link:focus { top: var(--s2); color: var(--shadow); }
+
 @media (prefers-reduced-motion: reduce) {
   svg .flow { animation: none; }
   .gen-bg, .telemetry { display: none; }
+  /* The original block only stopped the decorative SVG flow. A stated preference
+     for less motion covers transitions and scroll behaviour too. */
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* progress chip ------------------------------------------------------------------ */
