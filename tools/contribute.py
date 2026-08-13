@@ -2,7 +2,7 @@
 """
 contribute.py — prepare a page for the shared commons, safely.
 
-The flow up from a personal wiki to `YOUR-COMMONS`. It is deliberately the same consent
+The flow up from a personal wiki to `xco-team-wiki`. It is deliberately the same consent
 loop as everything else: this script only ever writes a **staging bundle** to disk. It
 does not push, does not open a PR, and cannot reach the commons on its own.
 
@@ -48,7 +48,29 @@ import export            # noqa: E402
 import export_shared     # noqa: E402
 
 DEFAULT_OUT = "contrib"
-ORIGIN = "YOUR-WIKI"
+
+# The commons this wiki contributes into. One constant, because a spoke belongs to one
+# commons; change it here if that ever stops being true.
+COMMONS = os.environ.get("WIKI_COMMONS", "xco-team-wiki")
+
+
+def _origin_repo():
+    """This wiki's own name, derived from the git remote rather than hardcoded.
+
+    Every spoke stamps its provenance with its own name. Hardcoding that means one
+    hand-edit per repo and one chance to get it wrong — and a mis-stamped `origin` is
+    a quiet lie about where a page came from, which is exactly what provenance exists
+    to prevent. Deriving it makes a fresh spoke correct with no setup step.
+    """
+    url = subprocess.run(["git", "remote", "get-url", "origin"],
+                         capture_output=True, text=True).stdout.strip()
+    if not url:
+        return "unknown-origin"
+    name = url.rstrip("/").rsplit("/", 1)[-1]
+    return name[:-4] if name.endswith(".git") else name
+
+
+ORIGIN = _origin_repo()
 
 # Whole areas that never travel, whatever their tier says.
 REFUSE_PATH_PREFIXES = ("crm/",)
