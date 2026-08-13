@@ -80,6 +80,22 @@ def page_meta(text, fallback):
     m = re.search(r"^title:\s*[\"']?(.+?)[\"']?\s*$", text, re.M)
     return m.group(1) if m else fallback
 
+# How much a page counts toward the corpus's centre, by who has stood behind it.
+# Unvalidated material is admitted, indexed and searchable — it simply does not yet
+# move the centre. This is the mechanical form of the failure the owner named: a bulk
+# load of well-formed but out-of-date thinking should not drag the whole model
+# backwards just because it is voluminous.
+#
+# These are calibration values, not findings. What matters is the ordering and the
+# gap between machine and collective; tune with real use.
+VALIDATION_WEIGHT = {"machine": 0.25, "self": 0.6, "peer": 0.85, "collective": 1.0}
+DEFAULT_VALIDATION = "machine"
+
+def page_validation(text):
+    m = re.search(r"^validation:\s*([a-z]+)\s*$", text, re.M)
+    v = m.group(1) if m else DEFAULT_VALIDATION
+    return v if v in VALIDATION_WEIGHT else DEFAULT_VALIDATION
+
 def build_space(current_pages):
     """IDF lens from the CURRENT corpus (one lens for all snapshots — a modelling choice)."""
     df = collections.Counter()
@@ -103,7 +119,11 @@ def inbound_mass(pages):
             link = link.strip()
             if link != titles[f]:
                 inbound[link] += 1
-    return {f: 1 + math.log(1 + inbound[titles[f]]) for f in pages}, inbound
+    # Two multipliers: how connected a page is, and how far anyone has stood behind
+    # it. Link mass alone lets volume win; validation is the counterweight.
+    return ({f: (1 + math.log(1 + inbound[titles[f]]))
+                * VALIDATION_WEIGHT[page_validation(pages[f])]
+             for f in pages}, inbound)
 
 def cos(a, b):
     if len(b) < len(a):

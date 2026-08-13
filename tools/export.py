@@ -31,7 +31,8 @@ SCHEMA_VERSION = "1.0"
 
 REQUIRED_FIELDS = ["type", "title", "description", "tags", "status",
                    "visibility", "confidence", "timestamp", "sources"]
-ALLOWED_TYPE = {"entity", "concept", "summary", "comparison", "overview", "synthesis"}
+ALLOWED_TYPE = {"entity", "concept", "summary", "comparison", "overview", "synthesis",
+                "goal", "commitment"}
 ALLOWED_VISIBILITY = {"public", "unlisted", "internal", "private"}
 
 # Two boundaries, deliberately distinct:
@@ -41,6 +42,26 @@ ALLOWED_VISIBILITY = {"public", "unlisted", "internal", "private"}
 HIDE_FROM_WEB = frozenset({"private", "internal"})
 HIDE_FROM_SHARED = frozenset({"private"})
 ALLOWED_LAYER = {"goal", "portfolio", "mechanism", "sequence"}
+
+# Validation — who has stood behind a page, as distinct from what the page claims
+# about its own evidence (that is `confidence`). A well-sourced page nobody has
+# confirmed is a different object from a hunch the group has endorsed, and the
+# gravity weighting treats them differently.
+#   machine    — written or filed by the model; nobody has confirmed it yet
+#   self       — the author confirmed it
+#   peer       — another member confirmed it
+#   collective — reviewed together
+ALLOWED_VALIDATION = {"machine", "self", "peer", "collective"}
+
+# Commitment lifecycle. `declined` is FIRST-CLASS and non-penalised: refusing is a valid
+# outcome, and a ledger that renders a decline as a failure teaches people not to answer.
+# `exited` likewise — leaving a commitment deliberately is not the same as letting it lapse.
+ALLOWED_COMMITMENT_STATE = {"proposed", "held", "honoured", "revised",
+                            "lapsed", "exited", "declined"}
+# States that represent a commitment nobody is carrying any more, but which are NOT
+# failures. Only `lapsed` is a failure — the commitment fell over without a decision.
+NON_FAILURE_CLOSED = {"honoured", "exited", "declined"}
+DEFAULT_VALIDATION = "machine"
 ALLOWED_HORIZON = {"near", "mid", "far"}
 
 WIKILINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]*))?\]\]")
@@ -170,6 +191,16 @@ def build_nodes(wiki_dir):
             "horizon": fm.get("horizon"),      # optional
             "tags": fm.get("tags", []),
             "confidence": fm.get("confidence"),
+            "validation": fm.get("validation", DEFAULT_VALIDATION),
+            "validated_by": fm.get("validated_by", []),
+            "validated_at": fm.get("validated_at"),
+            "contradicts": fm.get("contradicts"),
+            "commits_to": fm.get("commits_to"),
+            "resources": fm.get("resources"),
+            "until": fm.get("until"),
+            "state": fm.get("state"),
+            "superseded_by": fm.get("superseded_by"),
+            "devalued_by": fm.get("devalued_by"),
             "visibility": fm.get("visibility", "private"),
             "timestamp": fm.get("timestamp"),
             "description": fm.get("description"),
@@ -281,6 +312,22 @@ def validate(wiki_dir):
             errors.append((slug, f"invalid layer: {fm['layer']!r}"))
         if "horizon" in fm and fm["horizon"] not in ALLOWED_HORIZON:
             errors.append((slug, f"invalid horizon: {fm['horizon']!r}"))
+        if fm.get("type") == "commitment":
+            st = fm.get("state")
+            if st is None:
+                errors.append((slug, "a commitment must declare a `state`"))
+            elif st not in ALLOWED_COMMITMENT_STATE:
+                errors.append((slug, f"invalid commitment state: {st!r}"))
+            if not fm.get("commits_to"):
+                errors.append((slug, "a commitment must name the goal it `commits_to`"))
+        if "state" in fm and fm.get("type") != "commitment":
+            errors.append((slug, "`state` is only meaningful on a commitment"))
+        if "validation" in fm and fm["validation"] not in ALLOWED_VALIDATION:
+            errors.append((slug, f"invalid validation: {fm['validation']!r}"))
+        # A page validated above `machine` must say who did it: an unattributed
+        # tick is indistinguishable from the model marking its own homework.
+        if fm.get("validation") in {"self", "peer", "collective"} and not fm.get("validated_by"):
+            errors.append((slug, f"validation {fm['validation']!r} requires validated_by"))
         for m in SPLIT_LINK_RE.findall(body):
             errors.append((slug, "newline-split wiki-link (won't resolve): "
                            + re.sub(r"\s+", " ", m).strip()))

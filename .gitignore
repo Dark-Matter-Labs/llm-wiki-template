@@ -55,3 +55,6 @@ export/
 # Shared-mirror build output, published to a separate repo by CI.
 shared/
 shared_out/
+
+# Staged contribution bundles (tools/contribute.py) — output, never committed.
+contrib/

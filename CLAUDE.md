@@ -58,13 +58,14 @@ Every page in `wiki/` (except `index.md` and `log.md`) starts with YAML frontmat
 
 ```yaml
 ---
-type: entity | concept | summary | comparison | overview | synthesis
+type: entity | concept | summary | comparison | overview | synthesis | goal | commitment
 title: Human-readable title
 description: One sentence describing the page
 tags: [tag1, tag2]
 status: draft | reviewed
 visibility: public | unlisted | internal | private   # default: private
 confidence: high | medium | low
+validation: machine | self | peer | collective       # default: machine
 timestamp: YYYY-MM-DD
 sources: [raw/filename.pdf, raw/other.md]
 # optional viz-layer fields (set only when the page clearly belongs to a layer):
@@ -106,6 +107,39 @@ These help a frontend "lens" place a page in the right view. Set them only when 
 - **`parent`** — the exact title of the parent page, for nesting.
 - **`horizon`** — `near` | `mid` | `far`, for sequence/timeline views.
 
+### Validation — who has stood behind a page (required)
+
+`validation` is **not** `confidence`. Confidence is what the page claims about its own
+evidence; validation records **who has stood behind it**. A well-sourced page nobody has
+confirmed is a different object from a hunch the group has endorsed.
+
+- **`machine`** — you wrote or filed it; nobody has confirmed it. This is the default and
+  the honest state for anything new.
+- **`self`** — the owner confirmed it. Requires `validated_by`.
+- **`peer`** — another member confirmed it. Requires `validated_by`.
+- **`collective`** — reviewed together. Requires `validated_by`.
+
+**You may set `machine`, and propose `self`. You may never award `peer` or `collective`** —
+those need a second person, and a model granting them would make the hierarchy meaningless.
+
+Validation feeds the gravity weighting: unvalidated material is admitted, indexed and
+searchable, but does not yet move the corpus's centre. That is the protection against a
+large body of well-formed but out-of-date thinking dragging the whole model backwards.
+
+### Contradictions must resolve, never sit silent
+
+When two pages genuinely disagree, declare it on the newer page:
+
+```yaml
+contradicts: "Title of the page this disagrees with"
+```
+
+Declaring is your job; **resolving is not**. A contradiction closes only when a human adds,
+to whichever page loses, either `superseded_by: "Title"` (the new position replaces it) or
+`devalued_by: "Title"` (the input is downgraded). Nothing is deleted either way — the losing
+page stays readable with a pointer, so plurality is preserved and only the silence is removed.
+Run `python3 tools/contradictions.py` to see what is open.
+
 - **`confidence`** reflects how well-supported the page is. A page built from one source is
   `low`; a synthesis confirmed across several sources is `high`. This lets the lint pass
   find pages that need re-examination when new sources arrive.
@@ -129,6 +163,16 @@ These help a frontend "lens" place a page in the right view. Set them only when 
 - **concept** — an idea, framework, method, or theme that spans multiple sources.
 - **comparison** — a deliberate side-by-side (e.g. two approaches, two cities).
 - **overview** — `wiki/overview.md`, the top-level map of the whole wiki. Kept current.
+- **goal** — a destination the work is aimed at. Explicit and formal, because it carries a
+  contractual layer: `horizon`, and `parent` when goals nest. This is the one place the
+  system asks for structure up front; everything else stays tacit.
+- **commitment** — resources actually committed against a goal. Requires `commits_to`
+  (the goal's exact title), `resources`, `until`, and a `state`:
+  `proposed | held | honoured | revised | lapsed | exited | declined`.
+  **`declined` and `exited` are non-penalised** — refusing, or leaving deliberately, is a
+  valid outcome and must never be rendered as failure. Only `lapsed` (fell over without a
+  decision) counts against a goal. Run `python3 tools/goals.py` for the computed view;
+  **progress is never typed by hand.**
 - **synthesis** — the evolving thesis / "what it all means so far" for a topic.
 
 ---
@@ -179,6 +223,7 @@ In plain-English terms, here is when each fires:
 | "what's the gravity / trajectory of the repo", "where does this sit relative to the repo" | `gravity` |
 | "make that a skill", "learn this pattern" (asks you to verify before creating) | `learn` |
 | "run a delta", "measure this against the wiki", "where does this sit / move us" | `delta` |
+| "share this with the team", "contribute this", "propose this to the commons" | `contribute` |
 | "add a contact", "log that meeting", "who do we know at…", "prep me for my meeting with…" | `crm` |
 
 Published web pages live in `docs/` and are served by GitHub Pages.

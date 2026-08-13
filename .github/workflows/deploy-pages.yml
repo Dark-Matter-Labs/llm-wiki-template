@@ -36,36 +36,28 @@ jobs:
         # tools/sensitive_terms.txt appears anywhere under docs/. No untrusted input.
         run: python3 tools/scan_public_leaks.py
 
+      - name: Block deploy on design-standard errors
+        # ERROR-level findings only (missing link preview, a skip link pointing at
+        # nothing, duplicate landmarks) — the things that are broken rather than
+        # merely imperfect. WARNs are reported but never block.
+        #
+        # This gate exists because the standard drifted: seven pages added after the
+        # last manual sweep shipped without it. A standard nobody enforces is a
+        # preference. No untrusted input.
+        run: python3 tools/audit_design.py --check
+
       - name: Configure Pages
         # enablement: true switches the Pages source to "GitHub Actions" so this
         # workflow becomes the active deployer (no manual settings change needed).
-        #
-        # This step CANNOT self-enable Pages where the org/plan disallows it or the
-        # token lacks permission - the normal state of a wiki freshly created from the
-        # template. Rather than failing on every push until someone enables Pages, it
-        # is allowed to fail and the deploy steps skip. A workflow that is red by
-        # default trains people to ignore CI, and the leak tripwire above is the check
-        # that actually matters here - it still runs, and still blocks a real deploy.
-        id: configure
-        continue-on-error: true
         uses: actions/configure-pages@v5
         with:
           enablement: true
 
-      - name: Report that Pages is not enabled
-        if: steps.configure.outcome == 'failure'
-        run: |
-          echo "::notice::GitHub Pages is not enabled for this repository - skipping the deploy."
-          echo "The site is optional. To publish pages, enable Pages under"
-          echo "Settings > Pages, set the source to 'GitHub Actions', then re-run this workflow."
-
       - name: Upload /docs as the Pages artifact
-        if: steps.configure.outcome == 'success'
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
 
       - name: Deploy to GitHub Pages
         id: deployment
-        if: steps.configure.outcome == 'success'
         uses: actions/deploy-pages@v4

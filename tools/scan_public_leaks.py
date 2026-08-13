@@ -92,9 +92,22 @@ def main(argv=None):
     ap.add_argument("--wiki", default="wiki")
     ap.add_argument("--terms", default=DEFAULT_TERMS)
     ap.add_argument("--list", action="store_true", help="list scanned surfaces and exit")
+    ap.add_argument("--paths", default=None,
+                    help="scan an arbitrary directory INSTEAD of the default public surfaces. "
+                         "Used by tools/contribute.py to check a staged bundle before it is "
+                         "proposed to the commons — a wider audience than this repo, so the "
+                         "never-public terms apply there too.")
     args = ap.parse_args(argv)
 
-    paths = surfaces(args.docs, args.wiki)
+    if args.paths:
+        if not os.path.isdir(args.paths):
+            print(f"error: --paths is not a directory: {args.paths}", file=sys.stderr)
+            return 2
+        paths = sorted(os.path.join(r, fn)
+                       for r, _d, fs in os.walk(args.paths) for fn in fs
+                       if os.path.splitext(fn)[1].lower() in TEXT_EXT or fn.endswith(".md"))
+    else:
+        paths = surfaces(args.docs, args.wiki)
     if args.list:
         for p in paths:
             print(p)

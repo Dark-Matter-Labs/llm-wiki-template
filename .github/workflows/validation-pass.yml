@@ -1,0 +1,134 @@
+name: Validation pass
+
+# The validation layer's cadence, from the 7 Aug session: not weekly (too slow — "a week
+# is too long, I just don't remember it") and not unconditionally daily (burns credits on
+# days nothing happened). So this runs DAILY but the deciding step is free.
+#
+# tools/validation_due.py counts words added to wiki/ since the last recorded pass and
+# calls no model. Only when it says "due" does the paid step run. Cost therefore tracks
+# use rather than the calendar — on a quiet week this workflow costs nothing at all.
+on:
+  schedule:
+    - cron: "0 16 * * *"   # 16:00 UTC daily — the decision is free; the work rarely runs
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Run the pass even if the trigger says not due"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: validation-pass
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # the trigger measures a diff against history
+
+      # ---- free gate: decides whether anything below should run at all --------
+      - name: Is a validation pass due?
+        id: due
+        env:
+          FORCE: ${{ inputs.force }}
+        run: |
+          if [ "$FORCE" = "true" ]; then
+            echo "due=true" >> "$GITHUB_OUTPUT"
+            echo "Forced by manual dispatch."
+            exit 0
+          fi
+          if python3 tools/validation_due.py; then
+            echo "due=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "due=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Not enough new material since the last pass - skipping, no cost."
+          fi
+
+      # ---- free checks: worth running whenever the pass runs -------------------
+      - name: Contradiction coherence
+        if: steps.due.outputs.due == 'true'
+        run: python3 tools/contradictions.py --check
+
+      - name: Guard the API key
+        id: guard
+        if: steps.due.outputs.due == 'true'
+        env:
+          KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::ANTHROPIC_API_KEY not set - reporting what is due, without the model step."
+            python3 tools/contradictions.py --open || true
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ---- the paid step: only reached when material is due AND a key exists ----
+      - name: Ask for validation decisions
+        if: steps.due.outputs.due == 'true' && steps.guard.outputs.enabled == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --allowedTools Bash,Read,Edit,Write,Glob,Grep
+          prompt: |
+            Run a validation pass over the material added since the last one.
+
+            1. `python3 tools/validation_due.py` to see the volume in question, and
+               `git diff` to see what actually changed in wiki/ since the recorded pass.
+            2. For each page whose substance is new or materially changed, propose a
+               validation decision in its frontmatter:
+                  validation: self        (the author stands behind it)
+                  validated_by: [name]
+                  validated_at: YYYY-MM-DD
+               Propose `self` only. You may NOT raise a page to `peer` or `collective` -
+               those require a second person, and a model awarding them would make the
+               whole hierarchy meaningless.
+            3. Where two pages now contradict each other, declare it on the newer page
+               with `contradicts: "Title"`. Do NOT resolve it: superseding or devaluing
+               is a human judgement. Leaving it open is the correct outcome.
+            4. Leave anything you are unsure about at `machine`. An unvalidated page is
+               honest; a wrongly-validated one is not.
+            5. Run `python3 tools/export.py --check`, `python3 tools/contradictions.py --check`
+               and `python3 tools/test_validation_weighting.py`. Do NOT commit, push, or
+               open a PR - the next step does that.
+
+      - name: Open the validation PR
+        if: steps.due.outputs.due == 'true' && steps.guard.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Nothing proposed this run - no PR."
+            exit 0
+          fi
+          # Record the pass at the commit it covered, so the next run measures from here.
+          python3 tools/validation_due.py --record
+          BRANCH="validation/$(date -u +%Y%m%d-%H%M%S)"
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "validation: pass over material added since the last run"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" \
+            "HEAD:refs/heads/${BRANCH}"
+          gh pr create --base main --head "$BRANCH" \
+            --title "Validation pass - $(date -u +%Y-%m-%d)" \
+            --body "Proposed validation decisions for material added since the last pass.
+
+          Only \`self\` is proposed here. \`peer\` and \`collective\` require a second
+          person and are never awarded by the model. Anything uncertain was left at
+          \`machine\` - an unvalidated page is honest.
+
+          Any contradictions found are **declared, not resolved**: choosing which side
+          supersedes or is devalued is a human judgement. Review each one before merging."
