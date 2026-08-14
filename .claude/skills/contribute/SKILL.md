@@ -53,7 +53,7 @@ that mirrors one person's wiki is not a commons.
    log and cross-references when the PR is reviewed. Do not edit the commons' index from
    this side.
 7. **Log it** — append `## [YYYY-MM-DD] contribute | <title> → YOUR-COMMONS#<pr>` to the
-   current month's log file.
+   day's log file (`wiki/log/YYYY-MM-DD.md`).
 
 ## What the tool guarantees (so you do not have to check by hand)
 
@@ -65,6 +65,28 @@ that mirrors one person's wiki is not a commons.
 | Links to private pages redacted | Including in `description` and other frontmatter strings |
 | Provenance stamped | `contributed_by`, `origin`, `origin_rev` — recorded, never invented |
 | Sensitive-term scan on the bundle | The commons is a wider audience than this repo |
+
+## If the commons already has the page
+
+The tool refuses, and that refusal is usually correct. **Nearly every page in a wiki seeded
+from the commons already exists there** — 577 of 595 when this was first measured — so
+contributing without checking would overwrite the commons' copy and silently lose whatever
+it had done since.
+
+When you hit it, there are only two honest answers:
+
+- **The commons copy is fine.** Reference it; do not re-contribute. If your version differs
+  because you *disagree*, say so on your page with `contradicts:` — that is a position, and
+  positions are kept, not overwritten.
+- **The commons copy is genuinely stale and yours should replace it.** Then say so
+  deliberately with `--update`, and **write in the PR body what changed and why**, because
+  the reviewer is now approving a replacement rather than an addition.
+
+`--update` is not the way past an inconvenient error. It is a claim that you have looked at
+the commons copy and it should go.
+
+*(If there is no cached commons graph the tool says it cannot check, rather than implying
+all-clear. Run the sync workflow to enable the check.)*
 
 ## Validation is re-based on the way across
 

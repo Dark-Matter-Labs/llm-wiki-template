@@ -108,9 +108,12 @@ def main():
               "frontmatter is rebuilt from a whitelist, never copied")
 
         # --- lying -----------------------------------------------------------
+        # Assert against the DERIVED origin, not a literal: origin now comes from the
+        # git remote, so a hardcoded name only passes in the one repo it was written in.
         check("provenance is stamped",
-              "contributed_by: tester" in text and "origin: YOUR-WIKI" in text
-              and "origin_rev: abc1234" in text)
+              "contributed_by: tester" in text and f"origin: {C.ORIGIN}" in text
+              and "origin_rev: abc1234" in text,
+              f"origin resolved to {C.ORIGIN!r}")
 
         def val_of(slug, page_slug=None):
             t = build([slug])["wiki/" + (page_slug or slug) + ".md"]
@@ -127,6 +130,39 @@ def main():
               val_of("self-page") == "self", f"got {val_of('self-page')}")
         check("machine stays machine",
               val_of("another-shared") == "machine", f"got {val_of('another-shared')}")
+
+        # --- collision with the commons ---------------------------------------
+        # 577 of 595 contributable pages already existed in the commons when this was
+        # found by rehearsing the loop. A silent overwrite would lose whatever the
+        # commons had done to its copy — the two-canons failure, at the moment of
+        # contribution, invisible in the staged bundle.
+        import json as _json
+        cache_dir = os.path.join(tmp, ".commons", "export")
+        os.makedirs(cache_dir, exist_ok=True)
+        with open(os.path.join(cache_dir, "wiki.shared.json"), "w", encoding="utf-8") as fh:
+            _json.dump({"nodes": [{"title": "A Shareable Concept"}]}, fh)
+        old_cwd = os.getcwd()
+        try:
+            os.chdir(tmp)
+            _t, hits = C.check_collisions("wiki", {"shareable"})
+            check("a page already in the commons is detected as a collision",
+                  len(hits) == 1 and hits[0][0] == "shareable", f"hits={hits}")
+            _t2, hits2 = C.check_collisions("wiki", {"another-shared"})
+            check("a page the commons does not have is not a collision",
+                  hits2 == [], f"hits={hits2}")
+        finally:
+            os.chdir(old_cwd)
+
+        # with no cache, it must say it cannot check rather than imply all-clear
+        old_cwd = os.getcwd()
+        try:
+            os.chdir(tempfile.mkdtemp())
+            os.makedirs("wiki", exist_ok=True)
+            t3, hits3 = C.check_collisions("wiki", set())
+            check("with no commons cache it reports unknown, not clear",
+                  t3 is None, f"titles={t3}")
+        finally:
+            os.chdir(old_cwd)
 
         # --- nothing escapes on its own --------------------------------------
         check("build_bundle writes nothing to disk by itself",

@@ -2,7 +2,7 @@
 """
 contribute.py — prepare a page for the shared commons, safely.
 
-The flow up from a personal wiki to `xco-team-wiki`. It is deliberately the same consent
+The flow up from a personal wiki to `YOUR-COMMONS`. It is deliberately the same consent
 loop as everything else: this script only ever writes a **staging bundle** to disk. It
 does not push, does not open a PR, and cannot reach the commons on its own.
 
@@ -39,6 +39,7 @@ Usage:
 """
 
 import argparse
+import json
 import os
 import subprocess
 import sys
@@ -51,7 +52,7 @@ DEFAULT_OUT = "contrib"
 
 # The commons this wiki contributes into. One constant, because a spoke belongs to one
 # commons; change it here if that ever stops being true.
-COMMONS = os.environ.get("WIKI_COMMONS", "xco-team-wiki")
+COMMONS = os.environ.get("WIKI_COMMONS", "YOUR-COMMONS")
 
 
 def _origin_repo():
@@ -75,6 +76,11 @@ ORIGIN = _origin_repo()
 # Whole areas that never travel, whatever their tier says.
 REFUSE_PATH_PREFIXES = ("crm/",)
 
+# The commons graph this spoke has cached, if the down-flow has run. Used to detect a
+# page that already exists there — see check_collisions().
+COMMONS_CACHE = [os.path.join(".commons", "export", "wiki.shared.json"),
+                 os.path.join(".commons", "export", "wiki.public.json")]
+
 # Validation levels are group-relative above `self`; see the module docstring.
 VALIDATION_REBASE = {"machine": "machine", "self": "self",
                      "peer": "self", "collective": "self"}
@@ -94,6 +100,39 @@ def eligible(slug, fm):
         return False, ("marked `private` — promote it to `internal` deliberately first, "
                        "which is a disclosure decision and belongs to a person")
     return True, f"{vis} — eligible"
+
+
+def commons_titles():
+    """Titles already in the commons, from the cached export. None if no cache."""
+    for path in COMMONS_CACHE:
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as fh:
+                d = json.load(fh)
+            nodes = d.get("nodes", {})
+            nodes = list(nodes.values()) if isinstance(nodes, dict) else nodes
+            return {n.get("title") for n in nodes if isinstance(n.get("title"), str)}
+    return None
+
+
+def check_collisions(wiki_dir, slugs):
+    """Titles among `slugs` that the commons already holds.
+
+    Contributing a page the commons already has OVERWRITES it — silently losing any
+    edit the commons made after it arrived, and dropping provenance the commons added.
+    That is the two-canons problem at the moment of contribution, and it is invisible
+    in the staged bundle: the file looks fine, it just replaces a different one.
+
+    Nearly every page in a seeded spoke collides, so this cannot be a warning nobody
+    reads. It refuses, and --update is the deliberate override.
+    """
+    theirs = commons_titles()
+    if theirs is None:
+        return None, []            # no cache; cannot check, say so rather than assume
+    hits = []
+    for slug, _p, fm, _b in export.discover(wiki_dir):
+        if slug in slugs and fm.get("title") in theirs:
+            hits.append((slug, fm.get("title")))
+    return theirs, hits
 
 
 def build_bundle(wiki_dir, slugs, contributed_by, rev):
@@ -151,6 +190,8 @@ def main(argv=None):
     ap.add_argument("--out", default=DEFAULT_OUT)
     ap.add_argument("--by", default=None, help="who is contributing (required to stage)")
     ap.add_argument("--list", action="store_true", help="show what is eligible")
+    ap.add_argument("--update", action="store_true",
+                    help="the page already exists in the commons and you mean to replace it")
     args = ap.parse_args(argv)
 
     if not os.path.isdir(args.wiki):
@@ -172,6 +213,29 @@ def main(argv=None):
         ap.error("give at least one slug, or --list")
     if not args.by:
         ap.error("--by is required: provenance is stamped, never invented")
+
+    # Refuse a silent overwrite before doing any work.
+    theirs, hits = check_collisions(args.wiki, set(args.slugs))
+    if theirs is None:
+        print("note: no cached commons graph (.commons/), so a page that already exists\n"
+              "      there cannot be detected. Run the 'Sync the commons' workflow to enable\n"
+              "      the check, or review the PR diff carefully.", file=sys.stderr)
+    elif hits and not args.update:
+        print("error: these pages ALREADY EXIST in the commons — contributing would "
+              "overwrite them:\n", file=sys.stderr)
+        for slug, title in hits:
+            print(f"         {slug}\n           -> {title!r}", file=sys.stderr)
+        print("\n       The commons may have edited its copy since. Overwriting loses that\n"
+              "       silently, which is the two-canons failure this federation exists to\n"
+              "       avoid.\n\n"
+              "       If the commons copy is stale and yours should replace it, say so\n"
+              "       deliberately:  --update  (the reviewer then sees the diff and decides).\n"
+              "       If not, reference the commons page instead of re-contributing it.",
+              file=sys.stderr)
+        return 1
+    elif hits:
+        print(f"warning: {len(hits)} page(s) already in the commons will be REPLACED. "
+              f"Say so in the PR body so the reviewer checks the diff.\n", file=sys.stderr)
 
     rev = git("rev-parse", "--short", "HEAD") or "unknown"
     if git("status", "--porcelain", "--", args.wiki):
@@ -202,7 +266,7 @@ def main(argv=None):
         return 1
 
     print(f"\n  {len(bundle)} page(s) staged in {args.out}/ at rev {rev}, contributed_by {args.by}.")
-    print("  Nothing has left this repo. Open a PR against the commons to propose them.")
+    print(f"  Nothing has left this repo. Open a PR against {COMMONS} to propose them.")
     return 0
 
 
