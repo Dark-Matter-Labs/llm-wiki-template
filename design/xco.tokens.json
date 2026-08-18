@@ -1,0 +1,329 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "$description": "xCO design tokens — the composed source of truth. Generated CSS lives at docs/assets/xco-tokens.css; never edit that file by hand.",
+  "$extensions": {
+    "org.xco": {
+      "version": "1.0.0",
+      "status": "active",
+      "date": "2026-08-14",
+      "supersedes": [
+        "xco.css / xco-dusk.css token blocks (v1)",
+        "xco2.css inline tokens (the thesis extraction)",
+        "xco-documentation-system v0.1 (Indy, draft)"
+      ],
+      "composedFrom": {
+        "architecture": "Indy's documentation system v0.1 — layered primitives/semantic/component, JSON as source of truth, governance metadata, semantic vs orientational colour kept apart, text markers primary with line style secondary.",
+        "palette": "Indy's v0.1, with four contrast repairs and a complete set of inverse-register variants that the draft did not carry.",
+        "typography": "Indy's v0.1 stacks and scale. No webfonts: the published site fetches nothing from a CDN.",
+        "space": "Indy's 4-based scale, which is more practical than the Fibonacci steps carried from v1 and quarantines its apparatus primitives explicitly.",
+        "shapeChannel": "New here. Indy's v0.1 requires that colour never carry meaning alone but does not say what the second channel is. Six meanings, six shapes, measured against the requirement.",
+        "registerModel": "New here. Resolves the disagreement between 'inverse is an authored register, not a dark-mode proxy' and honouring a reader's dark preference — see registerModel below."
+      },
+      "registerModel": {
+        "principle": "Register and theme are two different axes and were being conflated.",
+        "register": "AUTHORED. `paper` or `inverse`. A section-level rhetorical choice — inverse marks a move into the consequential, institutional, or terminal. The author sets it; the reader cannot.",
+        "theme": "ENVIRONMENTAL. light or dark. The reader's preference; the author cannot set it.",
+        "resolution": "Inverse means maximal contrast against the CURRENT ground, not a fixed dark colour. In a light theme the inverse register is a dark band in a light document. In a dark theme it is a light band in a dark document. The rhetorical move — the ground flips under you — survives in both, which is what 'not a dark-mode proxy' was protecting.",
+        "consequence": "A document keeps its authored score whichever theme the reader is in, and a reader's preference is never overridden by an authored choice."
+      },
+      "accessibilityContract": {
+        "enforcement": "tools/test_tokens.py — these are executable, not prose. CI fails on violation.",
+        "rules": [
+          "Text on its ground: >= 4.5:1.",
+          "Large text and essential graphical objects: >= 3:1.",
+          "Every meaning token has a text marker AND a shape; colour is never the sole carrier.",
+          "Every meaning and tint token resolves in BOTH registers and BOTH themes.",
+          "No token may reference a webfont or any external URL."
+        ],
+        "knownLimit": "Under deuteranopia, continuity and risk separate by only dE 4.1 — near-opposite meanings that are not tellable apart by hue. No re-hueing fixes this without abandoning the palette, so the shape channel and text marker are load-bearing rather than decorative. This is measured, not assumed."
+      }
+    }
+  },
+
+  "primitive": {
+    "color": {
+      "$type": "color",
+      "paper": {
+        "000": { "$value": "#fffffc", "$description": "Raised surface; cards and dossiers." },
+        "050": { "$value": "#f4f1e9", "$description": "Primary warm paper ground." },
+        "100": { "$value": "#e9e5dc", "$description": "Recessed surface, quiet division." },
+        "200": { "$value": "#d7d2c8", "$description": "Structural band and divider field." }
+      },
+      "ink": {
+        "950": { "$value": "#20201e", "$description": "Primary ink. 14.46:1 on paper.050." },
+        "800": { "$value": "#45443f", "$description": "Strong secondary ink." },
+        "650": { "$value": "#514f4b", "$description": "Secondary reading text. RE-SPACED from #6d6b65: the draft put secondary at 4.72 and muted at 4.04, so one was below the floor and the two were barely distinguishable. 6.50:1 on the darkest text surface." },
+        "500": { "$value": "#686661", "$description": "Muted metadata. REPAIRED from #77766e (4.04:1, below its own spec) and re-spaced against secondary. 4.56:1 on the darkest text surface." },
+        "300": { "$value": "#aaa69d", "$description": "Hairline rules. Decorative boundaries only: 2.15:1, so never an essential graphic." }
+      },
+      "dark": {
+        "900": { "$value": "#242421", "$description": "Inverse ground." },
+        "400": { "$value": "#c7c4bb", "$description": "Muted content on the inverse ground." },
+        "100": { "$value": "#f6f3eb", "$description": "Primary content on the inverse ground." }
+      },
+      "mint":  { "100": { "$value": "#ddf7eb" }, "300": { "$value": "#b9efd9" },
+                 "600": { "$value": "#4aaa85" }, "800": { "$value": "#267b61", "$description": "REPAIRED from #2c8f70 (3.53:1)." },
+                 "lift": { "$value": "#309b79", "$description": "Inverse-register foreground. New." } },
+      "blue":  { "100": { "$value": "#e3eff8" }, "300": { "$value": "#cbd5f0" },
+                 "600": { "$value": "#7285bd" }, "800": { "$value": "#50649f", "$description": "REPAIRED from #566caa, which fell to 4.05:1 on surface.quiet." },
+                 "lift": { "$value": "#8292c0", "$description": "Inverse-register foreground. New." } },
+      "pink":  { "100": { "$value": "#f8e2e8" }, "300": { "$value": "#f0cce1" },
+                 "600": { "$value": "#bd789a" }, "800": { "$value": "#a0567e", "$description": "REPAIRED from #a55882 (4.31:1)." },
+                 "lift": { "$value": "#b67799", "$description": "Inverse-register foreground. New." } },
+      "ochre": { "100": { "$value": "#f8efcf" }, "300": { "$value": "#e7c982" },
+                 "600": { "$value": "#ac8330" }, "800": { "$value": "#8e6713", "$description": "REPAIRED from #936b14 (4.27:1)." },
+                 "lift": { "$value": "#b28218", "$description": "Inverse-register foreground. New." } },
+      "lilac": { "100": { "$value": "#ede9fa" }, "300": { "$value": "#cbc4ed" },
+                 "600": { "$value": "#6859a8" }, "800": { "$value": "#41376d" },
+                 "lift": { "$value": "#8e82c0", "$description": "Inverse-register foreground. New." } },
+      "red":   { "100": { "$value": "#f9e1de" }, "700": { "$value": "#9b352e" },
+                 "900": { "$value": "#60221e" },
+                 "lift": { "$value": "#d47a74", "$description": "Inverse-register foreground. New." } }
+    },
+
+    "font": {
+      "family": {
+        "$type": "fontFamily",
+        "serif": { "$value": ["Iowan Old Style", "Palatino Linotype", "Palatino", "Baskerville", "Georgia", "serif"],
+                   "$description": "Editorial serif. Iowan on macOS, Palatino on Windows, Georgia everywhere — no webfont, no CDN, no loading state." },
+        "sans":  { "$value": ["Inter", "ui-sans-serif", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"] },
+        "mono":  { "$value": ["SFMono-Regular", "Consolas", "Liberation Mono", "Courier New", "monospace"] }
+      },
+      "weight":     { "$type": "fontWeight", "regular": { "$value": 400 }, "medium": { "$value": 500 } },
+      "size":       { "$type": "dimension",
+                      "075": { "$value": "12px" }, "100": { "$value": "14px" }, "200": { "$value": "16px" },
+                      "300": { "$value": "18px" }, "400": { "$value": "21px" }, "500": { "$value": "25px" },
+                      "600": { "$value": "32px" }, "700": { "$value": "42px" }, "800": { "$value": "56px" },
+                      "900": { "$value": "76px" }, "1000": { "$value": "104px" } },
+      "lineHeight": { "$type": "number", "tight": { "$value": 0.94 }, "display": { "$value": 1.02 },
+                      "heading": { "$value": 1.12 }, "body": { "$value": 1.58 }, "relaxed": { "$value": 1.72 } },
+      "tracking":   { "$type": "dimension", "tight": { "$value": "-0.025rem" },
+                      "normal": { "$value": "0rem" }, "label": { "$value": "0.08rem" } }
+    },
+
+    "space": {
+      "$type": "dimension",
+      "$description": "Public compositional scale. The apparatus primitives 025/075/250/500/1000/2400 exist for hairlines and compact insets and are NOT a second scale.",
+      "000": { "$value": "0px" },  "025": { "$value": "2px" },  "050": { "$value": "4px" },
+      "075": { "$value": "6px" },  "100": { "$value": "8px" },  "150": { "$value": "12px" },
+      "200": { "$value": "16px" }, "250": { "$value": "20px" }, "300": { "$value": "24px" },
+      "400": { "$value": "32px" }, "500": { "$value": "40px" }, "600": { "$value": "48px" },
+      "800": { "$value": "64px" }, "1000": { "$value": "80px" }, "1200": { "$value": "96px" },
+      "1600": { "$value": "128px" }, "2400": { "$value": "192px" }
+    },
+
+    "size": {
+      "$type": "dimension",
+      "proseNarrow": { "$value": "620px" }, "prose": { "$value": "760px" },
+      "proseWide": { "$value": "900px" }, "field": { "$value": "1120px" },
+      "canvas": { "$value": "1440px" }, "hitTarget": { "$value": "44px" },
+      "header": { "$value": "64px" }, "marginNote": { "$value": "240px" }
+    },
+    "radius": { "$type": "dimension", "none": { "$value": "0px" }, "tight": { "$value": "4px" },
+                "small": { "$value": "8px" }, "medium": { "$value": "12px" },
+                "large": { "$value": "22px" }, "pill": { "$value": "999px" } },
+    "stroke": { "$type": "dimension", "hairline": { "$value": "1px" },
+                "emphasis": { "$value": "2px" }, "focus": { "$value": "3px" } },
+    "duration": { "$type": "duration", "instant": { "$value": "1ms" }, "fast": { "$value": "160ms" },
+                  "standard": { "$value": "240ms" }, "deliberate": { "$value": "420ms" },
+                  "enunciation": { "$value": "900ms" }, "hold": { "$value": "1600ms" } },
+    "easing": { "$type": "cubicBezier", "standard": { "$value": "cubic-bezier(0.2, 0, 0, 1)" },
+                "enter": { "$value": "cubic-bezier(0.16, 1, 0.3, 1)" },
+                "exit": { "$value": "cubic-bezier(0.4, 0, 1, 1)" },
+                "linear": { "$value": "linear" } },
+    "breakpoint": { "$type": "dimension", "compact": { "$value": "620px" }, "narrow": { "$value": "920px" },
+                    "wide": { "$value": "1240px" }, "canvas": { "$value": "1440px" } }
+  },
+
+  "semantic": {
+    "surface": {
+      "$type": "color",
+      "page":       { "$value": "{primitive.color.paper.050}" },
+      "raised":     { "$value": "{primitive.color.paper.000}" },
+      "quiet":      { "$value": "{primitive.color.paper.100}" },
+      "structural": { "$value": "{primitive.color.paper.200}", "$description": "Divider band and disabled field. NOT a text surface — active text must sit on page, raised or quiet, which are the only three the contrast contract checks." }
+    },
+    "text": {
+      "$type": "color",
+      "primary":   { "$value": "{primitive.color.ink.950}" },
+      "secondary": { "$value": "{primitive.color.ink.650}" },
+      "muted":     { "$value": "{primitive.color.ink.500}" },
+      "link":      { "$value": "{primitive.color.blue.800}" },
+      "critical":  { "$value": "{primitive.color.red.900}" }
+    },
+    "border": {
+      "$type": "color",
+      "subtle":  { "$value": "{primitive.color.paper.200}", "$description": "Decorative only — 1.33:1." },
+      "default": { "$value": "{primitive.color.ink.300}",   "$description": "Decorative only — 2.15:1. An essential boundary must use border.strong." },
+      "strong":  { "$value": "{primitive.color.ink.650}",   "$description": "4.72:1 — the only border token valid for an essential graphic." },
+      "focus":   { "$value": "{primitive.color.blue.600}",  "$description": "3.20:1." }
+    },
+    "orientation": {
+      "$type": "color",
+      "$description": "Navigation and family only. Carries NO epistemic rank. Used as a wash with ink on top, never as a mark that must be seen against the page.",
+      "mint":  { "$value": "{primitive.color.mint.300}" },
+      "pink":  { "$value": "{primitive.color.pink.300}" },
+      "lilac": { "$value": "{primitive.color.lilac.300}" },
+      "blue":  { "$value": "{primitive.color.blue.300}" },
+      "ochre": { "$value": "{primitive.color.ochre.300}" }
+    },
+    "meaning": {
+      "$type": "color",
+      "$description": "Declared semantic signal. Every one of these MUST ship with its text marker and its shape — see component.meaning. Measured limit: continuity and risk are dE 4.1 apart under deuteranopia.",
+      "continuity": { "$value": "{primitive.color.mint.800}" },
+      "system":     { "$value": "{primitive.color.blue.800}" },
+      "risk":       { "$value": "{primitive.color.pink.800}" },
+      "agency":     { "$value": "{primitive.color.ochre.800}" },
+      "contested":  { "$value": "{primitive.color.lilac.800}" },
+      "critical":   { "$value": "{primitive.color.red.900}" }
+    },
+    "tint": {
+      "$type": "color",
+      "$description": "Ground for a meaning. Ink sits on these at >= 9.8:1.",
+      "continuity": { "$value": "{primitive.color.mint.300}" },
+      "system":     { "$value": "{primitive.color.blue.300}" },
+      "risk":       { "$value": "{primitive.color.pink.300}" },
+      "agency":     { "$value": "{primitive.color.ochre.300}" },
+      "contested":  { "$value": "{primitive.color.lilac.300}" },
+      "critical":   { "$value": "{primitive.color.red.100}" }
+    },
+    "measure": {
+      "$type": "dimension",
+      "prose":  { "$value": "{primitive.size.prose}" },
+      "lead":   { "$value": "{primitive.size.proseWide}" },
+      "field":  { "$value": "{primitive.size.field}" },
+      "canvas": { "$value": "{primitive.size.canvas}" },
+      "marginNote": { "$value": "{primitive.size.marginNote}" }
+    },
+    "motion": {
+      "duration": { "$type": "duration",
+        "interaction":  { "$value": "{primitive.duration.fast}" },
+        "stateChange":  { "$value": "{primitive.duration.standard}" },
+        "semanticOpen": { "$value": "{primitive.duration.deliberate}" },
+        "enunciation":  { "$value": "{primitive.duration.enunciation}" },
+        "hold":         { "$value": "{primitive.duration.hold}" },
+        "reduced":      { "$value": "{primitive.duration.instant}" } },
+      "easing": { "$type": "cubicBezier",
+        "default": { "$value": "{primitive.easing.standard}" },
+        "enter":   { "$value": "{primitive.easing.enter}" },
+        "exit":    { "$value": "{primitive.easing.exit}" } }
+    }
+  },
+
+  "component": {
+    "meaning": {
+      "$description": "The second channel. Indy's v0.1 requires that colour never carry meaning alone; this is what carries it. Shape encodes the relationship, not an arbitrary lookup: risk and critical share a family because critical is risk realised, and fill is the escalation.",
+      "continuity": { "marker": { "$value": "CONTINUITY" }, "shape": { "$value": "ring" },
+                      "$description": "An unbroken form — sustaining, ongoing." },
+      "system":     { "marker": { "$value": "SYSTEM" },     "shape": { "$value": "square" },
+                      "$description": "The most stable form — structure, frame, standing." },
+      "risk":       { "marker": { "$value": "RISK" },       "shape": { "$value": "triangle" },
+                      "$description": "Hollow triangle — a tendency, not yet realised." },
+      "critical":   { "marker": { "$value": "CRITICAL" },   "shape": { "$value": "triangle-filled" },
+                      "$description": "The same family, filled — risk realised." },
+      "agency":     { "marker": { "$value": "AGENCY" },     "shape": { "$value": "diamond" },
+                      "$description": "Standing on a point — a pivot or threshold." },
+      "contested":  { "marker": { "$value": "CONTESTED" },  "shape": { "$value": "half" },
+                      "$description": "A divided form — two readings of one thing." }
+    },
+    "epistemicStanding": {
+      "$description": "Text marker is primary; line cue is a redundant second channel. Carried from Indy's v0.1 unchanged.",
+      "observed":  { "marker": { "$value": "OBSERVED" },  "lineCue": { "$value": "solid" } },
+      "reported":  { "marker": { "$value": "REPORTED" },  "lineCue": { "$value": "dashed" } },
+      "inferred":  { "marker": { "$value": "INFERRED" },  "lineCue": { "$value": "dotted" } },
+      "alleged":   { "marker": { "$value": "ALLEGED" },   "lineCue": { "$value": "dashed" } },
+      "diagnosed": { "marker": { "$value": "DIAGNOSED" }, "lineCue": { "$value": "solid" } },
+      "judged":    { "marker": { "$value": "JUDGED" },    "lineCue": { "$value": "double" } },
+      "evaluated": { "marker": { "$value": "EVALUATED" }, "lineCue": { "$value": "solid" } },
+      "contested": { "marker": { "$value": "CONTESTED" }, "lineCue": { "$value": "dotted" } },
+      "unknown":   { "marker": { "$value": "UNKNOWN" },   "lineCue": { "$value": "dotted" } }
+    },
+    "claimType": {
+      "descriptive":  { "marker": { "$value": "DESCRIPTIVE" } },
+      "causal":       { "marker": { "$value": "CAUSAL" } },
+      "predictive":   { "marker": { "$value": "PREDICTIVE" } },
+      "normative":    { "marker": { "$value": "NORMATIVE" } },
+      "definitional": { "marker": { "$value": "DEFINITIONAL" } },
+      "procedural":   { "marker": { "$value": "PROCEDURAL" } }
+    }
+  },
+
+  "domain": {
+    "$description": "The four domains of the world from the computational identity code thesis — biophysical, institutional, technological, cultural. These are ORIENTATIONAL, not semantic: they say which part of the world a mark is about, and carry no epistemic rank. Keeping them here rather than in semantic.meaning is what stops the system having two competing colour taxonomies. Every value passes 3:1 on both grounds and each carries a shape, measured in the v2 extraction.",
+    "bio": {
+      "base":   { "$type": "color", "$value": "#d56c53" },
+      "ink":    { "$type": "color", "$value": "#b74b32" },
+      "tint":   { "$type": "color", "$value": "#efd1c8" },
+      "shape":  { "$value": "circle" },
+      "marker": { "$value": "BIOPHYSICAL" }
+    },
+    "inst": {
+      "base":   { "$type": "color", "$value": "#1f9a91" },
+      "ink":    { "$type": "color", "$value": "#437670" },
+      "tint":   { "$type": "color", "$value": "#c8dfda" },
+      "shape":  { "$value": "square" },
+      "marker": { "$value": "INSTITUTIONAL" }
+    },
+    "tech": {
+      "base":   { "$type": "color", "$value": "#7375b7" },
+      "ink":    { "$type": "color", "$value": "#6566ae" },
+      "tint":   { "$type": "color", "$value": "#d1d0e7" },
+      "shape":  { "$value": "triangle" },
+      "marker": { "$value": "TECHNOLOGICAL" }
+    },
+    "culture": {
+      "base":   { "$type": "color", "$value": "#cd6a95" },
+      "ink":    { "$type": "color", "$value": "#ac4c78" },
+      "tint":   { "$type": "color", "$value": "#ecd0dc" },
+      "shape":  { "$value": "diamond" },
+      "marker": { "$value": "CULTURAL" }
+    }
+  },
+
+  "register": {
+    "$description": "Authored, not environmental. Values below are the INVERSE register's overrides; the paper register is the semantic layer above. Each register resolves in both themes — see $extensions.org.xco.registerModel.",
+    "inverse": {
+      "surface": {
+        "$type": "color",
+        "page":       { "$value": "{primitive.color.dark.900}" },
+        "raised":     { "$value": "#2c2c28" },
+        "quiet":      { "$value": "#1c1c1a" },
+        "structural": { "$value": "#3a3a35" }
+      },
+      "text": {
+        "$type": "color",
+        "primary":   { "$value": "{primitive.color.dark.100}" },
+        "secondary": { "$value": "{primitive.color.dark.400}" },
+        "muted":     { "$value": "#9d9a92" },
+        "link":      { "$value": "{primitive.color.blue.lift}" },
+        "critical":  { "$value": "{primitive.color.red.lift}" }
+      },
+      "border": {
+        "$type": "color",
+        "subtle":  { "$value": "#3a3a35" },
+        "default": { "$value": "#55554e" },
+        "strong":  { "$value": "{primitive.color.dark.400}" },
+        "focus":   { "$value": "{primitive.color.blue.lift}" }
+      },
+      "meaning": {
+        "$type": "color",
+        "$description": "The gap in v0.1: the draft remapped surface and text for the inverse register but not the semantic colours, so all six landed between 1.29:1 and 3.91:1 on the inverse ground — in the register where consequence is actually marked.",
+        "continuity": { "$value": "{primitive.color.mint.lift}" },
+        "system":     { "$value": "{primitive.color.blue.lift}" },
+        "risk":       { "$value": "{primitive.color.pink.lift}" },
+        "agency":     { "$value": "{primitive.color.ochre.lift}" },
+        "contested":  { "$value": "{primitive.color.lilac.lift}" },
+        "critical":   { "$value": "{primitive.color.red.lift}" }
+      },
+      "tint": {
+        "$type": "color",
+        "continuity": { "$value": "#1d5e4a" },
+        "system":     { "$value": "#3c4d78" },
+        "risk":       { "$value": "#743e5b" },
+        "agency":     { "$value": "#66490e" },
+        "contested":  { "$value": "#332c56" },
+        "critical":   { "$value": "#4a1a17" }
+      }
+    }
+  }
+}

@@ -79,8 +79,19 @@ def audit_page(path):
         out.append((SEV_WARN, "multiple-h1", f"{s.count('<h1')} h1 elements"))
     if s.count("<main") > 1:
         out.append((SEV_ERROR, "multiple-main", f"{s.count('<main')} main landmarks — invalid"))
-    if 'class="skip-link"' in s and 'id="main"' not in s:
-        out.append((SEV_ERROR, "skip-target-missing", "skip link has no target"))
+    # Resolve the skip link's ACTUAL href rather than assuming it points at #main.
+    # A page is free to name its landmark anything; what matters is that the target
+    # exists. Hardcoding the id reported a working skip link on a perfectly good page
+    # as broken, which would have blocked its deploy.
+    m = re.search(r'class="skip-link"[^>]*href="#([^"]+)"', s) or \
+        re.search(r'href="#([^"]+)"[^>]*class="skip-link"', s)
+    if m:
+        target = m.group(1)
+        if not re.search(rf'id="{re.escape(target)}"', s):
+            out.append((SEV_ERROR, "skip-target-missing",
+                        f'skip link points at #{target}, which no element has'))
+    elif 'class="skip-link"' in s:
+        out.append((SEV_ERROR, "skip-target-missing", "skip link has no href"))
     if re.search(r"<table", s) and "scope=" not in s:
         out.append((SEV_WARN, "table-no-scope", "table without th scope"))
     if 'target="_blank"' in s:

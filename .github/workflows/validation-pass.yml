@@ -30,6 +30,11 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
+      - name: House rules — civilization with a z, xCO with a lowercase x
+        # From xco-style-guide#11. Skips raw/, generated exports, blockquotes,
+        # slugs and paths — see tools/house_rules.py. No untrusted input.
+        run: python3 tools/house_rules.py --check
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
