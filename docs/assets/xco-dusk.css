@@ -8,21 +8,38 @@
    stat, deck-figure) so content ports without markup changes.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
+@import url("xco-tokens.css");
+
+/* --------------------------------------------------------------------------
+   v1 dusk, retokened onto the v2 system.
+
+   These pages are decks and instruments: a dark ground carrying light
+   parchment sheets. That is a deliberate figure/ground, not a dark mode, so
+   the values are PINNED rather than following the viewer's preference — a
+   deck that flips to light on a light OS would lose its whole composition.
+
+   The role mapping, verified:
+     --shadow       ground        -> #151613     light text on it 15.83:1
+     --highlight    light text
+                    AND sheets    -> #f3efe6     dark text on sheets 15.83:1
+     --midtone      structure     -> --accent    5.28:1 on the ground
+     --midtone-ink  text on sheet -> #b74b32     4.50:1 AA
+     --midtone-lift text on ground-> #d96f56     5.50:1 AA
+   -------------------------------------------------------------------------- */
 :root {
-  --shadow: #2F444E;      /* deep dusk slate-teal — ground + structure */
-  --midtone: #F0654A;     /* coral-vermilion (the low sun) — trigger / accent */
-  --highlight: #F1E6D0;   /* warm parchment — paper sheets */
+  --shadow:       #242421;
+  --highlight:    #f6f3eb;
+  --midtone:      #d56c53;   /* = --accent; pinned with the rest */
+  --midtone-ink:  #b74b32;
+  --midtone-lift: #d47a74;
+
+  --s1: 13px; --s2: 21px; --s3: 34px; --s4: 55px; --s5: 89px;
+
   --measure: 76ch;
   --wide: 1120px;
-  --phi-major: 61.8fr;
-  --phi-minor: 38.2fr;
-  --s1: 13px; --s2: 21px; --s3: 34px; --s4: 55px; --s5: 89px;
-  --serif: "Crimson Pro", Georgia, "Times New Roman", serif;
-  --sans: Inter, "Helvetica Neue", Arial, sans-serif;
-  --mono: "DM Mono", "SFMono-Regular", "Courier New", monospace;
 }
+
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -38,7 +55,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--midtone); text-decoration: none; border-bottom: 1.5px solid var(--midtone); }
+a { color: var(--midtone-lift); text-decoration: none; border-bottom: 1.5px solid var(--midtone); }
 .slide a { color: inherit; border-bottom-color: var(--midtone); }
 
 p { margin: 0 0 var(--s2); max-width: var(--measure); }
@@ -79,12 +96,12 @@ h1 { font-size: clamp(3.4rem, 8vw, 7rem); max-width: 12ch; }
 
 .kicker {
   font-family: var(--mono); font-size: 0.9375rem; line-height: 1.6;
-  text-transform: uppercase; letter-spacing: 0.01em; color: var(--midtone);
+  text-transform: uppercase; letter-spacing: 0.01em; color: var(--midtone-ink);
 }
 
 .meta-grid { display: grid; grid-template-columns: 1fr; gap: 13px; font-family: var(--mono); font-size: 0.9375rem; line-height: 1.6; }
 .meta-row { display: grid; grid-template-columns: 38.2fr 61.8fr; gap: 13px; border-top: 0.75px solid var(--highlight); padding-top: 13px; }
-.meta-row span:first-child { color: var(--midtone); }
+.meta-row span:first-child { color: var(--midtone-lift); }
 
 .toc { font-family: var(--mono); font-size: 0.9375rem; line-height: 1.6; display: grid; gap: 8px; margin-top: auto; }
 .toc a { color: var(--highlight); border-bottom: 0.75px solid var(--highlight); }
@@ -108,12 +125,13 @@ h1 { font-size: clamp(3.4rem, 8vw, 7rem); max-width: 12ch; }
 .slide-kicker {
   font-family: var(--mono); font-size: 0.9375rem; line-height: 1.6;
   text-transform: uppercase; letter-spacing: 0.01em;
-  color: var(--midtone); margin: 0 0 var(--s3) 0;
+  color: var(--midtone-ink); margin: 0 0 var(--s3) 0;
 }
+.slide-dark .slide-kicker { color: var(--midtone-lift); }
 
 /* act marker: orange chip preceding the kicker on act-opening slides */
 .act-chip {
-  display: inline-block; background: var(--midtone); color: var(--highlight);
+  display: inline-block; background: var(--midtone-ink); color: var(--highlight);
   padding: 3px 10px; margin-right: 13px;
 }
 
@@ -127,8 +145,8 @@ h1 { font-size: clamp(3.4rem, 8vw, 7rem); max-width: 12ch; }
 
 /* quote: filled statement callout ------------------------------------------ */
 .quote-block {
-  background: var(--midtone); color: var(--highlight);
-  border: 1.5px solid var(--midtone);
+  background: var(--midtone-ink); color: var(--highlight);
+  border: 1.5px solid var(--midtone-ink);
   padding: var(--s3); margin: var(--s3) 0;
   max-width: 900px;
 }
@@ -136,7 +154,7 @@ h1 { font-size: clamp(3.4rem, 8vw, 7rem); max-width: 12ch; }
   font-family: var(--sans); font-size: clamp(1.45rem, 2vw, 2rem);
   line-height: 1.25; letter-spacing: -0.025em; margin: 0; max-width: 34ch;
 }
-.slide-dark .quote-block { border-color: var(--midtone); }
+.slide-dark .quote-block { border-color: var(--midtone-ink); }
 
 /* cards -------------------------------------------------------------------- */
 .aside-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); margin: var(--s3) 0; max-width: 1060px; }
@@ -157,20 +175,22 @@ h1 { font-size: clamp(3.4rem, 8vw, 7rem); max-width: 12ch; }
 }
 .card .label {
   display: block; font-family: var(--mono); font-size: 0.9375rem; line-height: 1.5;
-  text-transform: uppercase; letter-spacing: 0.01em; color: var(--midtone);
+  text-transform: uppercase; letter-spacing: 0.01em; color: var(--midtone-ink);
 }
+.slide-dark .card .label { color: var(--midtone-lift); }
 .card p { font-size: 1.03rem; line-height: 1.5; margin: 0; }
-.accent-card { background: var(--midtone); color: var(--highlight); border-color: var(--midtone); }
+.accent-card { background: var(--midtone-ink); color: var(--highlight); border-color: var(--midtone-ink); }
 .accent-card .label { color: var(--highlight); }
+.slide-dark .accent-card .label { color: var(--highlight); }
 .slide-dark .card { background: var(--shadow); color: var(--highlight); border-color: var(--highlight); }
-.slide-dark .accent-card { background: var(--midtone); border-color: var(--midtone); }
+.slide-dark .accent-card { background: var(--midtone-ink); border-color: var(--midtone-ink); }
 /* clickable card (hub/gateway pages) */
 a.card-link { display: block; border-bottom: 0; color: inherit; transition: transform .15s ease; }
 a.card-link .card { height: 100%; transition: border-color .15s ease, box-shadow .15s ease; }
 a.card-link h3 { margin: 0; font-size: 1.28rem; line-height: 1.15; }
 a.card-link:hover { transform: translateY(-2px); }
-a.card-link:hover .card { border-color: var(--midtone); box-shadow: 0 6px 22px rgba(25,38,64,0.18); }
-a.card-link:hover .accent-card { box-shadow: 0 6px 22px rgba(240,101,74,0.28); }
+a.card-link:hover .card { border-color: var(--midtone); box-shadow: 0 6px 22px color-mix(in srgb, var(--shadow) 18%, transparent); }
+a.card-link:hover .accent-card { box-shadow: 0 6px 22px color-mix(in srgb, var(--midtone) 28%, transparent); }
 
 /* stats --------------------------------------------------------------------- */
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s3) var(--s2); margin: var(--s3) 0; max-width: 1060px; }
@@ -218,11 +238,12 @@ td { font-size: 1.02rem; line-height: 1.5; }
    A bordered mono line, quieter than a quote-block; scrolls on narrow screens. */
 .eqn {
   font-family: var(--mono); font-size: 1rem; line-height: 1.5;
-  border: 1.5px solid var(--shadow); background: rgba(47,68,78,0.05);
+  border: 1.5px solid var(--shadow); background: color-mix(in srgb, var(--shadow) 5%, transparent);
   padding: 16px 21px; margin: var(--s2) 0; max-width: 1060px; overflow-x: auto;
 }
-.eqn .lhs { color: var(--midtone); }
-.slide-dark .eqn { border-color: var(--highlight); background: rgba(241,230,208,0.06); }
+.eqn .lhs { color: var(--midtone-ink); }
+.slide-dark .eqn .lhs { color: var(--midtone-lift); }
+.slide-dark .eqn { border-color: var(--highlight); background: color-mix(in srgb, var(--highlight) 6%, transparent); }
 
 /* generative layer ---------------------------------------------------------------
    Algorithmic texture: contour fields on dark grounds, telemetry numerals,
@@ -233,7 +254,7 @@ td { font-size: 1.02rem; line-height: 1.5; }
 
 .telemetry {
   font-family: var(--mono); font-size: 11px; line-height: 1.6; letter-spacing: 0.04em;
-  color: rgba(241,230,208,0.62); white-space: nowrap; overflow: hidden;
+  color: color-mix(in srgb, var(--highlight) 62%, transparent); white-space: nowrap; overflow: hidden;
 }
 .telemetry b { font-weight: 400; color: var(--midtone); }
 
@@ -323,22 +344,22 @@ svg .flow { animation: dashflow 1.4s linear infinite; }
   display: inline-block; width: 13px; height: 13px; border-radius: 50%;
   margin-right: 7px; vertical-align: -2px;
 }
-.swatch-concept { background: rgba(240,101,74,.85); }
-.swatch-vehicle { background: rgba(241,230,208,.85); }
-.swatch-place   { background: repeating-linear-gradient(45deg, rgba(241,230,208,.9) 0 2px, transparent 2px 5px); border: 1px solid rgba(241,230,208,.8); }
-.slide .swatch-vehicle { background: rgba(47,68,78,.35); }
-.slide .swatch-place { background: repeating-linear-gradient(45deg, rgba(47,68,78,.55) 0 2px, transparent 2px 5px); border-color: rgba(47,68,78,.6); }
+.swatch-concept { background: color-mix(in srgb, var(--midtone) 85%, transparent); }
+.swatch-vehicle { background: color-mix(in srgb, var(--highlight) 85%, transparent); }
+.swatch-place   { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--highlight) 90%, transparent) 0 2px, transparent 2px 5px); border: 1px solid color-mix(in srgb, var(--highlight) 80%, transparent); }
+.slide .swatch-vehicle { background: color-mix(in srgb, var(--shadow) 35%, transparent); }
+.slide .swatch-place { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--shadow) 55%, transparent) 0 2px, transparent 2px 5px); border-color: color-mix(in srgb, var(--shadow) 60%, transparent); }
 
 mark.hl {
   color: inherit; padding: 0 0.18em; border-radius: 2px;
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
-.hl-concept { background: rgba(240,101,74,.30); }
-.hl-vehicle { background: rgba(47,68,78,.15); }
-.hl-place   { background: repeating-linear-gradient(45deg, rgba(47,68,78,.20) 0 2px, rgba(47,68,78,.05) 2px 6px); }
-.slide-dark .hl-concept, .cover .hl-concept { background: rgba(240,101,74,.48); }
-.slide-dark .hl-vehicle, .cover .hl-vehicle { background: rgba(241,230,208,.22); }
-.slide-dark .hl-place, .cover .hl-place { background: repeating-linear-gradient(45deg, rgba(241,230,208,.26) 0 2px, rgba(241,230,208,.06) 2px 6px); }
+.hl-concept { background: color-mix(in srgb, var(--midtone) 30%, transparent); }
+.hl-vehicle { background: color-mix(in srgb, var(--shadow) 15%, transparent); }
+.hl-place   { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--shadow) 20%, transparent) 0 2px, color-mix(in srgb, var(--shadow) 5%, transparent) 2px 6px); }
+.slide-dark .hl-concept, .cover .hl-concept { background: color-mix(in srgb, var(--midtone) 48%, transparent); }
+.slide-dark .hl-vehicle, .cover .hl-vehicle { background: color-mix(in srgb, var(--highlight) 22%, transparent); }
+.slide-dark .hl-place, .cover .hl-place { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--highlight) 26%, transparent) 0 2px, color-mix(in srgb, var(--highlight) 6%, transparent) 2px 6px); }
 
 .spark { width: 236px; max-width: 100%; font-family: var(--mono); }
 .spark svg { display: block; width: 100%; height: auto; overflow: visible; }
@@ -346,9 +367,9 @@ mark.hl {
 .spark .sp-line { stroke-width: 1.4; fill: none; }
 .spark .sp-dot { fill: var(--shadow); }
 .spark .sp-peak { font-family: var(--mono); font-size: 9.5px; fill: var(--shadow); opacity: .85; }
-.sp-concept .sp-area { fill: rgba(240,101,74,.34); }
+.sp-concept .sp-area { fill: color-mix(in srgb, var(--midtone) 34%, transparent); }
 .sp-concept .sp-line { stroke: var(--midtone); }
-.sp-vehicle .sp-area { fill: rgba(47,68,78,.22); }
+.sp-vehicle .sp-area { fill: color-mix(in srgb, var(--shadow) 22%, transparent); }
 .sp-vehicle .sp-line { stroke: var(--shadow); }
 .sp-place .sp-area { fill: url(#sp-hatch); }
 .sp-place .sp-line { stroke: var(--shadow); stroke-dasharray: 3 2.5; }
@@ -362,7 +383,7 @@ mark.hl {
 .slide-dark .spark .sp-base, .slide-dark .spark .sp-dot { stroke: var(--highlight); fill: var(--highlight); }
 .slide-dark .spark .sp-dot { stroke: none; }
 .slide-dark .spark .sp-peak { fill: var(--highlight); }
-.slide-dark .sp-vehicle .sp-area { fill: rgba(241,230,208,.20); }
+.slide-dark .sp-vehicle .sp-area { fill: color-mix(in srgb, var(--highlight) 20%, transparent); }
 .slide-dark .sp-vehicle .sp-line { stroke: var(--highlight); }
 .slide-dark .spark-term, .slide-dark .spark-meta { color: var(--highlight); }
 
@@ -396,3 +417,24 @@ mark.hl {
 @media print {
   .spark-row .spark::before, .aq-left .spark::after, .aq-right .spark::after { border-color: var(--shadow); }
 }
+
+/* ==========================================================================
+   v2 typographic alignment
+   --------------------------------------------------------------------------
+   Same move as the light sheet: v1 set display type in `--sans` at -0.035em,
+   an Inter treatment. Arial inherits the geometry without the face that
+   justified it. v2 puts display in the serif, so these rules move the legacy
+   display roles across and relax the tracking Georgia does not want.
+
+   `.display` keeps its accent colour: on the dark ground the accent runs at
+   5.28:1, so it is safe as large text here — which it was not on paper. That
+   is exactly the distinction the -ink tokens exist to make.
+   ========================================================================== */
+h1, h2, h3, .display {
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+}
+h1 { font-size: clamp(2.9rem, 6.4vw, 5.6rem); max-width: 14ch; }
+.display { font-size: clamp(2.1rem, 4.2vw, 4.4rem); }

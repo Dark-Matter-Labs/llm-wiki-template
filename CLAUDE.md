@@ -247,6 +247,24 @@ If intent is ambiguous, ask **one** short clarifying question, then proceed.
 
 ## Hard rules
 
+### The two house rules (xco-style-guide#11)
+
+These are orthographic and non-negotiable, so they come before everything else:
+
+1. **Always spell civilization with a z**, never an s.
+2. **Always write xCO** — lowercase x, uppercase CO.
+
+Rule 1 is a deliberate exception to the rest of the house's British spelling: *optionality*,
+*manoeuvre* and *organising* keep their s; *civilization* does not. That is precisely the kind
+of rule nobody remembers, so it is checked rather than trusted — run
+`python3 tools/house_rules.py` (or `--fix`). It runs in CI.
+
+Neither rule touches `raw/`, which is immutable: a source that says "civilisation" said that,
+and correcting it would falsify the record. Verbatim blockquotes are left alone for the same
+reason — they are someone else's words. Slugs, paths, domains, handles and CSS variables stay
+lowercase (`xco-style-guide`, `docs/xco.md`, `--xco-tokens`); only prose is corrected. A file
+that must be exempt can carry the marker `house-rules: ignore-file`.
+
 - **Respect `visibility` at every boundary.** Content marked `private` never appears in
   exports, in PR descriptions of public repos, in published web pages, or in any external
   channel — not its body, its title, or links pointing to it. When in doubt, treat as private.

@@ -6,36 +6,48 @@
    (13 / 21 / 34 / 55 / 89), navy + orange, Crimson Pro / Inter / DM Mono.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
+@import url("xco-tokens.css");
+
+/* --------------------------------------------------------------------------
+   v1 light, retokened onto the v2 system.
+
+   The component rules below are unchanged — only the tokens they read have
+   moved. Every page linking this stylesheet therefore adopts the v2 palette,
+   the system type stack and the dropped webfont dependency without a single
+   markup edit.
+
+   The role mapping, verified:
+     --highlight  page ground     -> --paper       ink on it 15.69:1
+     --shadow     text/structure  -> --ink
+     --midtone    structure only  -> --accent      3.00:1, non-text
+     --midtone-ink  accent text   -> --accent-ink  4.50:1 AA
+
+   `--accent` is deliberately not a domain token: these pages were written
+   before colour meant anything, and dressing them in `--bio` would assert a
+   biophysical claim they never made.
+
+   The values are PINNED to the light register rather than written as
+   var(--paper) / var(--ink). Those follow the viewer's OS theme, and making 32
+   already-published editorial pages start flipping to dark is a behaviour
+   change nobody asked for — their component rules were written assuming a
+   light ground. Whether published pages should follow the reader's preference
+   is a real question, and it belongs to Indy, not to a migration.
+   -------------------------------------------------------------------------- */
 :root {
-  --shadow: #192640;      /* deep navy — text + structure */
-  --midtone: #F27F3D;     /* orange — STRUCTURE on paper: rules, borders, underlines.
-                             Only 2.67:1 on white, so never use it for text on paper.
-                             On navy it is 5.66:1 and safe for text. */
-  --midtone-ink: #C34F0D; /* orange — TEXT on paper. Same hue (21.8°) and saturation as
-                             --midtone, darkened to 4.60:1 on --highlight so it passes
-                             WCAG AA for body text. */
+  --shadow:      #20201e;
+  --highlight:   #f4f1e9;
+  --midtone:     #d56c53;   /* = --accent; pinned, see above */
+  --midtone-ink: #b74b32;   /* = --accent-ink at the light register */
 
-  /* Paper is deliberately NOT pure #FFFFFF. It carries a trace of the brand navy hue
-     (OKLCH 99.1% 0.0025 264) — a chroma far too small to read as a colour, but enough
-     to stop the page feeling like a blank browser default and to tie the surface to the
-     palette. Hex first so old browsers get a correct value; OKLCH second for browsers
-     that support it. Never make the OKLCH line load-bearing. */
-  --highlight: #FBFCFE;
-  --highlight: oklch(99.1% 0.0025 264);
-
-  --page-pad: 55px;
-  --measure: 760px;       /* reading measure */
-  --phi-major: 61.8fr;
-  --phi-minor: 38.2fr;
-
+  /* v1's scale starts at 13, v2's at 8. Pinned, or every legacy page silently
+     loses a spacing step. */
   --s1: 13px; --s2: 21px; --s3: 34px; --s4: 55px; --s5: 89px;
 
-  --serif: "Crimson Pro", Georgia, "Times New Roman", serif;
-  --sans: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --mono: "DM Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --page-pad: 55px;
+  --measure: 760px;
 }
+
 
 * { box-sizing: border-box; }
 
@@ -200,6 +212,27 @@ main { padding: 0; }
 .card-link:hover { transform: translateY(-2px); }
 .card-link:hover .card { border-color: var(--midtone); }
 
+/* copy block -------------------------------------------------------------
+   A bordered specimen of text that exists to be LIFTED — bio copy, boilerplate,
+   a standard description someone will paste into a programme or a deck.
+   Distinct from .quote-block (one display line, sans, huge, orange rule) and from
+   .card (a parallel item in a grid, 18px, single paragraph). This is running serif
+   prose, held to the reading measure, with real paragraph separation, and no accent —
+   the border alone says "this is a discrete object you may take whole".
+   Multi-paragraph by design: .card p and .quote-block p both zero their margins,
+   which silently runs paragraphs together. */
+.copy-block {
+  border: 1.5px solid var(--shadow); background: var(--highlight);
+  padding: var(--s3); margin: var(--s2) 0 var(--s4) 0;
+  max-width: calc(var(--measure) + var(--s3) * 2);
+}
+.copy-block .label {
+  display: block; font-family: var(--mono); font-size: 12px; line-height: 1.4;
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--s2);
+}
+.copy-block p { font-size: 19px; line-height: 1.5; margin-bottom: var(--s2); max-width: none; }
+.copy-block p:last-child { margin-bottom: 0; }
+
 .caption { font-size: 13px; line-height: 1.5; margin-top: var(--s1); max-width: 780px; }
 
 /* tables ----------------------------------------------------------------- */
@@ -273,7 +306,7 @@ tr:last-child td { border-bottom: 0; }
   padding: var(--s1) var(--s2);
   margin: var(--s2) 0 var(--s3) 0;
   max-width: 1060px;
-  background: rgba(25, 38, 64, 0.03);
+  background: color-mix(in srgb, var(--shadow) 3%, transparent);
   font-family: var(--serif);
   font-size: 21px;
   line-height: 1.5;
@@ -351,7 +384,7 @@ tr:last-child td { border-bottom: 0; }
 .hn-warrant { font-family: var(--serif); font-style: italic; font-size: 17px; line-height: 1.35; margin-top: var(--s2); opacity: 0.9; max-width: none; }
 .hn-handle { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: var(--s2); opacity: 0.6; }
 .hn-handle .arw { color: var(--midtone); }
-.hn-coda { font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em; color: var(--midtone); margin-top: var(--s2); padding-top: var(--s1); border-top: 1.5px solid rgba(242,127,61,0.35); }
+.hn-coda { font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em; color: var(--midtone); margin-top: var(--s2); padding-top: var(--s1); border-top: 1.5px solid color-mix(in srgb, var(--midtone) 35%, transparent); }
 .hn-commit { grid-column: 1 / -1; background: var(--shadow); color: var(--highlight); aspect-ratio: auto; padding: var(--s4); display: block; }
 .hn-commit::before { width: 61.8%; }
 .hn-commit .hn-thesis { font-family: var(--sans); font-weight: 500; letter-spacing: -0.035em; line-height: 1.0; font-size: clamp(34px, 5vw, 60px); margin: var(--s2) 0 var(--s3) 0; max-width: 900px; }
@@ -365,3 +398,32 @@ tr:last-child td { border-bottom: 0; }
 .hn-flag { font-family: var(--mono); font-size: 12px; letter-spacing: 0.02em; margin-top: var(--s1); padding-left: 13px; color: var(--midtone); }
 .hn-movement { font-family: var(--mono); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; margin: var(--s4) 0 0 0; padding-top: var(--s2); border-top: 1.5px solid var(--shadow); }
 .hn-movement:first-of-type { border-top: 0; }
+
+/* ==========================================================================
+   v2 typographic alignment
+   --------------------------------------------------------------------------
+   Retokening alone is not enough here. v1 set display type in `--sans` at
+   weight 500 with -0.025em tracking — an Inter treatment. Substituting Arial
+   into that leaves the page in v1's typographic model wearing v2's faces,
+   which is the worst of both: a generic grotesque doing work it was not
+   chosen for, at 108px.
+
+   v2 inverts the roles — serif carries display and prose, sans carries dense
+   supporting copy. These four rules move the legacy display roles across.
+   Tracking is relaxed because Georgia has a larger x-height and wider set
+   width than Inter and does not want the same negative letter-spacing.
+   ========================================================================== */
+h1, h2, h3, .display, .nav-title,
+.lead,
+.quote-block {
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Georgia sets wider than Inter, so the top of the display ramp overshoots its
+   measure. Pulled back one step; the visual size is unchanged because the face
+   is larger on the body. */
+h1 { font-size: clamp(42px, 6.4vw, 84px); line-height: 1.0; }
+.lead { font-size: clamp(24px, 2.9vw, 38px); line-height: 1.18; }
+.quote-block { font-size: clamp(22px, 2.7vw, 34px); line-height: 1.2; }

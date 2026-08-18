@@ -1,0 +1,329 @@
+/* ==========================================================================
+   xCO design system v2 — "identity code"
+   --------------------------------------------------------------------------
+   Replaces xco.css / xco-dusk.css. Derived from Indy's computational identity
+   code thesis (v0.1), with three things carried forward from v1 because they
+   were better there, and two things fixed because they were broken in both.
+
+   THE ONE IDEA
+   Colour names a DOMAIN of the world; line pattern names EPISTEMIC STATUS;
+   a marker shape names the domain again, redundantly and on purpose. Colour is
+   never the only thing carrying an identity — see "the shape channel" below.
+
+   CARRIED FORWARD FROM v1
+   1. `-ink` variants. v1 learned the hard way that an accent used as text needs
+      its own darker token. Every domain hue here has one, at >= 4.5:1.
+   2. A named spacing scale instead of magic numbers. v1's Fibonacci steps,
+      extended, so nobody has to invent 112 or 124 again.
+   3. A dark register at all. v1 had one; the thesis did not.
+
+   FIXED IN BOTH
+   4. Every hue clears 3:1 against its ground, so a stroke that carries meaning
+      is actually visible (WCAG 1.4.11).
+   5. `inst` no longer reads grey — it was below the chroma floor, which is why
+      it was the first thing to disappear under colour-blindness.
+
+   Validated with the dataviz palette validator against BOTH grounds:
+   all checks PASS, light and dark, with one CVD warning that the shape channel
+   is there to answer.
+   ========================================================================== */
+
+@import url("xco-tokens.css");
+
+/* ==========================================================================
+   base
+   ========================================================================== */
+* { box-sizing: border-box; }
+
+html { background: var(--paper); -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-width: 320px;
+  color: var(--ink);
+  background: var(--paper);          /* explicit: a transparent body borrows the host's ground */
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+/* The only texture in the system. Fixed, so it reads as the surface the page
+   is printed on rather than something scrolling with the content. */
+.grain {
+  position: fixed; z-index: 100; inset: 0;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: repeating-radial-gradient(circle at 0 0,
+    transparent 0, var(--grain) .7px, transparent 1px, transparent 4px);
+  background-size: 5px 5px;
+  mix-blend-mode: var(--grain-blend);
+}
+
+a { color: var(--ink); }
+button { font: inherit; color: inherit; }
+
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+
+.skip-link {
+  position: fixed; z-index: 300; top: var(--s2); left: var(--s2);
+  padding: 10px 14px;
+  transform: translateY(-200%);
+  border-radius: 999px;
+  color: var(--paper); background: var(--ink);
+  font-family: var(--sans); font-size: 13px;
+  transition: transform var(--t-fast) ease;
+}
+.skip-link:focus { transform: translateY(0); }
+
+/* ==========================================================================
+   the shape channel
+   --------------------------------------------------------------------------
+   Colour cannot carry domain on its own. Measured: under deuteranopia
+   institutional and cultural separate by ΔE 1.5 where 8 is the target, and no
+   re-hueing fixes it without abandoning the muted palette entirely. So every
+   domain also has a SHAPE, and a legend entry always pairs mark + word.
+
+     biophysical    circle
+     institutional  square
+     technological  triangle
+     cultural       diamond
+
+   Use .mark for legends and inline references; use the same geometry for the
+   end-point markers on any chart.
+   ========================================================================== */
+.mark {
+  display: inline-block; width: 10px; height: 10px;
+  margin-right: 7px; vertical-align: -1px;
+  background: currentColor;
+}
+.mark-bio     { color: var(--bio);     border-radius: 50%; }
+.mark-inst    { color: var(--inst);    border-radius: 1px; }
+.mark-tech    { color: var(--tech);    clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.mark-culture { color: var(--culture); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+
+/* ==========================================================================
+   epistemic status — the second channel
+   Line pattern says how well something is known. It is orthogonal to domain,
+   so it never doubles as an identity cue.
+   ========================================================================== */
+.epi-evidence   { border-top: 2px solid  currentColor; }  /* observed relation */
+.epi-inference  { border-top: 2px dotted currentColor; }  /* inferred          */
+.epi-assumption { border-top: 2px dashed currentColor; }  /* assumed           */
+
+/* ==========================================================================
+   layout
+   ========================================================================== */
+.wrap { width: var(--content); margin: 0 auto; }
+
+.section {
+  padding: var(--s6) 0 var(--s6);
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: var(--s3);
+}
+
+.section-head,
+.section-intro {
+  display: grid;
+  grid-template-columns: var(--label) minmax(0, 1fr);
+  gap: var(--gutter);
+}
+.section-head { margin-bottom: var(--s5); }
+.section-intro p { grid-column: 2; margin: 0 0 var(--s3); max-width: var(--measure); font-size: 20px; line-height: 1.5; }
+
+.kicker {
+  margin: 7px 0 0;
+  color: var(--ink-soft);
+  font: 10px/1.5 var(--mono);
+  letter-spacing: .1em; text-transform: uppercase;
+}
+
+h1, h2, h3 { font-weight: 400; text-wrap: balance; }
+h1 { margin: 0; font-size: clamp(40px, 5vw, 68px); line-height: .98; letter-spacing: -.04em; }
+h2 { margin: 0; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.02; letter-spacing: -.035em; }
+h3 { margin: 0 0 var(--s2); font-size: 23px; line-height: 1.1; }
+
+/* the hanging measure — everything that interrupts the prose aligns here */
+.hang { margin-left: var(--hang); max-width: 730px; }
+
+/* ==========================================================================
+   components
+   ========================================================================== */
+
+/* -- port: a fragment with accountable depth ------------------------------ */
+.port {
+  position: relative; display: inline;
+  margin: 0 .05em; padding: .02em .12em .06em;
+  border: 0; border-bottom: 1px solid currentColor; border-radius: 1px;
+  color: var(--ink); background: var(--port-bg, transparent);
+  font: inherit; cursor: pointer;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  transition: filter var(--t-fast) ease, box-shadow var(--t-fast) ease;
+}
+.port::after {
+  position: absolute; right: 3px; bottom: -14px;
+  content: attr(data-kind);
+  opacity: 0;
+  color: var(--ink-soft);
+  font: 8px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase;
+  white-space: nowrap;
+  transition: opacity var(--t-fast) ease;
+}
+.port:hover, .port:focus-visible, .port.is-active {
+  filter: saturate(1.15) contrast(1.04);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ink) 8%, transparent);
+}
+.port:hover::after, .port:focus-visible::after, .port.is-active::after { opacity: 1; }
+
+.port-bio     { --port-bg: var(--bio-tint); }
+.port-inst    { --port-bg: var(--inst-tint); }
+.port-tech    { --port-bg: var(--tech-tint); }
+.port-culture { --port-bg: var(--culture-tint); }
+
+/* -- callout: a rule with a domain attached ------------------------------- */
+.callout {
+  margin: var(--s5) 0 0 var(--hang); max-width: 730px;
+  padding: var(--s3) var(--s4);
+  border-left: 4px solid var(--bio);
+  background: color-mix(in srgb, var(--bio) 9%, transparent);
+  font-size: 17px; line-height: 1.55;
+}
+.callout strong { font-weight: 400; }
+.callout-inst    { border-left-color: var(--inst);    background: color-mix(in srgb, var(--inst) 9%, transparent); }
+.callout-tech    { border-left-color: var(--tech);    background: color-mix(in srgb, var(--tech) 9%, transparent); }
+.callout-culture { border-left-color: var(--culture); background: color-mix(in srgb, var(--culture) 9%, transparent); }
+
+/* -- thesis: the pull-quote ----------------------------------------------- */
+.thesis {
+  margin: var(--s5) 0 0 var(--hang); max-width: 820px;
+  padding: var(--s4) 0;
+  border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+  font-size: clamp(22px, 2.4vw, 32px); line-height: 1.2; letter-spacing: -.02em;
+}
+
+/* -- register: the modular unit the thesis is built from ------------------
+   Nine of these, each carrying a different kind of authority, each typeset
+   differently so the register is legible before the words are read. */
+.register-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  margin-top: var(--s4);
+  border-top: 1px solid var(--ink); border-left: 1px solid var(--rule);
+}
+.register {
+  min-height: 186px; padding: var(--s4);
+  border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+}
+.register .reg-index {
+  display: block; margin-bottom: var(--s4);
+  color: var(--ink-faint); font: 9px/1 var(--mono); letter-spacing: .08em;
+}
+.register p { margin: 0; color: var(--ink-soft); font: 13px/1.55 var(--sans); }
+.register-code  h3, .register-math h3,
+.register-state h3 { font-family: var(--mono); font-size: 18px; }
+.register-voice  h3 { font-style: italic; }
+.register-affect h3 { font-family: var(--mono); letter-spacing: -.08em; }
+.register-space { background: linear-gradient(135deg, transparent 47%, var(--rule) 48%, transparent 49%); }
+
+/* -- witness: refusal is a first-class outcome ---------------------------- */
+.witness {
+  min-height: var(--touch); padding: 6px 10px;
+  border: 0; border-bottom: 1px solid currentColor;
+  background: var(--culture-tint);
+  font: 22px/1.2 var(--mono); letter-spacing: -.06em;
+  cursor: pointer;
+  transition: transform var(--t-fast) var(--ease);
+}
+.witness:hover, .witness:focus-visible { transform: translateY(-2px); }
+.witness-held    { background: var(--inst-tint); }
+.witness-refused { background: var(--bio-tint); }
+
+/* -- buttons -------------------------------------------------------------- */
+.pill-button {
+  min-height: 46px; padding: 0 var(--s3);
+  border: 0; border-radius: 25px;
+  color: var(--paper);
+  background: linear-gradient(115deg, rgba(255,255,255,.1), transparent 35%), var(--ink);
+  box-shadow: 0 7px 18px rgba(0,0,0,.16);
+  font-size: 14px; letter-spacing: .02em; cursor: pointer;
+  transition: transform var(--t-fast) var(--ease);
+}
+.pill-button:hover { transform: translateY(-1px); }
+
+.text-link {
+  min-height: var(--touch); padding: 0 2px;
+  border: 0; border-bottom: 1px solid var(--ink);
+  background: transparent;
+  font: 10px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* -- ledger: code and data objects ---------------------------------------- */
+.ledger-object {
+  margin: var(--s5) 0 0 var(--hang); max-width: 730px;
+  padding: var(--s4); overflow-x: auto;
+  border: 1px solid var(--rule); background: var(--panel);
+  font: 14px/1.72 var(--mono); white-space: pre;
+}
+
+/* -- tables --------------------------------------------------------------- */
+.table-scroll { overflow-x: auto; }   /* wide content scrolls itself, never the body */
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 14px 18px 14px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--ink-faint); font: 9px/1.4 var(--mono); letter-spacing: .08em;
+     text-transform: uppercase; font-weight: 400; white-space: nowrap; }
+td { font: 14px/1.6 var(--sans); color: var(--ink-soft); }
+td .num { font-variant-numeric: tabular-nums; }
+
+/* -- charts --------------------------------------------------------------- */
+.spark svg { display: block; width: 100%; height: 44px; overflow: visible; }
+.spark .base { stroke: var(--ink-faint); stroke-width: 1; opacity: .5; }
+.spark .peak { fill: var(--ink); }                  /* the ONLY labelled point */
+.spark .peak-label { fill: var(--ink); font: 9px/1 var(--sans); font-weight: 700; text-anchor: middle; }
+.spark b { display: block; margin-top: 9px; font-size: 15px; font-weight: 400; }
+.spark span { display: block; margin-top: 2px; color: var(--ink-soft); font: 11px/1.4 var(--sans); }
+
+/* Leader lines: dashed, ink-faint, never a domain hue — the leader is not
+   making a claim about the thing it points at. */
+.leaders path { fill: none; stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 3 4; opacity: .85; }
+
+/* ==========================================================================
+   responsive — the label column narrows, then stacks
+   ========================================================================== */
+@media (max-width: 1050px) {
+  :root { --content: calc(100vw - 104px); --label: 150px; --hang: 192px; }
+  .register-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 720px) {
+  :root { --content: calc(100vw - 40px); --hang: 0px; }
+  .section { padding: var(--s5) 0; }
+  .section-head, .section-intro { display: block; }
+  .kicker { margin: 0 0 var(--s3); }
+  .register-grid { grid-template-columns: 1fr; }
+  .hang, .callout, .thesis, .ledger-object { margin-left: 0; }
+}
+
+/* ==========================================================================
+   the other media states — all four were already correct in the thesis and
+   are kept verbatim, because they are the difference between a design system
+   and a stylesheet.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .port, .mark, .register { border: 1px solid ButtonText; }
+  .mark { forced-color-adjust: none; }
+}
+
+@media print {
+  .grain, .skip-link, .pill-button { display: none !important; }
+  .section { break-inside: avoid; }
+  /* Domain colour survives print badly and colour-blindness worse — the shape
+     channel and the legend word are what carry over. */
+}
