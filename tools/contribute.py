@@ -2,7 +2,7 @@
 """
 contribute.py — prepare a page for the shared commons, safely.
 
-The flow up from a personal wiki to `YOUR-COMMONS`. It is deliberately the same consent
+The flow up from a personal wiki to `xco-team-wiki`. It is deliberately the same consent
 loop as everything else: this script only ever writes a **staging bundle** to disk. It
 does not push, does not open a PR, and cannot reach the commons on its own.
 
@@ -50,9 +50,52 @@ import export_shared     # noqa: E402
 
 DEFAULT_OUT = "contrib"
 
-# The commons this wiki contributes into. One constant, because a spoke belongs to one
-# commons; change it here if that ever stops being true.
-COMMONS = os.environ.get("WIKI_COMMONS", "YOUR-COMMONS")
+# Where this wiki sits in the federation. Declared in design/federation.json rather
+# than assumed, because a spoke no longer belongs to exactly one commons: with
+# learning-system-wiki alongside xco-team-wiki, a person can contribute to either, and
+# a guess about which one is a disclosure decision made by a default.
+#
+# The file is per-repo and is NOT part of the synced design layer — a wiki's place in
+# the graph is its own, the same way its social-card wording is.
+FEDERATION = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          "..", "design", "federation.json")
+
+
+def topology():
+    """This wiki's declared role and targets.
+
+    A repo with no declaration keeps the old single-commons behaviour, so nothing that
+    predates the second commons breaks.
+    """
+    if os.path.exists(FEDERATION):
+        with open(FEDERATION, encoding="utf-8") as fh:
+            return json.load(fh)
+    return {"role": "spoke",
+            "contributes_to": [os.environ.get("WIKI_COMMONS", "xco-team-wiki")]}
+
+
+def resolve_commons(requested, topo):
+    """Which commons this contribution is for. Refuses to guess.
+
+    Returns (name, error). With more than one target and no --to, that is an error and
+    not a default: contributing to the wrong commons publishes to the wrong audience,
+    and the fix afterwards is a deletion request rather than a revert.
+    """
+    targets = topo.get("contributes_to") or []
+    if not targets:
+        return None, ("this wiki contributes to no commons "
+                      "(design/federation.json lists none)")
+    if requested:
+        if requested not in targets:
+            return None, (f"{requested!r} is not a commons this wiki contributes to.\n"
+                          f"       Declared: {', '.join(targets)}")
+        return requested, None
+    if len(targets) == 1:
+        return targets[0], None
+    return None, ("this wiki contributes to more than one commons, so --to is required:\n"
+                  + "\n".join(f"         --to {t}" for t in targets)
+                  + "\n\n       Which commons a page goes to is an audience decision; "
+                    "picking one for you would make it silently.")
 
 
 def _origin_repo():
@@ -76,10 +119,19 @@ ORIGIN = _origin_repo()
 # Whole areas that never travel, whatever their tier says.
 REFUSE_PATH_PREFIXES = ("crm/",)
 
-# The commons graph this spoke has cached, if the down-flow has run. Used to detect a
-# page that already exists there — see check_collisions().
-COMMONS_CACHE = [os.path.join(".commons", "export", "wiki.shared.json"),
-                 os.path.join(".commons", "export", "wiki.public.json")]
+def commons_cache_paths(name):
+    """Where a cached copy of `name`'s graph might be.
+
+    The per-commons layout comes first; the flat legacy path is the fallback, because
+    the sync-commons workflow still writes a single .commons/export for whichever
+    commons it is pointed at. Consequence, stated rather than hidden: with two commons
+    declared and the flat cache in use, the collision check below covers only the one
+    the workflow syncs — and check_collisions() says so when it cannot verify.
+    """
+    return [os.path.join(".commons", name, "export", "wiki.shared.json"),
+            os.path.join(".commons", name, "export", "wiki.public.json"),
+            os.path.join(".commons", "export", "wiki.shared.json"),
+            os.path.join(".commons", "export", "wiki.public.json")]
 
 # Validation levels are group-relative above `self`; see the module docstring.
 VALIDATION_REBASE = {"machine": "machine", "self": "self",
@@ -102,9 +154,9 @@ def eligible(slug, fm):
     return True, f"{vis} — eligible"
 
 
-def commons_titles():
-    """Titles already in the commons, from the cached export. None if no cache."""
-    for path in COMMONS_CACHE:
+def commons_titles(name):
+    """Titles already in `name`, from the cached export. None if no cache."""
+    for path in commons_cache_paths(name):
         if os.path.exists(path):
             with open(path, encoding="utf-8") as fh:
                 d = json.load(fh)
@@ -114,7 +166,7 @@ def commons_titles():
     return None
 
 
-def check_collisions(wiki_dir, slugs):
+def check_collisions(wiki_dir, slugs, commons):
     """Titles among `slugs` that the commons already holds.
 
     Contributing a page the commons already has OVERWRITES it — silently losing any
@@ -125,7 +177,7 @@ def check_collisions(wiki_dir, slugs):
     Nearly every page in a seeded spoke collides, so this cannot be a warning nobody
     reads. It refuses, and --update is the deliberate override.
     """
-    theirs = commons_titles()
+    theirs = commons_titles(commons)
     if theirs is None:
         return None, []            # no cache; cannot check, say so rather than assume
     hits = []
@@ -190,6 +242,9 @@ def main(argv=None):
     ap.add_argument("--out", default=DEFAULT_OUT)
     ap.add_argument("--by", default=None, help="who is contributing (required to stage)")
     ap.add_argument("--list", action="store_true", help="show what is eligible")
+    ap.add_argument("--to", default=None,
+                    help="which commons to contribute to; required when this wiki "
+                         "declares more than one")
     ap.add_argument("--update", action="store_true",
                     help="the page already exists in the commons and you mean to replace it")
     args = ap.parse_args(argv)
@@ -207,6 +262,9 @@ def main(argv=None):
             if ok:
                 print(f"  {slug}  ({why})")
         print(f"\n  eligible: {n_ok}   refused: {n_no}")
+        t = topology()
+        print(f"  role: {t.get('role', 'spoke')}   "
+              f"contributes to: {', '.join(t.get('contributes_to') or ['(none)'])}")
         return 0
 
     if not args.slugs:
@@ -214,12 +272,18 @@ def main(argv=None):
     if not args.by:
         ap.error("--by is required: provenance is stamped, never invented")
 
+    topo = topology()
+    commons, err = resolve_commons(args.to, topo)
+    if err:
+        print(f"error: {err}", file=sys.stderr)
+        return 1
+
     # Refuse a silent overwrite before doing any work.
-    theirs, hits = check_collisions(args.wiki, set(args.slugs))
+    theirs, hits = check_collisions(args.wiki, set(args.slugs), commons)
     if theirs is None:
-        print("note: no cached commons graph (.commons/), so a page that already exists\n"
-              "      there cannot be detected. Run the 'Sync the commons' workflow to enable\n"
-              "      the check, or review the PR diff carefully.", file=sys.stderr)
+        print(f"note: no cached graph for {commons} (.commons/), so a page that already\n"
+              f"      exists there cannot be detected. Run the 'Sync the commons' workflow\n"
+              f"      to enable the check, or review the PR diff carefully.", file=sys.stderr)
     elif hits and not args.update:
         print("error: these pages ALREADY EXIST in the commons — contributing would "
               "overwrite them:\n", file=sys.stderr)
@@ -266,7 +330,7 @@ def main(argv=None):
         return 1
 
     print(f"\n  {len(bundle)} page(s) staged in {args.out}/ at rev {rev}, contributed_by {args.by}.")
-    print(f"  Nothing has left this repo. Open a PR against {COMMONS} to propose them.")
+    print(f"  Nothing has left this repo. Open a PR against {commons} to propose them.")
     return 0
 
 
