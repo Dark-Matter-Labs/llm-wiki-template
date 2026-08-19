@@ -1,0 +1,9 @@
+{
+  "_comment": "This wiki's place in the federation. Per-repo and NOT part of the synced design layer \u2014 the design system travels between wikis, a wiki's position in the graph does not.",
+  "name": "llm-wiki-template",
+  "role": "spoke",
+  "contributes_to": [
+    "xco-team-wiki"
+  ],
+  "_note": "Seeds new spokes. A wiki created from this template should edit its own name and targets before contributing anything."
+}

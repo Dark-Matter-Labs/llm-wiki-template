@@ -48,6 +48,50 @@ def write(root, slug, title, vis="internal", val="machine",
                              extra=extra, body=body))
 
 
+def check_topology(check):
+    """The second commons.
+
+    A spoke may now contribute to more than one, and the tool must refuse to pick.
+    Contributing to the wrong commons publishes to the wrong audience, and the remedy
+    afterwards is a deletion request, not a revert.
+    """
+    import os as _os
+    import contribute as c
+
+    one = {"role": "spoke", "contributes_to": ["xco-team-wiki"]}
+    two = {"role": "spoke", "contributes_to": ["xco-team-wiki", "learning-system-wiki"]}
+    none_ = {"role": "commons", "contributes_to": []}
+
+    name, err = c.resolve_commons(None, one)
+    check("one declared target resolves without --to",
+          name == "xco-team-wiki" and not err, f"got {name!r} / {err!r}")
+
+    name, err = c.resolve_commons(None, two)
+    check("two targets REFUSE to be guessed",
+          name is None and bool(err) and "--to" in (err or ""), f"got {name!r}")
+
+    name, err = c.resolve_commons("learning-system-wiki", two)
+    check("an explicit --to resolves",
+          name == "learning-system-wiki" and not err, f"got {name!r} / {err!r}")
+
+    name, err = c.resolve_commons("some-other-wiki", two)
+    check("a target that is not declared is refused",
+          name is None and bool(err), f"got {name!r}")
+
+    name, err = c.resolve_commons(None, none_)
+    check("a commons that contributes nowhere is refused",
+          name is None and bool(err), "a top-level commons has nothing above it")
+
+    # The cache lookup must still find the legacy flat path, or every existing spoke
+    # silently loses its collision check the day it declares a topology.
+    paths = c.commons_cache_paths("xco-team-wiki")
+    check("per-commons cache path is preferred",
+          paths[0].endswith(_os.path.join("xco-team-wiki", "export", "wiki.shared.json")),
+          paths[0])
+    check("legacy flat cache path is still a fallback",
+          _os.path.join(".commons", "export", "wiki.shared.json") in paths, str(paths))
+
+
 def main():
     failures = []
 
@@ -144,10 +188,10 @@ def main():
         old_cwd = os.getcwd()
         try:
             os.chdir(tmp)
-            _t, hits = C.check_collisions("wiki", {"shareable"})
+            _t, hits = C.check_collisions("wiki", {"shareable"}, "xco-team-wiki")
             check("a page already in the commons is detected as a collision",
                   len(hits) == 1 and hits[0][0] == "shareable", f"hits={hits}")
-            _t2, hits2 = C.check_collisions("wiki", {"another-shared"})
+            _t2, hits2 = C.check_collisions("wiki", {"another-shared"}, "xco-team-wiki")
             check("a page the commons does not have is not a collision",
                   hits2 == [], f"hits={hits2}")
         finally:
@@ -158,7 +202,7 @@ def main():
         try:
             os.chdir(tempfile.mkdtemp())
             os.makedirs("wiki", exist_ok=True)
-            t3, hits3 = C.check_collisions("wiki", set())
+            t3, hits3 = C.check_collisions("wiki", set(), "xco-team-wiki")
             check("with no commons cache it reports unknown, not clear",
                   t3 is None, f"titles={t3}")
         finally:
@@ -170,6 +214,8 @@ def main():
               "staging is the caller's explicit step")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+    check_topology(check)
 
     print()
     if failures:
