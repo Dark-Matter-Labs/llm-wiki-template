@@ -46,6 +46,17 @@ def cr(a, b):
 
 def main():
     print("xCO tokens — the accessibility contract\n")
+
+    # A repo with no docs/ is a text commons: it carries the token source so it is ready
+    # the day it publishes, but there is no generated CSS and no social card to check.
+    # Failing there would be a gate reporting on a surface that does not exist — and a
+    # red CI nobody can act on trains people to ignore CI.
+    if not os.path.isdir(os.path.join(HERE, "..", "docs")):
+        print("  no docs/ — this is a text commons, so there is no published surface to")
+        print("  check. The token source is still present and syncs with the federation.")
+        print("\n  skipped.")
+        return 0
+
     doc = bt.load()
     idx = bt.build_index(doc)
     MISSING = object()
