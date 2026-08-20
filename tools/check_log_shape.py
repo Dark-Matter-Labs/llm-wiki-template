@@ -36,6 +36,8 @@ PRE_SPLIT_MONTHS: "set[str]" = set()   # migrated whole; no month here predates 
 MONTH = re.compile(r"^\d{4}-\d{2}\.md$")
 DAY = re.compile(r"^(\d{4}-\d{2}-\d{2})\.md$")
 ENTRY = re.compile(r"^## \[(\d{4}-\d{2}-\d{2})\]", re.M)
+# A whole entry, for the duplicate check below.
+BLOCK = re.compile(r"(?m)^(?=## \[\d{4}-\d{2}-\d{2}\])")
 
 
 def main() -> int:
@@ -67,6 +69,23 @@ def main() -> int:
                 )
             if not dates:
                 findings.append(f"{path.relative_to(LOG.parent.parent)}: day file with no entries")
+
+            # Day files are union-merged (see .gitattributes), so a bad merge lands
+            # without conflict markers and without anyone reading it. Duplication is
+            # how that goes wrong, and it has gone wrong once already: a faulty reset
+            # on 2026-08-20 put four of Robyn's entries in twice, and every gate then
+            # in place passed. This is the compensating control for the review point
+            # union removes.
+            blocks = [b.rstrip() for b in BLOCK.split(text) if b.startswith("## [")]
+            seen: dict[str, int] = {}
+            for b in blocks:
+                seen[b] = seen.get(b, 0) + 1
+            for b, n in seen.items():
+                if n > 1:
+                    findings.append(
+                        f"{path.relative_to(LOG.parent.parent)}: entry appears {n} times — "
+                        f"{b.splitlines()[0][:70]}"
+                    )
 
     # cross-check the month indexes against the day files on disk
     for month, days in sorted(day_files.items()):

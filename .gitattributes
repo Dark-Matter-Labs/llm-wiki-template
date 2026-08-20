@@ -1,0 +1,18 @@
+# Day log files are strictly append-only: entries are added, never rewritten
+# ("Never rewrite past days — corrections are appended as new entries"). Two sessions
+# working the same day therefore always append to the same tail, and git treats that
+# as a conflict every time. On 2026-08-20 this file was hand-resolved four times in
+# one day, always the same way: keep both sides.
+#
+# `merge=union` does exactly that, automatically. It is safe here *because* the file
+# is append-only — union is the wrong tool for a file whose existing lines change.
+#
+# The trade-off, stated: union never writes conflict markers, so it removes the human
+# review point. check_log_shape.py compensates by failing on a duplicated entry, which
+# is the way a union merge would go wrong.
+wiki/log/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md merge=union
+
+# The month index is NOT union-merged. It is generated from the day files, and its
+# rows change rather than accumulate, so union would produce duplicate day rows that
+# merge silently. It conflicts instead — and the resolution is never to hand-merge it
+# but to run `python3 tools/sync_log_index.py`, which CI verifies with --check.
