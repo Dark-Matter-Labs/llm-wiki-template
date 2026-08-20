@@ -184,12 +184,17 @@ and its type, organised by category. **You update it on every ingest.** When ans
 query, read `index.md` FIRST to find relevant pages, then drill in. Treat it as a routing
 file — do not scan the whole wiki.
 
-**`wiki/log.md`** — the log's **index**. The entries themselves live in **one file per month**
-at **`wiki/log/YYYY-MM.md`** (e.g. `wiki/log/2026-08.md`), so concurrent sessions writing on
-different days don't collide on one file. **Append every new entry to the current month's file**,
-creating it (with the same header as the others) if the month is new, and add the month to the
-index in `log.md`. Never rewrite past months — corrections are appended as new entries. To read
-"the log", read the current month first, then earlier months as needed.
+**`wiki/log.md`** — the log's **index**. The entries themselves live in **one file per day**
+at **`wiki/log/YYYY-MM-DD.md`** (e.g. `wiki/log/2026-08-19.md`). **Append every new entry to
+today's file**, creating it (with the same header as the others) if it is the day's first entry,
+then run `python3 tools/sync_log_index.py` — it regenerates the month index at
+`wiki/log/YYYY-MM.md` from the day files, so the row is never hand-typed and never forgotten.
+Never rewrite past days — corrections are appended as new entries. To read "the log", read
+today's file first, then walk back through the month index.
+
+Per-day, not per-month: a month file is one append point, so two sessions working the same day
+collide every time. This wiki was migrated on 2026-08-20, after that collision hit twice inside a
+single merge. `tools/check_log_shape.py` keeps entries out of the month index.
 
 Every ingest, query, and lint pass gets one entry. Start each entry with a consistent prefix so
 it stays greppable:

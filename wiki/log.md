@@ -3,18 +3,20 @@
 The dated record of everything that happens in this wiki: every ingest, query, lint pass,
 brief, reflection, and rebuild.
 
-**The entries themselves live in one file per month**, at `wiki/log/YYYY-MM.md`. That split
-exists for a practical reason: a single log file is the single biggest source of merge
-conflicts when more than one session is running, because every session appends to the same
-last line. Monthly files make same-day collisions rare and cross-month collisions impossible.
+**The entries themselves live in one file per day**, at `wiki/log/YYYY-MM-DD.md`, with
+`wiki/log/YYYY-MM.md` as that month's **index**. The split exists for a practical reason: a
+single append point is the biggest source of merge conflicts when more than one session is
+running. A monthly file still collides every time two sessions work on the same day, which
+is the common case — daily files make that impossible too.
 
 ## Rules
 
-- **Append** new entries to the **current month's file**, creating it if the month is new,
-  and add the new month to the list below.
-- **Never rewrite a past month.** Corrections are appended as new entries, not edits — the
+- **Append** new entries to **today's file**, creating it if it is the day's first entry, then
+  run `python3 tools/sync_log_index.py` — it regenerates the month index from the day files,
+  so the row is never hand-typed and never forgotten.
+- **Never rewrite a past day.** Corrections are appended as new entries, not edits — the
   log is a record of what happened, including what was got wrong.
-- To read "the log", read the **current month first**, then earlier months as needed.
+- To read "the log", read **today's file first**, then walk back through the month index.
 
 ## Entry format
 

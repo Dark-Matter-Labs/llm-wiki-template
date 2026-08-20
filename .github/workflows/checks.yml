@@ -32,6 +32,14 @@ jobs:
       - name: House-rule linter edge cases
         run: python3 tools/test_house_rules.py
 
+      - name: Log shape — entries in day files, month files are indexes
+        run: python3 tools/check_log_shape.py
+
+      - name: Log index matches the day files
+        # The month row is a projection of the day files, so it is generated, never
+        # typed. This catches a forgotten `python3 tools/sync_log_index.py`.
+        run: python3 tools/sync_log_index.py --check
+
       - name: Schema + link integrity
         run: python3 tools/export.py --check
 
