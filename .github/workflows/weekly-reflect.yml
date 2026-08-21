@@ -27,8 +27,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Skip cleanly when no API key is configured, rather than failing every Friday.
-      # A weekly red X trains people to ignore CI, which is worse than no reflection.
-      # Set ANTHROPIC_API_KEY (see SETUP.md) to switch this on.
+      # A weekly red X trains people to ignore CI, which is worse than no reflection —
+      # and this job costs money, so running without a key is a legitimate steady state,
+      # unlike the commons sync where it silently disables the whole down-flow.
+      #
+      # What DID need fixing (2026-08-21): a skipped run looked exactly like a completed
+      # one. Two spokes had reported "success" every Friday since 14 August while
+      # producing nothing, and the only trace was a notice in a log nobody opens. The
+      # run summary below now states the outcome on the run page itself.
       - name: Check for API key
         id: guard
         env:
@@ -36,11 +42,20 @@ jobs:
         run: |
           if [ -z "$KEY" ]; then
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::ANTHROPIC_API_KEY is not set - skipping the weekly reflection."
-            echo "Set it in Settings > Secrets and variables > Actions to enable this job."
-            echo "Note: it consumes Claude API credits billed outside your Claude plan."
+            {
+              echo "### No reflection was written"
+              echo ""
+              echo "\`ANTHROPIC_API_KEY\` is not set, so this job did nothing."
+              echo "That is a supported state — the reflection calls the Claude API and is"
+              echo "billed outside the Claude plan — but it means no weekly reflection and no"
+              echo "contribution prompt for this wiki."
+              echo ""
+              echo "To switch it on: \`gh secret set ANTHROPIC_API_KEY\`"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::ANTHROPIC_API_KEY is not set - no reflection was written."
           else
             echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "### Reflection ran" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Checkout
@@ -48,6 +63,29 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0   # reflect reads git history for the week
+
+      # The contribution prompt can only tell what the commons already holds if a
+      # cached export is present. Without it the prompt is honest but useless — it
+      # says "overlap UNKNOWN" every week, which is a prompt nobody can act on. This
+      # repo has no sync-commons schedule of its own, so fetch the cut here. Reading
+      # the orphan `export` branch (not the working tree) keeps the boundary: it is
+      # already filtered, so a private page in the commons cannot reach this runner.
+      - name: Fetch the commons export (so the contribution prompt can check overlap)
+        env:
+          TOKEN: ${{ secrets.COMMONS_READ_TOKEN }}
+          COMMONS: ${{ vars.COMMONS_REPO }}
+        run: |
+          COMMONS="${COMMONS:-Dark-Matter-Labs/xco-team-wiki}"
+          if [ -z "${TOKEN}" ]; then
+            echo "::notice::COMMONS_READ_TOKEN not set — the contribution prompt will report overlap as unknown."
+            exit 0
+          fi
+          mkdir -p ".commons/${COMMONS##*/}"
+          if git clone --depth 1 --branch export                "https://x-access-token:${TOKEN}@github.com/${COMMONS}.git"                ".commons/${COMMONS##*/}/export" 2>/dev/null; then
+            echo "Fetched the commons export from ${COMMONS}."
+          else
+            echo "::warning::No export branch on ${COMMONS} — overlap will report as unknown."
+          fi
 
       - name: Run reflect + joker (writes files only)
         if: steps.guard.outputs.enabled == 'true'
