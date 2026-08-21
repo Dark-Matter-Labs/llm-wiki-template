@@ -1,0 +1,118 @@
+name: Sync the commons
+
+# The DOWN flow of the federation: this spoke reads its commons, it never copies them.
+#
+# Two authoritative copies of the same page drifting apart is the failure that kills
+# federated systems, so nothing here writes into wiki/. Each commons' export lands in a
+# gitignored cache at .commons/<name>/export/ that instruments — search, gravity, delta,
+# the contribution prompt — read offline. Referencing a commons is fine; duplicating it
+# is not.
+#
+# Which commons: read from design/federation.json, the same declaration contribute.py
+# uses for the UP flow. There is deliberately no COMMONS_REPO variable — a wiki's place
+# in the graph is declared once, in the repo, and both directions read that one source.
+# Until 2026-08-21 this workflow cloned a single hardcoded commons into a flat
+# .commons/export, so a spoke declaring two commons silently synced only one of them.
+#
+# Why this FAILS when COMMONS_READ_TOKEN is missing
+# --------------------------------------------------
+# It used to skip and exit 0. That was the state in every spoke since the federation was
+# built: a daily green tick, fetching nothing, for weeks. Nobody reads the log of a job
+# that passed. A run that did no work must not look like a run that did.
+#
+# A spoke that deliberately runs with no commons access — supported, and the point of a
+# sovereign spoke — declares it once:
+#
+#     gh variable set COMMONS_SYNC_OPTIONAL --body true
+on:
+  schedule:
+    - cron: "0 6 * * *"   # daily, before the working day
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-commons
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - name: Can this spoke reach its commons?
+        id: check
+        env:
+          TOKEN: ${{ secrets.COMMONS_READ_TOKEN }}
+          OPTIONAL: ${{ vars.COMMONS_SYNC_OPTIONAL }}
+        run: |
+          if [ -n "$TOKEN" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "### Down-flow active" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "enabled=false" >> "$GITHUB_OUTPUT"
+          if [ "$OPTIONAL" = "true" ]; then
+            echo "### Down-flow off, by declaration" >> "$GITHUB_STEP_SUMMARY"
+            echo "\`COMMONS_SYNC_OPTIONAL\` is set, so this spoke runs without commons access on purpose." >> "$GITHUB_STEP_SUMMARY"
+            echo "::notice::Commons sync is off by declaration (COMMONS_SYNC_OPTIONAL=true)."
+            exit 0
+          fi
+          {
+            echo "### Down-flow INERT — nothing was fetched"
+            echo ""
+            echo "\`COMMONS_READ_TOKEN\` is not set, so this spoke has never read its commons."
+            echo "Instruments that rely on the cached export (search, gravity, delta, and the"
+            echo "weekly contribution prompt's overlap check) are running without it."
+            echo ""
+            echo "Fix it either way:"
+            echo ""
+            echo '- `gh secret set COMMONS_READ_TOKEN` — a read token for the commons, to turn the sync on'
+            echo '- `gh variable set COMMONS_SYNC_OPTIONAL --body true` — to declare this spoke runs without it'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::error::COMMONS_READ_TOKEN is not set — the commons sync did nothing. Set the secret, or set COMMONS_SYNC_OPTIONAL=true to declare that this spoke runs without commons access."
+          exit 1
+
+  sync:
+    needs: guard
+    if: needs.guard.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch every declared commons
+        env:
+          TOKEN: ${{ secrets.COMMONS_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          OWNER="${GITHUB_REPOSITORY%%/*}"
+          # The same declaration contribute.py reads for the UP flow — one source of
+          # truth for this wiki's place in the graph, in both directions.
+          TARGETS=$(python3 -c "import sys; sys.path.insert(0,'tools'); import contribute; print('\n'.join(contribute.topology().get('contributes_to') or []))")
+          if [ -z "$TARGETS" ]; then
+            echo "### Contributes to no commons" >> "$GITHUB_STEP_SUMMARY"
+            echo "::notice::design/federation.json lists no commons - nothing to sync."
+            exit 0
+          fi
+          echo "### Commons synced" >> "$GITHUB_STEP_SUMMARY"
+          for NAME in $TARGETS; do
+            DEST=".commons/${NAME}/export"
+            mkdir -p "$(dirname "$DEST")"
+            # Read the orphan `export` branch, never the working tree: it is the
+            # boundary-filtered cut, so a private page in a commons cannot reach a
+            # spoke even by accident.
+            if git clone --depth 1 --branch export \
+                 "https://x-access-token:${TOKEN}@github.com/${OWNER}/${NAME}.git" "$DEST" 2>/dev/null; then
+              echo "- \`${NAME}\` — fetched" >> "$GITHUB_STEP_SUMMARY"
+              echo "Fetched ${NAME}."
+            else
+              echo "- \`${NAME}\` — **no export branch yet**" >> "$GITHUB_STEP_SUMMARY"
+              echo "::warning::No export branch on ${OWNER}/${NAME} - nothing to sync from it."
+            fi
+          done
+
+      - name: Report what the commons hold
+        run: python3 tools/commons_report.py
