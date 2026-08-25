@@ -43,7 +43,14 @@ import export   # noqa: E402
 import search   # noqa: E402
 
 # Tripwires. Crossing one is a prompt to look, not an instruction to build.
-T_INDEX_LINES = 1500      # the router stops being skimmable
+#
+# The router tripwire counts TOKENS, not lines, and that correction was paid for. Until
+# 2026-08-25 it read `index.md is > 1500 lines`. At its worst the index was **523 lines
+# and 221,676 characters** — about 55,000 tokens, read before every single operation
+# against a corpus whose median page is under 1,000. The meter read "523, fine." The rows
+# had grown, not multiplied, and a line count cannot see that. A tripwire that cannot fire
+# on the failure it exists to catch is worse than no tripwire: it issues assurance.
+T_ROUTER_TOKENS = 15000   # what routing costs before the first useful token is read
 T_ROUTING_GAP = 0.05      # >5% of pages missing from the index = the cascade is slipping
 T_DISCRIM = 25            # a typical query no longer separates a handful from the rest
 T_ORPHANS = 0.15          # >15% unreachable by link = the graph is not doing its job
@@ -73,9 +80,22 @@ def measure(wiki_dir="wiki"):
     m["words_median"] = int(statistics.median(words)) if words else 0
 
     # --- routing -----------------------------------------------------------
+    # The router is what every operation pays for; the shelves are opt-in. So the COST
+    # metric reads the router alone, and the COVERAGE metric reads router + shelves —
+    # they are one catalogue for "is this page listed?" and two different things for
+    # "what does routing cost?". Conflating them is how `sync_index_counts.py` went blind
+    # to 356 pages the day the index was tiered.
     index_path = os.path.join(wiki_dir, "index.md")
-    index_text = open(index_path, encoding="utf-8").read() if os.path.exists(index_path) else ""
-    m["index_lines"] = index_text.count("\n") + 1 if index_text else 0
+    router_text = open(index_path, encoding="utf-8").read() if os.path.exists(index_path) else ""
+    m["index_lines"] = router_text.count("\n") + 1 if router_text else 0
+    m["router_tokens"] = len(router_text) // 4
+
+    shelf_dir = os.path.join(wiki_dir, "index")
+    shelves = sorted(f for f in os.listdir(shelf_dir) if f.endswith(".md")) \
+        if os.path.isdir(shelf_dir) else []
+    index_text = "\n".join([router_text] + [
+        open(os.path.join(shelf_dir, f), encoding="utf-8").read() for f in shelves])
+    m["shelves"] = len(shelves)
 
     titles = {fm.get("title") for _s, _p, fm, _b in pages if isinstance(fm.get("title"), str)}
     listed = {t.strip() for t in re.findall(r"\[\[([^\]|#]+)", index_text)}
@@ -87,6 +107,16 @@ def measure(wiki_dir="wiki"):
     # reachable if the index links it, or if any page the index links reaches it.
     nodes_r, _t2s_r = export.build_nodes(wiki_dir)
     title_of = {s: n.get("title") for s, n in nodes_r.items()}
+
+    # A catalogue may link by wiki-link OR by ordinary markdown path — the template wikis
+    # ship an index written entirely as `[Overview](overview.md)`. Reading only `[[...]]`
+    # reported 100% of their pages unlisted, which is a false alarm about a file format,
+    # not a finding about routing. Both forms are links; count both.
+    for href in re.findall(r"\]\(([^)]+?\.md)\)", index_text):
+        slug = href.split("/")[-1][:-3]
+        if slug in title_of and isinstance(title_of[slug], str):
+            listed.add(title_of[slug])
+
     reachable = set(listed)
     for s, n in nodes_r.items():
         if title_of.get(s) in listed:
@@ -129,8 +159,9 @@ def measure(wiki_dir="wiki"):
 def verdict(m):
     """Which tripwires have fired, with the number that fired them."""
     fired = []
-    if m["index_lines"] > T_INDEX_LINES:
-        fired.append(f"index.md is {m['index_lines']} lines (> {T_INDEX_LINES})")
+    if m["router_tokens"] > T_ROUTER_TOKENS:
+        fired.append(f"routing costs ~{m['router_tokens']:,} tokens before the first "
+                     f"useful one (> {T_ROUTER_TOKENS:,})")
     if m["routing_gap_rate"] > T_ROUTING_GAP:
         fired.append(f"{m['routing_gaps']} pages missing from the index "
                      f"({m['routing_gap_rate']:.1%} > {T_ROUTING_GAP:.0%})")
@@ -164,7 +195,9 @@ def main(argv=None):
     print(f"scale reading — {m['date']}\n")
     print(f"  corpus          {m['pages']} pages, {m['words_total']:,} words "
           f"(median page {m['words_median']})")
-    print(f"  index.md        {m['index_lines']} lines            (tripwire > {T_INDEX_LINES})")
+    print(f"  routing cost    ~{m['router_tokens']:,} tokens "
+          f"({m['index_lines']} router lines + {m['shelves']} shelves)"
+          f"   (tripwire > {T_ROUTER_TOKENS:,})")
     print(f"  routing gaps    {m['routing_gaps']} pages unlisted "
           f"({m['routing_gap_rate']:.1%})   (tripwire > {T_ROUTING_GAP:.0%})")
     if m["_missing_sample"]:
