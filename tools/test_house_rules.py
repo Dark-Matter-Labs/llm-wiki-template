@@ -49,6 +49,20 @@ CASES = [
     ("organising and manoeuvre stay", False, "organising and manoeuvre stay"),
     # --- someone else's words are not ours to correct -----------------------
     (f"> A quote about {w}ation.",    False, f"> A quote about {w}ation."),
+    (f"> {W} is what they wrote.",    False, f"> {W} is what they wrote."),
+
+    # --- but a wiki-link inside a quotation IS ours --------------------------
+    # The quoted words belong to their author; the link target cannot — a source
+    # cannot have written a [[…]] into someone else's wiki. Skipping both cost four
+    # unresolvable links on 2026-08-21.
+    (f"> See [[{W} Goal Space]] for more.", True, "> See [[xCO Goal Space]] for more."),
+    (f"> A quote about [[{w.capitalize()}ation Options]].", True,
+     "> A quote about [[Civilization Options]]."),
+    # The case that matters: prose and a link on the SAME quoted line. Only the link moves.
+    (f"> {W} is what they wrote, see [[{W} Goal Space]].", True,
+     f"> {W} is what they wrote, see [[xCO Goal Space]]."),
+    # A quotation with no link is still untouched, even alongside one that has one.
+    (f"> plain {w}ation, no link here",  False, f"> plain {w}ation, no link here"),
 ]
 
 

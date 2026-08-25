@@ -42,6 +42,11 @@ SKIP_DIRS = {".git", "raw", "export", "node_modules", "view", "contrib",
              ".commons", "__pycache__"}
 EXTS = {".md", ".html", ".txt", ".json", ".css", ".py", ".yml", ".yaml"}
 
+# Generated caches are derived artifacts, like everything under export/. They quote
+# page paths and source titles verbatim, so a cache of a corpus that discusses
+# "civilisation" trips rule 1 on text nobody wrote. Fix the source, not the cache.
+SKIP_FILES = {".staleness-cache.json"}
+
 # Rule 1 — the s/z family. Case is preserved when fixing.
 CIVIL = re.compile(r"\bcivilis(ation|ations|ational|ed|es|ing|e)\b", re.I)
 
@@ -65,12 +70,37 @@ def fix_civil(m):
     return word[:6] + z + word[7:]
 
 
+# A wiki-link inside a quotation. The quoted words belong to their author; the link
+# TARGET does not — a source cannot have written a `[[…]]` into someone else's wiki, so
+# it is always the wiki's own editorial choice and always ours to correct.
+WIKILINK = re.compile(r"\[\[([^\]]+)\]\]")
+
+
+def _fix_links_only(line):
+    """Correct casing inside [[...]] and nowhere else. For blockquote lines."""
+    return WIKILINK.sub(lambda m: "[[" + _apply(m.group(1)) + "]]", line)
+
+
 def scan_text(text, fix=False):
     """Return (new_text, [(rule, line_no, excerpt)])."""
     hits, lines = [], text.split("\n")
     for i, line in enumerate(lines, 1):
-        # A verbatim quotation is not ours to correct.
+        # A verbatim quotation is not ours to correct — except its wiki-links.
+        #
+        # The corpus uses `>` for two different things: real quotations, and its own
+        # editorial callouts. Skipping both wholesale cost four links on 2026-08-21 —
+        # targets spelled with a capital X that never resolved, while the correctly
+        # spelled pages sat right there with 15–18 inbound links each. Correcting only
+        # the link target fixes them without touching a word anyone else wrote.
         if line.lstrip().startswith(">"):
+            for m in WIKILINK.finditer(line):
+                inner = m.group(1)
+                for c in CIVIL.finditer(inner):
+                    hits.append(("civilization-z", i, c.group(0)))
+                for c in BAD_CASE.finditer(inner):
+                    hits.append(("xCO-casing", i, c.group(0)))
+            if fix:
+                lines[i - 1] = _fix_links_only(line)
             continue
         # Blank out URLs for detection so a link never trips a rule.
         probe = URL.sub(lambda m: " " * len(m.group(0)), line)
@@ -101,6 +131,8 @@ def walk(root):
     for dirpath, dirnames, filenames in os.walk(root):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
         for fn in filenames:
+            if fn in SKIP_FILES:
+                continue
             if os.path.splitext(fn)[1].lower() in EXTS:
                 yield os.path.join(dirpath, fn)
 

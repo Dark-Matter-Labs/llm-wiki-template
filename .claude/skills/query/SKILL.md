@@ -7,6 +7,16 @@ description: Answer a question against the wiki. Use when the owner asks "what d
 
 ## Steps
 
+1. **Search first — do not scan.** Run `python3 tools/search.py "<the question>" --top 12`.
+   It ranks title, tags and description above body text, so the top hits are the pages the
+   question is *about*. ~1k tokens. **Never load pages in order to decide which pages to load** —
+   context is for reasoning over candidates, traversal is for finding them.
+
+   Second hop by graph, not by catalogue: `export/wiki.json` carries `inbound_links` and
+   `outbound_links`, so a page's neighbourhood is a lookup.
+
+   `wiki/index.md` is the router — read it for the *shape* of the corpus, not to find a page.
+
 1. **Read `wiki/index.md` first.** It's the routing file. Find the pages relevant to
    the question from their one-line summaries. Do not scan the whole wiki.
 

@@ -32,6 +32,16 @@ MAY fix frontmatter metadata when the correct value is unambiguous.
 6. **Duplicates.** Find pages with near-identical titles or content. List them for
    the owner to approve a merge. Never merge or delete without approval.
 
+7. **Dormancy candidates.** Run `python3 tools/staleness.py --older-than 42 --json` and cross it
+   with the graph. A candidate is **all three** of: body untouched for the threshold,
+   `confidence: low`, and one inbound link or fewer. Report them; never set `status: dormant`
+   yourself.
+
+   **State the baseline before the count.** The threshold only means something once repo history
+   substantially exceeds it — in a young wiki "untouched 42 days" means "arrived in the first
+   bulk ingest", which is youth, not death. If history is under about twice the threshold, say
+   the pass is not yet informative rather than presenting a list.
+
 ## Output
 
 Produce a plain-language report:

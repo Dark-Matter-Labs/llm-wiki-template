@@ -36,6 +36,7 @@ you your yours would could may might must shall one two three per via vs eg ie e
 pdf html png jpg svg csv raw docs wiki assets http https www com org""".split())
 
 EXCLUDE = {"index.md", "log.md"}
+EXCLUDE_DIRS = {"index", "log"}
 
 def tokenize(text):
     text = re.sub(r"^---\n.*?\n---\n", "", text, count=1, flags=re.S)  # frontmatter off
@@ -49,17 +50,28 @@ def tokenize(text):
         out.append(t)
     return out
 
+def is_dormant(text):
+    """`status: dormant` — retired by a human. Present and readable, but it no longer
+    votes on where the corpus's centre is. Retired thinking must not keep pulling."""
+    import re as _re
+    m = _re.search(r"^status:\s*(\S+)", text, _re.M)
+    return bool(m) and m.group(1).strip().strip('"') == "dormant"
+
+
 def wiki_files_from_dir(root):
     out = {}
     wiki = os.path.join(root, "wiki")
     for dirpath, _, files in os.walk(wiki):
         # wiki/log/ holds the monthly log files — catalogue prose, not corpus content.
-        if os.path.basename(dirpath) == "log" and os.path.dirname(dirpath) == wiki:
+        if os.path.basename(dirpath) in EXCLUDE_DIRS and os.path.dirname(dirpath) == wiki:
             continue
         for f in files:
             if f.endswith(".md") and f not in EXCLUDE:
                 p = os.path.join(dirpath, f)
-                out[os.path.relpath(p, root)] = open(p, encoding="utf-8", errors="replace").read()
+                text = open(p, encoding="utf-8", errors="replace").read()
+                if is_dormant(text):
+                    continue
+                out[os.path.relpath(p, root)] = text
     return out
 
 def snapshot_at(date):
