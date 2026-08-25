@@ -52,6 +52,8 @@ jobs:
         run: |
           python3 tools/test_export.py
           python3 tools/test_internal_tier.py
+          python3 tools/test_measure_scale.py
+          python3 tools/test_staleness.py
 
       - name: Sensitive-terms scan on public surfaces
         run: python3 tools/scan_public_leaks.py
