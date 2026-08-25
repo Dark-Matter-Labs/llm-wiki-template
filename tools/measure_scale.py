@@ -112,8 +112,12 @@ def measure(wiki_dir="wiki"):
     # ship an index written entirely as `[Overview](overview.md)`. Reading only `[[...]]`
     # reported 100% of their pages unlisted, which is a false alarm about a file format,
     # not a finding about routing. Both forms are links; count both.
+    # Resolve by PATH, not basename. Nested pages are keyed by their path relative to
+    # `wiki/` (`crm/roster`), and basenames genuinely collide — malik's wiki holds both
+    # `aew.md` and `crm/accounts/aew.md`. Matching on basename would have credited the
+    # wrong page and reported coverage that was not there.
     for href in re.findall(r"\]\(([^)]+?\.md)\)", index_text):
-        slug = href.split("/")[-1][:-3]
+        slug = href.lstrip("./")[:-3]
         if slug in title_of and isinstance(title_of[slug], str):
             listed.add(title_of[slug])
 

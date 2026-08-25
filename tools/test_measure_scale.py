@@ -80,10 +80,17 @@ def main():
         # The template wikis catalogue with ordinary markdown paths, not wiki-links.
         # Reading only [[...]] reported 100% of their pages unlisted — a false alarm
         # about a file format, dressed as a finding about routing.
-        w = build(tmp, "# Index\n\n- [Alpha](alpha.md)\n- [Beta](beta.md)\n")
+        w = build(tmp, "# Index\n\n- [Alpha](alpha.md)\n- [Beta](sub/beta.md)\n")
+        # Beta lives in a subdirectory and shares its basename with a decoy at the root:
+        # resolution must go by path, or the decoy gets the credit and Beta stays a gap.
+        wp = pathlib.Path(w)
+        (wp / "sub").mkdir()
+        (wp / "beta.md").rename(wp / "sub" / "beta.md")
+        page(wp, "beta.md", "Beta Decoy")
         m = measure_scale.measure(w)
-        check("a markdown-path catalogue counts as listed",
-              m["routing_gaps"] == 0, f"reported {m['routing_gaps']}: {m['_missing_sample']}")
+        check("a markdown-path catalogue counts as listed, resolved by path",
+              m["routing_gaps"] == 1 and m["_missing_sample"] == ["Beta Decoy"],
+              f"reported {m['routing_gaps']}: {m['_missing_sample']}")
 
     with tempfile.TemporaryDirectory() as tmp:
         # The shape that slipped through: few lines, enormous rows.
