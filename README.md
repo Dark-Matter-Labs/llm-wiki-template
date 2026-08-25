@@ -134,3 +134,5 @@ reflection does. Delete its `schedule:` block to make reflections manual-only.
 ## Credit
 
 Pattern: Andrej Karpathy's LLM-Wiki gist. Skill structure inspired by Garry Tan's gstack.
+
+**Fixing something small yourself?** You don't need Claude for a typo — see **[EDITING.md](EDITING.md)** for the thirty-second browser edit, and for the short list of files that are computed rather than written and shouldn't be hand-edited.

@@ -93,6 +93,23 @@ def main():
               f"reported {m['routing_gaps']}: {m['_missing_sample']}")
 
     with tempfile.TemporaryDirectory() as tmp:
+        # The hub case, which the metric exists NOT to punish: the index links a roster,
+        # and the roster links its cards by relative markdown path. malik's nine CRM
+        # cards were reported as gaps for exactly this shape.
+        w = build(tmp, "# Index\n\n- [Roster](crm/roster.md)\n- [Alpha](alpha.md)\n- [Beta](beta.md)\n")
+        wp = pathlib.Path(w)
+        (wp / "crm" / "cards").mkdir(parents=True)
+        page(wp / "crm" / "cards", "mapfre.md", "Mapfre (account)")
+        (wp / "crm" / "roster.md").write_text(
+            "---\ntype: entity\ntitle: Roster\ndescription: d\ntags: [t]\nstatus: draft\n"
+            "visibility: private\nconfidence: high\nvalidation: machine\n"
+            "timestamp: 2026-08-25\nsources: []\n---\n\n- [Mapfre](cards/mapfre.md)\n",
+            encoding="utf-8")
+        m = measure_scale.measure(w)
+        check("a card reached only through a hub's relative markdown link is not a gap",
+              m["routing_gaps"] == 0, f"reported {m['routing_gaps']}: {m['_missing_sample']}")
+
+    with tempfile.TemporaryDirectory() as tmp:
         # The shape that slipped through: few lines, enormous rows.
         fat = "# Index\n\n" + "".join(f"- [[P{i}]] — {'x' * 900}\n" for i in range(80))
         w = build(tmp, fat, "# Concepts\n\n- [[Alpha]] — a\n- [[Beta]] — b\n")

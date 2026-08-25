@@ -69,6 +69,26 @@ PROBES = [
 ]
 
 
+def md_link_titles(text, base_dir, title_of):
+    """Titles of pages reached by ordinary markdown links in `text`.
+
+    Resolution is by PATH, not basename, and relative to the LINKING page's directory.
+    Both details were paid for: malik's wiki holds `aew.md` and `crm/accounts/aew.md`, so
+    basename matching credits the wrong page; and the CRM roster links its cards as
+    `accounts/mapfre.md`, which only resolves from `wiki/crm/`.
+    """
+    found = set()
+    for href in re.findall(r"\]\(([^)\s]+?\.md)\)", text):
+        if "://" in href:
+            continue
+        slug = os.path.normpath(os.path.join(base_dir, href))[:-3].replace(os.sep, "/")
+        slug = slug.lstrip("./")
+        title = title_of.get(slug)
+        if isinstance(title, str):
+            found.add(title)
+    return found
+
+
 def measure(wiki_dir="wiki"):
     m = {"date": datetime.date.today().isoformat()}
 
@@ -109,17 +129,14 @@ def measure(wiki_dir="wiki"):
     title_of = {s: n.get("title") for s, n in nodes_r.items()}
 
     # A catalogue may link by wiki-link OR by ordinary markdown path — the template wikis
-    # ship an index written entirely as `[Overview](overview.md)`. Reading only `[[...]]`
-    # reported 100% of their pages unlisted, which is a false alarm about a file format,
-    # not a finding about routing. Both forms are links; count both.
-    # Resolve by PATH, not basename. Nested pages are keyed by their path relative to
-    # `wiki/` (`crm/roster`), and basenames genuinely collide — malik's wiki holds both
-    # `aew.md` and `crm/accounts/aew.md`. Matching on basename would have credited the
-    # wrong page and reported coverage that was not there.
-    for href in re.findall(r"\]\(([^)]+?\.md)\)", index_text):
-        slug = href.lstrip("./")[:-3]
-        if slug in title_of and isinstance(title_of[slug], str):
-            listed.add(title_of[slug])
+    # ship an index written entirely as `[Overview](overview.md)`, and the CRM roster
+    # catalogues its cards as `[Mapfre](accounts/mapfre.md)`. Reading only `[[...]]`
+    # reported those pages unlisted: a false alarm about a file format dressed as a
+    # finding about routing. Both forms are links, at BOTH hops — the roster is exactly
+    # the deliberate hub this metric was written not to punish.
+    listed |= md_link_titles(index_text, "", title_of)
+
+    body_of = {s: b for s, _p, _fm, b in pages}
 
     reachable = set(listed)
     for s, n in nodes_r.items():
@@ -128,6 +145,7 @@ def measure(wiki_dir="wiki"):
                 t = title_of.get(tgt) if tgt in nodes_r else tgt
                 if isinstance(t, str):
                     reachable.add(t)
+            reachable |= md_link_titles(body_of.get(s, ""), os.path.dirname(s), title_of)
     missing = {t for t in titles if t and t not in reachable}
     m["routing_gaps"] = len(missing)
     m["routing_gap_rate"] = round(len(missing) / max(1, len(titles)), 3)
