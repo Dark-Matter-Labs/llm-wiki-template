@@ -40,6 +40,9 @@ jobs:
         # typed. This catches a forgotten `python3 tools/sync_log_index.py`.
         run: python3 tools/sync_log_index.py --check
 
+      - name: No model is standing in for a person
+        run: python3 tools/cross_check.py --check
+
       - name: Schema + link integrity
         run: python3 tools/export.py --check
 
@@ -53,6 +56,7 @@ jobs:
           python3 tools/test_export.py
           python3 tools/test_internal_tier.py
           python3 tools/test_measure_scale.py
+          python3 tools/test_cross_check.py
           python3 tools/test_staleness.py
 
       - name: Sensitive-terms scan on public surfaces

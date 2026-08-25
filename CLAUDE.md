@@ -122,6 +122,25 @@ confirmed is a different object from a hunch the group has endorsed.
 **You may set `machine`, and propose `self`. You may never award `peer` or `collective`** —
 those need a second person, and a model granting them would make the hierarchy meaningless.
 
+A **second frontier model** reading a page is a real signal and is recorded separately, in
+`machine_checks:` — never in `validation`:
+
+```yaml
+machine_checks:
+  - model: gpt-5.2
+    date: 2026-08-25
+    verdict: agrees | disputes | unsure
+    note: one line on what it actually said
+```
+
+**A machine check may move `confidence`. It may never move `validation`.** Two models
+agreeing is weaker evidence than it feels like — they were trained on overlapping corpora
+and fail in correlated ways, and neither has a stake in being wrong. A `disputes` entry is
+a **declaration, not a resolution**, exactly like `contradicts:`: it stands until a person
+decides, and may not be deleted by the model that disagrees with it. Run the `cross-check`
+skill; `python3 tools/cross_check.py --check` gates it, and refuses any `validated_by`
+that names something model-shaped.
+
 Validation feeds the gravity weighting: unvalidated material is admitted, indexed and
 searchable, but does not yet move the corpus's centre. That is the protection against a
 large body of well-formed but out-of-date thinking dragging the whole model backwards.
@@ -309,3 +328,5 @@ Prefer direct, grounded work over hedged options. When you ingest or answer:
 - Separate what a source actually says from what you infer from it.
 - Flag contradictions between sources rather than smoothing them over.
 - When something is uncertain or thin, say so plainly.
+
+**Small corrections** — typos, dates, a tag, `status`, `validation: self` — can be made directly through GitHub's web editor; `EDITING.md` is the guide. The line it draws is **blast radius, not effort**: one file is theirs, anything that touches the cross-reference graph is yours.
