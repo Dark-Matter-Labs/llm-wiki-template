@@ -6,7 +6,7 @@ At small scale (a few hundred pages), wiki/index.md is enough and you rarely nee
 As the wiki grows, this gives Claude a fast way to find candidate pages without reading
 everything. It uses a simple TF-IDF ranking over the markdown files in wiki/.
 
-Usage (Claude shells out to this; the owner never runs it directly):
+Usage (Claude shells out to this; Indy never runs it directly):
     python tools/search.py "climate finance outcomes"
     python tools/search.py "permissioning" --top 5
 
@@ -33,16 +33,22 @@ def tokenize(text):
 def read_pages():
     pages = []
     for p in sorted(WIKI_DIR.rglob("*.md")):
-        # index.md and the log (log.md + the wiki/log/ monthly files) are catalogues,
-        # not content pages.
-        if p.name in ("index.md", "log.md") or p.parent.name == "log":
+        # Catalogues are navigation, not content. wiki/index/ joined this list on
+        # 2026-08-23 when the index was tiered: those files list every description in
+        # the corpus, so without this they outrank every real page on every query.
+        if p.name in ("index.md", "log.md") or p.parent.name in ("log", "index"):
             continue
         text = p.read_text(encoding="utf-8", errors="ignore")
-        desc = ""
-        m = re.search(r"^description:\s*(.+)$", text, re.MULTILINE)
-        if m:
-            desc = m.group(1).strip()
-        pages.append({"path": p, "text": text, "desc": desc, "tokens": tokenize(text)})
+        def field(name):
+            m = re.search(rf"^{name}:\s*(.+)$", text, re.MULTILINE)
+            return m.group(1).strip().strip('"') if m else ""
+        pages.append({
+            "path": p, "text": text,
+            "desc": field("description"),
+            "title": field("title"),
+            "tags": field("tags"),
+            "tokens": tokenize(text),
+        })
     return pages
 
 
@@ -57,14 +63,29 @@ def score(pages, query):
             df[t] += 1
     idf = {t: math.log((N + 1) / (df.get(t, 0) + 1)) + 1 for t in q_tokens}
 
+    # Field weights. Body TF-IDF alone ranked long essays above the concept page a
+    # question was actually about — which is why nothing used this tool and every
+    # query went through the 55k-token index instead. What a page IS lives in its
+    # title, tags and description; the body is for recall, not for precision.
+    W_TITLE, W_TAGS, W_DESC, W_BODY = 6.0, 3.0, 2.0, 1.0
+
     results = []
     for pg in pages:
         tf = Counter(pg["tokens"])
         length = len(pg["tokens"]) or 1
-        s = sum((tf.get(t, 0) / length) * idf[t] for t in q_tokens)
-        # small boost if query terms appear in the description/title
-        if any(t in tokenize(pg["desc"]) for t in q_tokens):
-            s *= 1.5
+        body = sum((tf.get(t, 0) / length) * idf[t] for t in q_tokens)
+
+        title_t = set(tokenize(pg["title"]))
+        tags_t = set(tokenize(pg["tags"]))
+        desc_t = set(tokenize(pg["desc"]))
+        hits = lambda field: sum(idf[t] for t in q_tokens if t in field) / len(q_tokens)
+
+        s = (W_TITLE * hits(title_t) + W_TAGS * hits(tags_t)
+             + W_DESC * hits(desc_t) + W_BODY * body)
+
+        # All query terms in the title is almost always the page being asked for.
+        if title_t and all(t in title_t for t in q_tokens):
+            s *= 2.0
         if s > 0:
             results.append((s, pg))
     results.sort(key=lambda x: x[0], reverse=True)

@@ -62,7 +62,7 @@ type: entity | concept | summary | comparison | overview | synthesis | goal | co
 title: Human-readable title
 description: One sentence describing the page
 tags: [tag1, tag2]
-status: draft | reviewed
+status: draft | reviewed | dormant
 visibility: public | unlisted | internal | private   # default: private
 confidence: high | medium | low
 validation: machine | self | peer | collective       # default: machine
@@ -125,6 +125,21 @@ those need a second person, and a model granting them would make the hierarchy m
 Validation feeds the gravity weighting: unvalidated material is admitted, indexed and
 searchable, but does not yet move the corpus's centre. That is the protection against a
 large body of well-formed but out-of-date thinking dragging the whole model backwards.
+
+### Dormancy — pages retire, they do not die
+
+`status: dormant` marks a page nobody stands behind and nothing references any more. It is a
+**weight-and-visibility** change, not a deletion: the file stays and stays readable, its
+catalogue row moves to an attic shelf, and `compute_gravity.py` stops counting it so retired
+thinking cannot keep pulling the corpus's centre. Waking it is symmetrical.
+
+**Only a human sets it.** `lint` proposes candidates and never applies them — deciding that a
+line of thinking is finished is a judgement, and a model making it silently would quietly narrow
+the corpus.
+
+The signal is `tools/staleness.py`, which reports when a page's **body** last changed, ignoring
+frontmatter-only commits. Git mtime cannot be used: one schema backfill rewrites every page's
+frontmatter and resets every clock at once. A signal a migration can reset measures migrations.
 
 ### Contradictions must resolve, never sit silent
 
