@@ -42,6 +42,49 @@ Two edits, and the wiki stops being generic:
 
 Everything else can be left alone until it needs changing.
 
+## 3b. If this is a COMMONS, not a personal wiki
+
+Skip this if the wiki belongs to one person. A **commons** — a team's or an option's shared
+wiki — needs four changes, and **the first one is not optional**: without it the commons
+publishes an empty graph and every spoke syncing from it is told the sync succeeded.
+
+**1. The two-cut export.** This template ships the *spoke* export, which publishes only
+`wiki.public.json`. A commons defaults every page to `internal`, so its public cut is empty
+by construction. Copy both files from an existing commons (`xco-team-wiki` is the reference):
+
+```bash
+cp ../xco-team-wiki/tools/export.py            tools/export.py
+cp ../xco-team-wiki/.github/workflows/export.yml .github/workflows/export.yml
+```
+
+That version writes `wiki.shared.json` too — public + unlisted + **internal**, the cut the
+`internal` tier exists for — and adds the `origin` / `contributed` provenance fields the
+federation view needs. Both cuts strip `private` completely: body, title and inbound links.
+
+Verify it rather than assuming, because the failure looks like success:
+
+```bash
+python3 tools/export.py && ls export/
+python3 tools/test_export_shared.py
+```
+
+You want `wiki.shared.json` present and non-trivial. A 218-byte `wiki.public.json` on its
+own is the bug.
+
+**2. The private-page advisory.** Copy `tools/check_no_private.py` from a commons and add a
+step to `.github/workflows/checks.yml`. It **warns** rather than fails — a page
+mid-migration is a real case — and surfaces on the pull request so a reviewer decides.
+
+**3. Delete `deploy-pages.yml`.** A commons is not a publishing surface. Work that should
+reach the open web goes out through a member's own wiki, after `publish-check`.
+
+**4. Fix the scaffolding's own visibility.** `wiki/axioms.md` and `wiki/overview.md` ship
+`private`. In a commons they should be `internal`, or the advisory in step 2 fires on the
+template's own files from day one.
+
+Then set `design/federation.json`: `"role": "commons"`, a one-line `subject`, `receives_from`
+listing who contributes up into it, and `contributes_to` if it feeds a wider commons in turn.
+
 ## 4. Connect Claude
 
 1. The GitHub account the owner uses with Claude needs access to the repo — via the Claude
