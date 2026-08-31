@@ -45,7 +45,11 @@ EXTS = {".md", ".html", ".txt", ".json", ".css", ".py", ".yml", ".yaml"}
 # Generated caches are derived artifacts, like everything under export/. They quote
 # page paths and source titles verbatim, so a cache of a corpus that discusses
 # "civilisation" trips rule 1 on text nobody wrote. Fix the source, not the cache.
-SKIP_FILES = {".staleness-cache.json"}
+# Generated registers. Each one quotes page paths and titles verbatim, so a corpus file whose
+# NAME carries the s-spelling — `cof-civilisation-options-hedge-summary.md` — makes the register
+# trip a rule about prose. The register is not prose, and correcting it would break the very
+# paths it exists to record.
+SKIP_FILES = {".staleness-cache.json", "sources-baseline.json", "links-baseline.json"}
 
 # Rule 1 — the s/z family. Case is preserved when fixing.
 CIVIL = re.compile(r"\bcivilis(ation|ations|ational|ed|es|ing|e)\b", re.I)
@@ -53,10 +57,30 @@ CIVIL = re.compile(r"\bcivilis(ation|ations|ational|ed|es|ing|e)\b", re.I)
 # Rule 2 — a standalone xCO token. The character classes on both sides are what
 # keep slugs, paths, domains, handles and identifiers out: `xco-style-guide`,
 # `docs/xco.md`, `xco@example.org`, `--xco-tokens` all have an excluded neighbour.
+# The lookarounds exempt identifiers: slugs (`xco-style-guide`), paths (`docs/xco.md`),
+# domains, handles and CSS variables. Quotes are exempt for the same reason, added
+# 2026-08-27: a quoted lowercase token is a DATA LITERAL, not prose — `OURS_TAGS = {"xco"}`
+# in a tool has to match the frontmatter tag exactly, and "correcting" it would break the
+# match it exists to make. The rule governs what we write about xCO, not the strings we
+# compare against. Blockquoted lines are already skipped elsewhere as someone else's words.
 BAD_CASE = re.compile(
-    r"(?<![A-Za-z0-9_./@-])(XCO|Xco|xCo|XCo|xco)(?![A-Za-z0-9_@/-]|\.[A-Za-z0-9])")
+    r"""(?<![A-Za-z0-9_./@'"-])(XCO|Xco|xCo|XCo|xco)(?![A-Za-z0-9_@/-]|\.[A-Za-z0-9]|['"])""")
 
 URL = re.compile(r"https?://\S+")
+
+# A path INTO raw/ is a reference to an immutable file. `CLAUDE.md` already says this rule
+# "does not touch raw/, which is immutable: a source that says 'civilisation' said that, and
+# correcting it would falsify the record" — but until 2026-08-27 that exemption covered the
+# FILES and not the CITATIONS pointing at them. So `--fix` rewrote
+#   raw/…/COF Civilisation Options Hedge/…       (the directory that exists on disk)
+# into
+#   raw/…/COF Civilization Options Hedge/…       (a path that does not)
+# and broke two citations on pages nobody had reason to re-open. A gate enforcing a spelling
+# rule was silently breaking the rule that matters more — never invent or break a citation.
+#
+# Two spans are protected: a whole `sources:` line, and any `(raw/…)` inline citation.
+SOURCES_LINE = re.compile(r"^\s*sources:", re.I)
+RAW_CITATION = re.compile(r"\(raw/[^)\n]*\)?")
 
 
 def fix_civil(m):
@@ -102,8 +126,13 @@ def scan_text(text, fix=False):
             if fix:
                 lines[i - 1] = _fix_links_only(line)
             continue
-        # Blank out URLs for detection so a link never trips a rule.
+        # A `sources:` line is entirely paths into an immutable directory. Never ours.
+        if SOURCES_LINE.match(line):
+            continue
+
+        # Blank out URLs and raw/ citations for detection so neither trips a rule.
         probe = URL.sub(lambda m: " " * len(m.group(0)), line)
+        probe = RAW_CITATION.sub(lambda m: " " * len(m.group(0)), probe)
 
         for m in CIVIL.finditer(probe):
             hits.append(("civilization-z", i, m.group(0)))
@@ -113,7 +142,11 @@ def scan_text(text, fix=False):
         if fix and (CIVIL.search(probe) or BAD_CASE.search(probe)):
             # Rebuild the line, leaving any URL span untouched.
             out, last = [], 0
-            for u in URL.finditer(line):
+            spans = sorted(list(URL.finditer(line)) + list(RAW_CITATION.finditer(line)),
+                           key=lambda m: m.start())
+            for u in spans:
+                if u.start() < last:
+                    continue
                 out.append(_apply(line[last:u.start()]))
                 out.append(u.group(0))
                 last = u.end()

@@ -43,8 +43,18 @@ jobs:
       - name: No model is standing in for a person
         run: python3 tools/cross_check.py --check
 
-      - name: Schema + link integrity
+      - name: Schema — frontmatter, types, commitment states
+        # Renamed 2026-08-31. This step was called "Schema + link integrity" and did not check
+        # link integrity: it catches a link wrapped across a newline and nothing else. A broken
+        # target passed it silently, because export.py drops unresolvable edges while building
+        # the graph. The link check is its own step.
         run: python3 tools/export.py --check
+
+      - name: Wiki-links resolve
+        # Every [[link]] must point at a page that exists. Code spans are excluded — these wikis
+        # write about the link syntax as often as they use it. Existing dead links are baselined;
+        # this fails on anything new.
+        run: python3 tools/check_links.py --check
 
       - name: Design tokens keep their own accessibility contract
         # Generated CSS must match design/xco.tokens.json, and every text token
@@ -57,6 +67,7 @@ jobs:
           python3 tools/test_internal_tier.py
           python3 tools/test_measure_scale.py
           python3 tools/test_cross_check.py
+          python3 tools/test_check_links.py
           python3 tools/test_staleness.py
 
       - name: Sensitive-terms scan on public surfaces
