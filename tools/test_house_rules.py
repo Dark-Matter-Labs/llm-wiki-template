@@ -40,6 +40,21 @@ CASES = [
     ("Uses --xco-tokens variable.",   False, "Uses --xco-tokens variable."),
     ("the file xco2.css is fine",     False, "the file xco2.css is fine"),
     ("xco.tokens.json stays",         False, "xco.tokens.json stays"),
+    # A path INTO raw/ points at an immutable file. Correcting its spelling breaks the
+    # citation — which --fix actually did, to two real pages, before this was added.
+    (f"sources: [raw/COF {w.capitalize()}ation Options Hedge/x.pdf]", False,
+     f"sources: [raw/COF {w.capitalize()}ation Options Hedge/x.pdf]"),
+    (f"Holds (raw/COF {w.capitalize()}ation Hedge/x.pdf).", False,
+     f"Holds (raw/COF {w.capitalize()}ation Hedge/x.pdf)."),
+    # ...but prose on the same line as a citation is still ours.
+    (f"A {w}ation and (raw/{w.capitalize()}ation Notes.pdf) cited.", True,
+     f"A civilization and (raw/{w.capitalize()}ation Notes.pdf) cited."),
+    # A quoted lowercase token is a data literal — a tool matching the frontmatter tag
+    # `xco` must contain that exact string, and correcting it would break the match.
+    ('OURS_TAGS = {"dark-matter-labs", "xco"}', False, 'OURS_TAGS = {"dark-matter-labs", "xco"}'),
+    ("tags = ['xco', 'goal-space']",  False, "tags = ['xco', 'goal-space']"),
+    # ...but the exemption must not swallow a genuine prose mistake next to punctuation.
+    (f"{W} is the programme.",        True,  "xCO is the programme."),
     (f"Visit https://x.io/{W}/page here.", False, f"Visit https://x.io/{W}/page here."),
     # --- rule 1: civilization with a z --------------------------------------
     (f"{w.capitalize()}ation is at stake.", True, "Civilization is at stake."),
