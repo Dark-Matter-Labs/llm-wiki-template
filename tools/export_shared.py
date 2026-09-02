@@ -32,6 +32,28 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import export  # noqa: E402  (build_nodes, make_public, split_frontmatter, WIKILINK_RE)
 
+
+def wiki_display_name():
+    """Human label for this wiki, e.g. "Indy's LLM Wiki".
+
+    Read from design/federation.json rather than hardcoded, because that one string was
+    the only thing making this file repo-specific -- and so the only reason it could not
+    join the synced design layer. It had already drifted into two versions across ten
+    repos, which is how a fix to one of them fails to reach the other nine.
+
+    federation.json is the right home: it is per-repo and deliberately NOT synced, since
+    a wiki's position in the graph does not travel between wikis. Neither does its name.
+    """
+    import json
+    here = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(os.path.dirname(here), "design", "federation.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            fed = json.load(f)
+    except (OSError, ValueError):
+        return "this LLM Wiki"
+    return fed.get("display_name") or fed.get("name") or "this LLM Wiki"
+
 # Order sections in the generated index by page type.
 TYPE_SECTIONS = [
     ("overview", "Overview & synthesis"),
@@ -155,7 +177,7 @@ def _build_index(public):
     lines = [
         "# Shared Wiki Index",
         "",
-        "This is the **shared, read-only** cut of the owner's LLM Wiki — the pages marked "
+        f"This is the **shared, read-only** cut of {wiki_display_name()} — the pages marked "
         "`public` or `unlisted`. Private pages and raw sources are not present in this "
         "repository at all. Do not edit here; this mirror is regenerated automatically.",
         "",
@@ -174,10 +196,12 @@ def _build_index(public):
     return "\n".join(lines)
 
 
-README = """# the owner's LLM Wiki — shared mirror (read-only)
+def _readme():
+    name = wiki_display_name()
+    return f"""# {name} — shared mirror (read-only)
 
 This repository is an **automatically generated, read-only mirror** of the shareable
-part of the owner's LLM Wiki. It contains only pages marked `public` or `unlisted`.
+part of {name}. It contains only pages marked `public` or `unlisted`.
 
 **Not here (by design):** anything marked `private`, the `raw/` source documents, the
 activity log, and internal workflow files. Private page titles and links to them are
@@ -203,10 +227,14 @@ def write_shared(wiki_dir, out_dir):
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         with open(dst, "w", encoding="utf-8") as f:
             f.write(text)
+    # The out dir's wiki/ is otherwise created only as a side effect of copying a
+    # shareable page. A wiki with none -- a brand-new one -- reached this line with no
+    # directory to write into and raised FileNotFoundError, so its mirror never built.
+    os.makedirs(os.path.join(out_dir, "wiki"), exist_ok=True)
     with open(os.path.join(out_dir, "wiki", "index.md"), "w", encoding="utf-8") as f:
         f.write(index_md + "\n")
     with open(os.path.join(out_dir, "README.md"), "w", encoding="utf-8") as f:
-        f.write(README)
+        f.write(_readme())
     return len(shared_files)
 
 

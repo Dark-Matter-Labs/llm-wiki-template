@@ -155,7 +155,11 @@ hr { border: 0; border-top: 1.5px solid var(--shadow); margin: var(--s4) 0; max-
   border-top: 1.5px solid var(--shadow); border-bottom: 1.5px solid var(--shadow);
   max-width: 960px; margin: 0 var(--page-pad);
 }
-.document-meta div { padding: var(--s1) var(--s2) var(--s1) 0; border-right: 1.5px solid var(--shadow); min-height: 84px; }
+.document-meta div { padding: var(--s1) var(--s2); border-right: 1.5px solid var(--shadow); min-height: 84px; }
+/* The first cell aligns to the page's left edge; every later cell keeps a gutter from the
+   rule that precedes it. Before 2026-09-01 all cells had zero left padding, so the second
+   and third labels sat flush against a 1.5px vertical rule. */
+.document-meta div:first-child { padding-left: 0; }
 .document-meta div:last-child { border-right: 0; }
 .document-meta .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: var(--s1); }
 .document-meta .value { font-family: var(--sans); font-size: 20px; line-height: 1.2; }
@@ -427,3 +431,53 @@ h1, h2, h3, .display, .nav-title,
 h1 { font-size: clamp(42px, 6.4vw, 84px); line-height: 1.0; }
 .lead { font-size: clamp(24px, 2.9vw, 38px); line-height: 1.18; }
 .quote-block { font-size: clamp(22px, 2.7vw, 34px); line-height: 1.2; }
+
+/* ==========================================================================
+   Long-paper apparatus — added 2026-09-01 for the first full-length manuscript
+   published in the light register (consciousness-as-participatory-constraint).
+   Four small components; all read the existing tokens and the Fibonacci scale.
+   ========================================================================== */
+
+/* note-block: a recurring, labelled aside inside running prose — the paper's
+   "Laboratory consequence" device. Quiet by design: two navy hairlines and a mono
+   label, no accent, so six of them across 27,000 words never read as decoration. */
+.note-block {
+  border-top: 1.5px solid var(--shadow); border-bottom: 1.5px solid var(--shadow);
+  padding: var(--s2) 0; margin: var(--s3) 0 var(--s4) 0; max-width: var(--measure);
+}
+.note-block .label {
+  display: block; font-family: var(--mono); font-size: 12px; line-height: 1.4;
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--s1);
+}
+.note-block p { font-size: 19px; line-height: 1.5; margin: 0; }
+
+/* contents: a two-column table of contents for a document with more than a
+   handful of sections. Sans, small, with part headings in mono. Each link is an
+   inline-block with vertical padding so the target clears 24px (WCAG 2.2). */
+.contents { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: var(--s3); max-width: 1060px; font-family: var(--sans); font-size: 16px; line-height: 1.4; }
+.contents li { break-inside: avoid; margin: 0 0 6px 0; }
+.contents .contents-part { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; margin: var(--s2) 0 var(--s1) 0; break-after: avoid; }
+.contents .contents-part:first-child { margin-top: 0; }
+.contents a { display: inline-block; padding: 3px 0; text-decoration: none; border-bottom: 1.5px solid var(--midtone); }
+.contents a:hover { color: var(--midtone-ink); }
+.contents .num { font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; margin-right: 8px; }
+@media (max-width: 720px) { .contents { columns: 1; } }
+
+/* deck-figure--scroll: a diagram that must stay legible on a phone scrolls inside
+   its frame rather than shrinking to a smear. The page never scrolls sideways. */
+.deck-figure--scroll { overflow-x: auto; }
+.deck-figure--scroll svg { min-width: 600px; }
+.deck-figure details { margin-top: var(--s1); font-size: 15px; line-height: 1.5; max-width: var(--measure); }
+.deck-figure summary { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; padding: 4px 0; }
+
+/* references + in-text citations. A reference list is scanned, not read: sans at
+   the small size, hanging numbers, and URLs allowed to break anywhere so a DOI never
+   forces horizontal scroll. Citation links are dotted in navy rather than the accent
+   underline, so a page with three hundred citations does not turn orange. */
+.references { max-width: 900px; padding-left: 2.2em; font-family: var(--sans); font-size: 15px; line-height: 1.5; }
+.references li { margin-bottom: 10px; overflow-wrap: anywhere; }
+.references a { overflow-wrap: anywhere; text-decoration-line: underline; }
+/* note-block without a label: a set-apart statement too long for display type */
+.note-block--quote p { font-family: var(--serif); font-size: 21px; line-height: 1.5; }
+a.cite { text-decoration-color: var(--shadow); text-decoration-style: dotted; text-decoration-thickness: 1px; }
+a.cite:hover { color: var(--midtone-ink); text-decoration-color: var(--midtone-ink); }

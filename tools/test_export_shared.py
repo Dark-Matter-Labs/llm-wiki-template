@@ -178,5 +178,53 @@ def run():
         return 0
 
 
+def run_empty():
+    """A wiki with nothing shareable must still produce a valid, empty mirror.
+
+    This is not a hypothetical. `fang-llm-wiki` was created on 2026-08-26 with only
+    scaffolding, and its "Export shared mirror" workflow failed on every run for a week
+    with FileNotFoundError: 'shared_out/wiki/index.md' -- because the out dir's wiki/
+    was only ever created as a side effect of copying a shareable page, and there were
+    none. The colleague mirror for that wiki has never existed.
+
+    The failure mode is the worst shape available: it fires only on a brand-new wiki,
+    which is exactly when nobody is watching the Actions tab.
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        wiki = os.path.join(tmp, "wiki")
+        out = os.path.join(tmp, "shared")
+        os.makedirs(wiki)
+        # One page, private: shareable count is zero.
+        _write(wiki, PRIVATE_SLUG + ".md", PRIVATE_PAGE)
+
+        failures = []
+        try:
+            n = export_shared.write_shared(wiki, out)
+        except Exception as e:  # noqa: BLE001 - the bug was an uncaught FileNotFoundError
+            print(f"FAIL — empty corpus raised {type(e).__name__}: {e}")
+            return 1
+
+        if n != 0:
+            failures.append(f"expected 0 shared files, got {n}")
+        idx = os.path.join(out, "wiki", "index.md")
+        if not os.path.isfile(idx):
+            failures.append("no wiki/index.md written for an empty corpus")
+        else:
+            with open(idx, encoding="utf-8") as fh:
+                body = fh.read()
+            if PRIVATE_TITLE in body:
+                failures.append("private title leaked into the empty index")
+        if not os.path.isfile(os.path.join(out, "README.md")):
+            failures.append("no README.md written for an empty corpus")
+
+        if failures:
+            print("FAIL — empty corpus mirror is malformed:")
+            for f in failures:
+                print("  -", f)
+            return 1
+        print("PASS — a wiki with nothing shareable still yields a valid empty mirror")
+        return 0
+
+
 if __name__ == "__main__":
-    raise SystemExit(run())
+    raise SystemExit(run() or run_empty())
