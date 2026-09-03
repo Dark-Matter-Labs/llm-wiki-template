@@ -1,5 +1,22 @@
 #!/usr/bin/env python3
 """
+#
+# WHY THIS FILE IS NOT IN THE SYNCED DESIGN LAYER
+#
+# export.py deliberately differs by ROLE, and the differences are coherent rather than
+# drift. Checked 2026-09-02: every repo`s export workflow matches its own export.py, so
+# nothing here is broken.
+#
+#   * A commons (xco-team-wiki, learning-system-wiki, power-project-wiki, fang-llm-wiki)
+#     also emits wiki.shared.json -- public + unlisted + internal -- because spokes sync
+#     FROM it, and carries origin/contributed provenance for the federation view.
+#   * A personal spoke and the template emit the public cut only. Nobody syncs from them,
+#     so a shared cut would be an unused file.
+#
+# Do NOT "fix" this by adding the file to SHARED in sync_design_system.py. That would push
+# one role`s exporter onto every repo and give five of them a cut nobody reads. The cost of
+# the split is that a genuine bug must be propagated by hand -- as the bracket-list comment
+# fix in _parse_value was, on 2026-09-02, to nine repos at once.
 export.py — turn the wiki into a JSON graph for the frontend "lens".
 
 Standard library only (no dependencies) so it runs in CI and fresh cloud sessions.
@@ -92,6 +109,16 @@ def _strip_inline_comment(value):
 
 def _parse_value(raw):
     raw = raw.strip()
+    # A bracket list may carry a trailing comment: `sources: []   # why it is empty`.
+    # Without this the value fails the endswith("]") test below, falls through to the
+    # scalar branch, and the whole string becomes a one-element list -- so an EMPTY
+    # sources list turns into the phantom source "[]", which check_sources.py then
+    # hunts for on disk. Cutting only after the LAST "]" keeps a "#" that legitimately
+    # sits inside the list, which is why the comment stripper is not used here.
+    if raw.startswith("[") and not raw.endswith("]") and "]" in raw:
+        after = raw[raw.rfind("]") + 1:]
+        if after.lstrip().startswith("#"):
+            raw = raw[:raw.rfind("]") + 1]
     if raw.startswith("[") and raw.endswith("]"):
         inner = raw[1:-1].strip()
         if not inner:
