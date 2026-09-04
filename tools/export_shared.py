@@ -69,9 +69,22 @@ TYPE_SECTIONS = [
 # comments and any stray fields — a raw copy would leak private titles/links hidden
 # in `#` comment lines. Order mirrors the schema in CLAUDE.md.
 FM_STRING_FIELDS = ["type", "title", "description", "status", "visibility",
-                    "confidence", "timestamp", "layer", "parent", "horizon"]
+                    "confidence", "timestamp", "layer", "parent", "horizon",
+                    # Ledger fields, added 2026-09-02. The whitelist predated the
+                    # goal/commitment schema, so a contributed commitment arrived with no
+                    # commits_to / state / resources / until -- and the receiving repo's
+                    # own schema check REQUIRES commits_to and state on a commitment. The
+                    # contribution would therefore have landed red in the commons, which
+                    # is why the ledger had never successfully moved off a personal wiki.
+                    #
+                    # These pass through clean() like every other field, so a commits_to
+                    # naming a PRIVATE goal is blanked rather than published. That then
+                    # fails the receiving schema check by design: better a loud refusal
+                    # than a commitment quietly pointing at a goal nobody can see.
+                    "commits_to", "resources", "until", "state"]
 FM_LIST_FIELDS = ["tags", "sources"]
-FM_OPTIONAL = {"layer", "parent", "horizon"}
+FM_OPTIONAL = {"layer", "parent", "horizon",
+               "commits_to", "resources", "until", "state"}
 
 
 def _read(path):
