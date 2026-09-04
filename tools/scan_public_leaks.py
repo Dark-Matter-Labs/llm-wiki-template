@@ -119,7 +119,26 @@ def main(argv=None):
         return 2
     terms = load_terms(args.terms)
     if not terms:
-        print("warning: no terms configured; nothing to scan for.", file=sys.stderr)
+        # An empty terms file in a repo that PUBLISHES is a tripwire wired to nothing: the step
+        # goes green, the boundary is unguarded, and the green tick is the reason nobody looks.
+        # Found on 2026-09-04 in power-project-wiki, on the day Pages was being turned on there.
+        # A repo with no public surface is a different case and stays a warning.
+        # "Has files under docs/" is not the same as "publishes". Every wiki carries the same
+        # scaffolding -- a stylesheet, a quickstart, an empty index -- and failing on that would
+        # fire in six wikis that publish nothing. The two things that mean this repo really has
+        # an open surface are a Pages deploy workflow, or a page someone marked public/unlisted.
+        publishes = os.path.exists(os.path.join(".github", "workflows", "deploy-pages.yml"))
+        exposed = [q for q in paths if not q.startswith("docs" + os.sep) and q != "docs/index.html"]
+        if publishes or exposed:
+            why = ("this repo has a Pages deploy workflow" if publishes
+                   else f"{len(exposed)} page(s) are marked public or unlisted")
+            print(f"error: NO terms configured in {args.terms}, and {why}.\n"
+                  f"       An empty tripwire on a repo that publishes is a configuration error, "
+                  f"not a clean pass -- the step goes green and the boundary is unguarded.\n"
+                  f"       Copy the terms from a wiki that has them.", file=sys.stderr)
+            return 2
+        print("warning: no terms configured — and no public surface in this repo, so there is "
+              "nothing to guard yet.", file=sys.stderr)
         return 0
 
     hits = scan(paths, terms)
