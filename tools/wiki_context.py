@@ -60,8 +60,18 @@ def _corpus() -> tuple[int, int, int, int]:
     pages = sum(1 for p in wiki.rglob("*.md")
                 if p.relative_to(wiki).parts[0] not in {"log", "index"}
                 and p.name not in {"log.md", "index.md"}) if wiki.is_dir() else 0
-    raw = ROOT / "raw"
-    sizes = [p.stat().st_size for p in raw.rglob("*") if p.is_file()] if raw.is_dir() else []
+    # Only files git TRACKS. .gitignore excludes most binary sources, so a CI runner sees a
+    # different raw/ than a local checkout -- and a block generated from the local view could
+    # never match in CI. This is the same trap that keeps check_sources.py out of CI; the fix
+    # here is to describe the repository, which is what git tracks, not the working directory.
+    import subprocess
+    try:
+        out = subprocess.run(["git", "ls-files", "-z", "raw"], cwd=ROOT,
+                             capture_output=True, text=True).stdout
+    except OSError:
+        out = ""
+    tracked = [ROOT / f for f in out.split("\0") if f]
+    sizes = [p.stat().st_size for p in tracked if p.is_file()]
     big = [s for s in sizes if s > BIG_SOURCE_BYTES]
     return pages, len(sizes), len(big), max(sizes, default=0)
 

@@ -16,14 +16,14 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: CLAUDE.md's generated block matches this repo
         # The retrieval order and the federation facts are generated from design/federation.json
         # and the corpus. Hand-copied guidance is how nine wikis ended up six weeks out of date
         # on how to search their own pages.
         run: python3 tools/wiki_context.py --check
-
-      - name: Checkout
-        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5

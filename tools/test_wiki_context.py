@@ -15,6 +15,7 @@ hand-written one with extra steps.
 import json
 import os
 import pathlib
+import subprocess
 import sys
 import tempfile
 
@@ -41,6 +42,10 @@ def repo(tmp, fed, pages=3, sources=(), claude="# CLAUDE.md\n\nOpening prose.\n\
     for i, size in enumerate(sources):
         (root / "raw" / f"s{i}.md").write_text("x" * size, encoding="utf-8")
     (root / "CLAUDE.md").write_text(claude, encoding="utf-8")
+    # Every wiki is a git repo, and the block counts what git TRACKS -- so a fixture that is not
+    # a repo would test a state that cannot occur and would hide the CI-reproducibility property.
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=root, check=True)
     wc.ROOT = root
     return root
 
@@ -83,7 +88,8 @@ def main():
               "read them whole" in b and "do not read a large source" not in b)
 
     with tempfile.TemporaryDirectory() as t:
-        b = wc.render()  # ROOT still set; every render carries the retrieval discipline
+        repo(t, {"name": "w", "role": "spoke", "contributes_to": ["c"]})
+        b = wc.render()   # every wiki, whatever its shape, carries the retrieval discipline
         check("every wiki gets the same retrieval order",
               "search.py" in b and "Never load pages in order to decide which pages to load" in b)
         check("and is told to build the graph export when it is missing",
@@ -117,6 +123,19 @@ def main():
         wc.main([])
         check("regenerating picks up the new commons",
               "xco-team-wiki" in (root / "CLAUDE.md").read_text())
+
+    with tempfile.TemporaryDirectory() as t:
+        # THE CI PROPERTY: a runner sees only what git tracks. If the block counted the working
+        # directory, every wiki whose .gitignore excludes binary sources would generate a block
+        # locally that can never match in CI -- which is exactly how this shipped red the first time.
+        root = repo(t, {"name": "w", "role": "spoke", "contributes_to": ["c"]}, sources=(1_000,))
+        (root / ".gitignore").write_text("raw/*.pdf\n", encoding="utf-8")
+        (root / "raw" / "huge.pdf").write_bytes(b"x" * 90_000)     # ignored: must not be counted
+        subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+        b = wc.render()
+        check("gitignored sources are invisible to the block, so CI and local agree",
+              "1 source file(s)" in b and "over 40KB" not in b,
+              "a 90KB ignored PDF must not appear")
 
     with tempfile.TemporaryDirectory() as t:
         root = repo(t, {"name": "w", "role": "spoke", "contributes_to": ["c"]})
