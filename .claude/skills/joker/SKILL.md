@@ -5,11 +5,16 @@ description: Counter-orthodoxy challenge. Use when the owner says "run the joker
 
 # The Joker — counter-orthodoxy challenge
 
-The owner's framing: *"you're working under a presumed orthodoxy. What is a different assumed
-orthodoxy and what would be the challenges that would bring?"* The joker exists to **test the
-operating optima**, not to sneer at it. A landed challenge makes the position stronger; that is the point.
+The framing this skill was built from: *"you're working under a presumed orthodoxy. What is a
+different assumed orthodoxy and what would be the challenges that would bring?"* The joker exists
+to **test the operating optima**, not to sneer at it. A landed challenge makes the position
+stronger; that is the point.
 
-## Tone (this is the part that matters — The owner was explicit)
+In a commons the position under challenge usually belongs to more than one person, and may have
+arrived from the centre. Challenge the position, name whose it is where the page records it, and
+leave the deciding to the people who hold it.
+
+## Tone (this is the part that matters)
 
 The joker is a **serious rival thinker**, not a contrarian and not a devil's-advocate performance.
 It **steelmans a genuinely different set of axioms and reasons honestly from them** — the way a
@@ -51,7 +56,7 @@ title: "Joker: <what's being challenged>"
 description: One-line statement of the counterposition(s).
 tags: [joker, counterposition, challenge]
 status: draft
-visibility: private
+visibility: private        # a commons uses internal — see Rules
 confidence: medium
 timestamp: YYYY-MM-DD
 sources: []
@@ -61,10 +66,15 @@ sources: []
 Body: the orthodoxy named (with axiom links); each rival orthodoxy with its axioms, predictions,
 critique, favouring evidence; then "What we'd have to concede or strengthen"; then optional
 real-world holders/signals. Link the brief from the target page (`[[Joker: …]]`), add it to
-`index.md`, and log `## [YYYY-MM-DD] joker | <target>`.
+`index.md`, and log `## [YYYY-MM-DD] joker | <target>` in today's day file
+(`wiki/log/YYYY-MM-DD.md`), then run `python3 tools/sync_log_index.py`.
 
 ## Rules
-- Steelman, never strawman. A dishonest rival is worthless to the owner.
+- Steelman, never strawman. A dishonest rival is worthless to the people holding the position.
 - Different axioms, not vibes. Every counterposition must be reconstructable from a stated premise set.
-- Keep it `visibility: private` — a challenge brief is internal working material unless the owner opts it up.
+- Keep it `visibility: private` in a personal wiki and `internal` in a commons — in a commons `private` would hide it from the very people it is for; in a personal wiki
+  `internal` would send it to the colleague mirror, a wider audience than this warrants.
+  A challenge brief is working material, and a
+  challenge nobody here can read is a challenge that changes nothing. It does not go to the open
+  web, and it does not go up to the centre without the `contribute` consent loop.
 - Separate what the wiki says, what the web says, and what you infer.

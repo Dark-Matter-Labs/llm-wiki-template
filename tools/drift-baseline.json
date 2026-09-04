@@ -3,12 +3,6 @@
   "recorded": "2026-09-04",
   "drifted": [
     {
-      "path": ".claude/skills/brief/SKILL.md",
-      "repos": 10,
-      "versions": 5,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
       "path": ".claude/skills/contribute/SKILL.md",
       "repos": 9,
       "versions": 6,
@@ -21,64 +15,10 @@
       "reason": "DELIBERATELY PERSONAL — the CRM must never reach a commons, and shipping the skill invites the pages."
     },
     {
-      "path": ".claude/skills/cross-check/SKILL.md",
-      "repos": 10,
-      "versions": 2,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
-      "path": ".claude/skills/delta/SKILL.md",
-      "repos": 10,
-      "versions": 3,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
-      "path": ".claude/skills/gravity/SKILL.md",
-      "repos": 10,
-      "versions": 3,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
-      "path": ".claude/skills/ingest/SKILL.md",
-      "repos": 10,
-      "versions": 5,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
-      "path": ".claude/skills/joker/SKILL.md",
-      "repos": 10,
-      "versions": 3,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
-      "path": ".claude/skills/lint/SKILL.md",
-      "repos": 10,
-      "versions": 6,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
-      "path": ".claude/skills/office-hours/SKILL.md",
-      "repos": 10,
-      "versions": 3,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
-      "path": ".claude/skills/publish-check/SKILL.md",
-      "repos": 10,
-      "versions": 5,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
       "path": ".claude/skills/publish-web/SKILL.md",
       "repos": 9,
       "versions": 6,
       "reason": "BY ROLE — a publishing surface, not a discipline."
-    },
-    {
-      "path": ".claude/skills/query/SKILL.md",
-      "repos": 10,
-      "versions": 5,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".github/workflows/checks.yml",

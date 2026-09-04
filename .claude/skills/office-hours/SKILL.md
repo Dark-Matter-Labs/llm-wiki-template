@@ -15,8 +15,9 @@ it — reframe it, stress-test the premises, and connect it to existing knowledg
    problem, decision, or claim? What would success look like?
 
 2. **Ground it in the wiki.** Read `wiki/index.md` and pull any pages relevant to the
-   idea. Tell the owner what the accumulated knowledge already says about it — including
-   anything that supports, complicates, or contradicts the framing.
+   idea. Tell them what the accumulated knowledge already says about it — including
+   anything that supports, complicates, or contradicts the framing. In a commons that includes
+   what *other members* have already put here; say whose thinking you are drawing on.
 
 3. **Push back on the framing.** State plainly if the idea as posed is the wrong shape,
    too narrow, too broad, or resting on an unexamined premise. Offer the sharper framing.
@@ -34,9 +35,11 @@ it — reframe it, stress-test the premises, and connect it to existing knowledg
 
 7. **File it if it's worth keeping.** A sharpened concept, a decision, or a framing
    worth revisiting → write it into `wiki/` as a `concept` or `synthesis` page (with
-   `confidence` set honestly), add to index and log. Ask the owner first.
+   `confidence` set honestly, and `visibility: private` in a personal wiki or `internal`
+   in a commons), add to index and today's log file.
+   Ask first.
 
 ## Style
-- Direct and grounded. The owner prefers diagnosis over hedged menus of options.
+- Direct and grounded. This house prefers diagnosis over hedged menus of options.
 - Challenge the work, respect the person.
 - Never manufacture certainty. "I can't verify that from the wiki" is a valid answer.

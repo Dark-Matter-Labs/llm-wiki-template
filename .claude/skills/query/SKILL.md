@@ -5,23 +5,32 @@ description: Answer a question against the wiki. Use when the owner asks "what d
 
 # Query the wiki
 
+## Hard rule — knowledge, not surveillance
+
+Before anything else: if the question is really about *tracking a person's activity* —
+"what has the owner done this week", "who is X talking to", "who touched this page" — pause
+and decline, explaining the rule (CLAUDE.md: knowledge yes, tracking people no). A person
+querying their **own** activity in their **own** wiki is fine. When in doubt, ask what
+knowledge they're actually after and answer that instead.
+
 ## Steps
 
 1. **Search first — do not scan.** Run `python3 tools/search.py "<the question>" --top 12`.
-   It ranks title, tags and description above body text, so the top hits are the pages the
-   question is *about*. ~1k tokens. **Never load pages in order to decide which pages to load** —
-   context is for reasoning over candidates, traversal is for finding them.
+   It ranks by title, tags and description before body text, so the top few hits are
+   usually the pages the question is about. This costs ~1k tokens and replaces reading a
+   catalogue. **Never load pages in order to decide which pages to load.**
 
-   Second hop by graph, not by catalogue: `export/wiki.json` carries `inbound_links` and
-   `outbound_links`, so a page's neighbourhood is a lookup.
+   Then, for the second hop, follow the graph rather than the catalogue: `export/wiki.json`
+   carries `inbound_links`/`outbound_links` per page, so a page's neighbourhood is a lookup,
+   not another search.
 
-   `wiki/index.md` is the router — read it for the *shape* of the corpus, not to find a page.
+   `wiki/index.md` is the router — sections, counts and a pointer per shelf, ~9k tokens. Read
+   it when you need to know the *shape* of the corpus. The heavy catalogues under
+   `wiki/index/` are shelves: load one only when the question is squarely in that section,
+   and never more than one. Reading all of them is the thing this replaced.
 
-1. **Read `wiki/index.md` first.** It's the routing file. Find the pages relevant to
-   the question from their one-line summaries. Do not scan the whole wiki.
-
-2. **Drill into the relevant pages.** Read them in full. Follow `[[links]]` to
-   connected pages where they matter to the answer.
+2. **Read the shortlist in full.** Follow `[[links]]` to connected pages where they
+   matter to the answer — that is the graph hop, and it is cheaper than another search.
 
 3. **If the wiki can't answer it,** say so plainly. Offer to (a) ingest a source that
    would fill the gap, or (b) do a web search if the owner wants outside information — but
@@ -39,7 +48,7 @@ description: Answer a question against the wiki. Use when the owner asks "what d
    write it into `wiki/` as a new `comparison` or `synthesis` page and add it to the
    index. Don't let valuable synthesis vanish into chat. Ask the owner if unsure whether to file.
 
-7. **Log it:** append `## [YYYY-MM-DD] query | <the question>` to the current month's log file (`wiki/log/YYYY-MM.md`; see `wiki/log.md`).
+7. **Log it:** append `## [YYYY-MM-DD] query | <the question>` to the today's log file (`wiki/log/YYYY-MM-DD.md`; see `wiki/log.md`).
 
 ## Rules
 - Index first, then drill. Don't brute-force read everything.

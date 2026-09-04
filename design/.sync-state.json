@@ -28,11 +28,11 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "5dcc31a036973cb417b13164ed6b4a2eaed00140e988b3664a01fa9f8ecf0d93",
-    "tools/drift-baseline.json": "cdd18a436f9912e02e82aa056908aebeb1fb53d37b48ddd12a9bf377473cc727",
+    "design/shared-layer.json": "399107d94a7d2295edd30003bd7d943d012f18c3e2f29954766e5dc4afbee6fc",
+    "tools/drift-baseline.json": "2cd360d68aa2aede49bb64eb40e215b4621daf5ef780f08fa11e5a0d74122545",
     "tools/check_drift.py": "a5ea79887ecc0a9281752c0e8f1f1abd17b26a2ec1e72966fb257309551cc3ed",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
-    ".claude/skills/metacognition/SKILL.md": "524ab449c3b8ca2fdf1f9ad1119ef0ee07632eb73efec88a67d298bd39ec06c2",
+    ".claude/skills/metacognition/SKILL.md": "20d721351217dacf24b36b7c2c26fcaf52e8a99f7a3bd39b5a3c4fd14dd75f26",
     ".claude/skills/learn/SKILL.md": "d14b75625392c08a745c0053497ccb33f4b56e3b764cc343328d9e6e99d8910e",
     ".claude/skills/rebuild-parity/SKILL.md": "4020221d11e8209703094ec26d10623db6d2b073f0ead595cd53908076243b04",
     ".claude/skills/source-proportion/SKILL.md": "ce92b8f01c993faa7f8087ebd958eda38ef9cd35bf7eee59935270ba6d6f5c6c",
@@ -47,6 +47,16 @@
     "tools/check_log_shape.py": "df667951749fe215c3a89d3a05de33e686e265193ba8c344705079d15b32d8fd",
     "tools/sync_log_index.py": "0dc2a98e918078a9b344e589da99ce304fc247a5e6e7d7b2d74832376dd53637",
     ".claude/skills/gravity/compute_gravity.py": "7180939228b4acf17a0f307bd55f25afe00e0b59389095e094319e0431513fdb",
-    "tools/scan_public_leaks.py": "8074e417f11a5568f95ce5b90c80eaa9df710aab6d0a46f27f18f6c04efd0fbd"
+    "tools/scan_public_leaks.py": "8074e417f11a5568f95ce5b90c80eaa9df710aab6d0a46f27f18f6c04efd0fbd",
+    ".claude/skills/brief/SKILL.md": "cfe98e13ed5cc4b5469a2f05f7052921e7e0ab1b24649b0534acecfb84a28b0e",
+    ".claude/skills/ingest/SKILL.md": "40cf9e81823875a09b6f335330efbec3eba4a6e304f1ef8439d44ea520e0dafe",
+    ".claude/skills/lint/SKILL.md": "e961f1ea768ca127236fe94c9482bf086430e94a1904093d7d8d182ba80c8f41",
+    ".claude/skills/publish-check/SKILL.md": "2b53c0796cbecc45450fa47f162c35b428364cc5bab0a03864de4face3887fd4",
+    ".claude/skills/query/SKILL.md": "5b6279482e924b000ce979c2de002c1a8b43df5c84637226406642edcf113666",
+    ".claude/skills/delta/SKILL.md": "8594c198425ab3527ef971e0ef7bbb38958bacb1aa041cc24376852c6b62b4b4",
+    ".claude/skills/gravity/SKILL.md": "df7244bea6470d42e5f85d3961099c98504bcf0c4290b89e8a4e7f799ebfe004",
+    ".claude/skills/joker/SKILL.md": "ab85d0f1e69c098c79130bb70e46e10e907fb18f7b23e7e33aefff8f1b2dec2d",
+    ".claude/skills/office-hours/SKILL.md": "f95e1aeabfe5f2c5bfc439bb5f065be916473f97285b69274a39143fca1c9777",
+    ".claude/skills/cross-check/SKILL.md": "044e0125fc4be66e5c24c74b924e5c1a920d37a4be8fff2363153379c3035a8c"
   }
 }
