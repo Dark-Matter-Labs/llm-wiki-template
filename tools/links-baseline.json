@@ -1,22 +1,5 @@
 {
   "_comment": "Wiki-links whose target page does not exist. A debt register, not an exemption: it must only ever shrink. Fixing one is editorial — a dead `see [[log]]` might become prose or point at a real page — so they are reported here and never rewritten by a script. --check fails on anything not listed.",
   "recorded": "2026-08-31",
-  "unresolved": [
-    {
-      "page": "wiki/examples/greenline-summary.md",
-      "target": "Citizens as monitoring infrastructure"
-    },
-    {
-      "page": "wiki/examples/greenline-summary.md",
-      "target": "Cork"
-    },
-    {
-      "page": "wiki/examples/greenline-summary.md",
-      "target": "Lisbon"
-    },
-    {
-      "page": "wiki/examples/greenline-summary.md",
-      "target": "Tallinn"
-    }
-  ]
+  "unresolved": []
 }

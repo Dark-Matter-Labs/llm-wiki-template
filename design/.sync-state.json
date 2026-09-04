@@ -19,7 +19,7 @@
     "tools/test_measure_scale.py": "af96d15460b1ad55a671aa6118a6b51e23fee8372585258a10fd3fb7647729aa",
     "tools/cross_check.py": "8e43ba09855c48a5005479c993b257e13c0a35304f9290c7abf9edbbaf3b34cb",
     "tools/test_cross_check.py": "97a755e9e9f71ffa40eeef92eda121ce8f27fbae71bd03d806aae3f4b56e70e6",
-    "tools/check_links.py": "24396d66cae6d294691d0cedd3219fd1b0ac17f1d243298e190eef01fd6e4422",
+    "tools/check_links.py": "afb76fa240e981292b012d5c39e141d21f820904cf5f850b098c702c32e20a95",
     "tools/test_check_links.py": "9b07932595ee252c51714081b045a18243331caf5e21e8c606327f970a37f73d",
     "tools/export_shared.py": "27a0734a2963a44c5c60350a4dcfeca3e5e3d3f5b51f4ac4dd786e10fa96d23d",
     "tools/test_export_shared.py": "a16fed9d77563611e31a1bb38143bed52370df305d86cfee98127cd5506e8f2c",

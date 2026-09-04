@@ -12,6 +12,19 @@ deliberately nonexistent target and re-running produced *"schema check OK — 77
 The CI step was called **"Schema + link integrity"** and did not check link integrity. It checked
 one link failure mode — a link wrapped across a newline — and not the ordinary one.
 
+## In a shared repo, an unresolved link may be a boundary leak
+
+Found on 2026-09-04, clearing the last of the baseline: six rows in `xco-team-wiki` were links to
+pages that are `visibility: private` in the wiki they came from. `contribute.py` redacts those, but
+that overview page was hand-authored directly in the commons on 2026-08-05 and never went through
+the contribute route -- so nothing redacted anything.
+
+This checker was the only thing that noticed, and its finding sat in the baseline for four weeks
+labelled as known debt. **Baselining a dead link can baseline a boundary leak.** A wiki-link that
+does not resolve locally in a commons is not automatically a typo; before baselining one, check
+whether the target is a page somebody deliberately kept private. The prose can stay either way --
+it is the graph edge that must not exist.
+
 The reason it stayed invisible is in `export.py`:
 
     n["outbound_links"] = [s for s in n["outbound_links"] if s in present]

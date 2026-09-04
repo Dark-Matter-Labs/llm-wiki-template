@@ -27,6 +27,13 @@ Each entry is one line: a link, its type, and a one-line summary of what's on th
   source looks like.
 - **[Outcomes-based financing](examples/outcomes-based-financing.md)** — `concept` —
   the concept page the example summary cascades into.
+- **[Citizens as monitoring infrastructure](examples/citizens-as-monitoring-infrastructure.md)** —
+  `concept` — the second concept the summary cascades into.
+- **[Lisbon](examples/lisbon.md)**, **[Tallinn](examples/tallinn.md)**,
+  **[Cork](examples/cork.md)** — `entity` — the three cities the summary names. They exist so the
+  example demonstrates a *complete* cascade: every `[[link]]` in the summary resolves. Until
+  2026-09-04 these four pages were missing, so the page shipped to every new wiki with four
+  broken links — an example teaching the opposite of what it was for.
 
 Say *"delete the example files"* once you've added real sources.
 
