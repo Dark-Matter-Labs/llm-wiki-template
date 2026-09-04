@@ -8,6 +8,13 @@ description: Check whether a wiki page or synthesis is ready to be shared or pub
 The wiki is a working store; publishing to the outside world is a higher bar. Run this
 before any wiki content becomes a report, post, proposal, or client-facing document.
 
+**Where publishing happens depends on the wiki.** A personal wiki has its own surface — `docs/`,
+a Pages deploy — so this check ends in a publish. A commons has none: no `docs/`, no deploy, and a
+public export that carries nothing on purpose. There the check ends in one of two moves instead —
+the page goes up to the centre through `contribute`, or a member takes it into **their own wiki**
+and publishes from there. Run the check either way, and run it *before* the move: it is the same
+bar, and the bar is easier to hold before the content has left.
+
 ## Checks
 
 1. **Every claim is sourced or clearly marked.** Walk the page. Each factual claim
@@ -23,7 +30,10 @@ before any wiki content becomes a report, post, proposal, or client-facing docum
 4. **Contradictions resolved or acknowledged.** If the wiki flagged a contradiction on
    this topic, it can't silently disappear in the published version. Surface it.
 
-5. **Attribution and lineage.** If the content draws on external frameworks, other
+5. **Attribution and lineage.** In a commons this is not a formality: a page may carry
+   `contributed_by` from a member's own wiki, or have arrived from the centre, and the person
+   publishing is often not the person who wrote it. Credit the author by name, not the repo.
+   If the content draws on external frameworks, other
    people's ideas, or contributors, check they're credited. (If the owner has a house style
    guide for attribution/licensing, apply it here.)
 
@@ -66,7 +76,7 @@ Worth considering:
 ```
 
 Then, if the owner approves fixes, apply the sourcing/labelling corrections and note it in
-the current month's log file (`wiki/log/YYYY-MM.md`; see `wiki/log.md`).
+the today's log file (`wiki/log/YYYY-MM-DD.md`; see `wiki/log.md`).
 
 ## Rules
 - Err toward caution. Better to flag a borderline claim than let an unsupported one ship.

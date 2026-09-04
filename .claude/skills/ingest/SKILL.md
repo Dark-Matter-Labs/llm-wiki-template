@@ -21,10 +21,11 @@ The single most important operation. Done well, the wiki compounds. Done lazily
 
 3. **Discuss briefly with the owner.** Give them 3–5 key takeaways in plain language
    before you start filing, so they can steer what to emphasise. Keep it short.
-   **Ask the visibility tier once, here** — "Should these pages be public, unlisted,
-   or private?" if they doesn't answer, file everything **`private`** (the default; they can
-   opt pages up later). Apply the same tier to every page created/updated in this ingest
-   unless they say otherwise.
+   **Ask the visibility tier once, here** — "Should these pages be public, unlisted, internal
+   or private?" If there is no answer, file everything at **this wiki's default tier**: `private`
+   in a personal wiki (it can be opted up later), `internal` in a commons — a commons is shared by
+   construction, and a page left `private` there is a page the other members cannot see. Apply the
+   same tier to every page created or updated in this ingest unless told otherwise.
 
 4. **Write the summary page** at `wiki/<slug>-summary.md` with full frontmatter
    (`type: summary`, `visibility:` set from step 3, the source in `sources:`, a
@@ -45,14 +46,26 @@ The single most important operation. Done well, the wiki compounds. Done lazily
 
 6. **Update `wiki/overview.md`** if this source shifts the big picture.
 
-7. **Update `wiki/index.md`** — add every new page with a one-line summary under the
-   right category. This is mandatory.
+7. **Update the catalogue** — add every new page with a **genuinely one-line** summary
+   under the right category. This is mandatory.
 
-8. **Append to the current month's log file (`wiki/log/YYYY-MM.md`; see `wiki/log.md`):** `## [YYYY-MM-DD] ingest | <Source Title>` plus a
+   The index is tiered: `wiki/index.md` is the router, and the rows live on shelves under
+   `wiki/index/` (`concepts.md`, `summaries.md`, `overview-synthesis.md`). A new concept
+   row goes on the concepts shelf; the small sections are still inline on the router.
+   Then run `python3 tools/sync_index_counts.py` — the counts are computed, never typed.
+   *(That tool carries a router-specific pattern block and so exists only in the wikis whose
+   index is tiered. Where it is absent, the index has no computed counts to sync — skip it.)*
+
+   **One line means one line.** The rows drifted to a median of 294 characters and a worst
+   case of 4,400 before the split, which is how the catalogue became a second corpus and
+   routing came to cost more than reading. A row exists to let a reader decide whether to
+   open the page — not to save them the trip.
+
+8. **Append to the today's log file (`wiki/log/YYYY-MM-DD.md`; see `wiki/log.md`):** `## [YYYY-MM-DD] ingest | <Source Title>` plus a
    one-line note of what it touched (e.g. "new summary + updated 4 entities, 2 concepts").
 
 9. **Report back in plain language.** Tell the owner what you learned and what pages
-   changed, framed so their PR review is easy. Lead with the knowledge, not the filenames.
+   changed, framed so his PR review is easy. Lead with the knowledge, not the filenames.
 
 ## Rules
 - Never edit `raw/`.

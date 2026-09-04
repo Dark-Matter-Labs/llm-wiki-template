@@ -58,7 +58,8 @@ python3 .claude/skills/gravity/compute_gravity.py eval path/to/incoming-doc.md [
 
 - The readings are **ordinal tripwires, never scores or targets**. Never optimise any of them.
 - The instrument **opens questions; it never certifies** "we are learning" / "we have
-  drifted" — that verdict is the owner's.
+  drifted" — that verdict is a person's, and in a commons it is one the members reach together
+  rather than one this skill hands to whoever happened to run it.
 - Numbers accompany, never replace, the classified delta ledger (radial × tangential ×
   provenance) described above — the semantic field sees vocabulary,
   not meaning; a paraphrase drifts less than it should and a synonym drifts more.

@@ -1,8 +1,12 @@
+---
+name: cross-check
+description: Have a different frontier model read a page and record what it said, in `machine_checks:`. Use when the owner says "cross-check this", "get a second opinion", "what would another model say", or "check this against GPT/Gemini" — and from the validation pass when it decides enough new material has landed. A machine check may move `confidence`; it may never move `validation`.
+---
+
 # Cross-check
 
 Have a **different frontier model** read a page and say whether it agrees, then record
-what it said. Fires when Indy says "cross-check this", "get a second opinion",
-"what would another model say", or "check this against GPT/Gemini".
+what it said.
 
 ## The one rule
 
@@ -24,7 +28,7 @@ precisely what a second careful reader can speak to.
 
 ## Running a check
 
-**1. Pick the page.** If Indy hasn't named one:
+**1. Pick the page.** If nobody has named one:
 
 ```
 python3 tools/cross_check.py --due
@@ -34,7 +38,7 @@ This queues pages that are **load-bearing but weakly supported** — many inboun
 `confidence` below high, no check on record. A wrong claim on a page 139 others depend on
 propagates; a wrong claim on a leaf does not.
 
-**2. Build the packet.** Assemble, in one block Indy can paste elsewhere:
+**2. Build the packet.** Assemble, in one block a member can paste elsewhere:
 
 - the page in full;
 - the *relevant extracts* from every file in its `sources:` — never your summary of them,
@@ -85,6 +89,9 @@ One entry per pass:
 ```
 ## [YYYY-MM-DD] cross-check | <page title> — <model> <verdict>
 ```
+
+Append it to today's day file (`wiki/log/YYYY-MM-DD.md`), then run
+`python3 tools/sync_log_index.py`.
 
 Say what the other model actually objected to, not that a check occurred. A pass that
 found nothing is worth one line; a pass that found something is worth the detail.
