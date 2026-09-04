@@ -1,0 +1,186 @@
+{
+  "_comment": "Files present in two or more wikis, outside SHARED, whose contents disagree. A debt register, not an exemption: it must only ever shrink. Some entries are CORRECT and permanent -- design/federation.json is per-repo by design -- but recording that is a claim someone makes on purpose. --check fails on anything not listed.",
+  "recorded": "2026-09-04",
+  "drifted": [
+    {
+      "path": ".claude/skills/brief/SKILL.md",
+      "repos": 10,
+      "versions": 5
+    },
+    {
+      "path": ".claude/skills/contribute/SKILL.md",
+      "repos": 9,
+      "versions": 6
+    },
+    {
+      "path": ".claude/skills/crm/SKILL.md",
+      "repos": 9,
+      "versions": 4
+    },
+    {
+      "path": ".claude/skills/cross-check/SKILL.md",
+      "repos": 10,
+      "versions": 2
+    },
+    {
+      "path": ".claude/skills/delta/SKILL.md",
+      "repos": 10,
+      "versions": 3
+    },
+    {
+      "path": ".claude/skills/gravity/SKILL.md",
+      "repos": 10,
+      "versions": 3
+    },
+    {
+      "path": ".claude/skills/gravity/compute_gravity.py",
+      "repos": 10,
+      "versions": 4
+    },
+    {
+      "path": ".claude/skills/ingest/SKILL.md",
+      "repos": 10,
+      "versions": 5
+    },
+    {
+      "path": ".claude/skills/joker/SKILL.md",
+      "repos": 10,
+      "versions": 3
+    },
+    {
+      "path": ".claude/skills/lint/SKILL.md",
+      "repos": 10,
+      "versions": 6
+    },
+    {
+      "path": ".claude/skills/office-hours/SKILL.md",
+      "repos": 10,
+      "versions": 3
+    },
+    {
+      "path": ".claude/skills/publish-check/SKILL.md",
+      "repos": 10,
+      "versions": 5
+    },
+    {
+      "path": ".claude/skills/publish-web/SKILL.md",
+      "repos": 9,
+      "versions": 6
+    },
+    {
+      "path": ".claude/skills/query/SKILL.md",
+      "repos": 10,
+      "versions": 5
+    },
+    {
+      "path": ".claude/skills/reflect/SKILL.md",
+      "repos": 10,
+      "versions": 7
+    },
+    {
+      "path": ".github/workflows/checks.yml",
+      "repos": 10,
+      "versions": 4
+    },
+    {
+      "path": ".github/workflows/deploy-pages.yml",
+      "repos": 7,
+      "versions": 2
+    },
+    {
+      "path": ".github/workflows/export-shared.yml",
+      "repos": 9,
+      "versions": 4
+    },
+    {
+      "path": ".github/workflows/export.yml",
+      "repos": 10,
+      "versions": 4
+    },
+    {
+      "path": ".github/workflows/validation-pass.yml",
+      "repos": 9,
+      "versions": 2
+    },
+    {
+      "path": "design/federation.json",
+      "repos": 10,
+      "versions": 10
+    },
+    {
+      "path": "design/social-card.json",
+      "repos": 8,
+      "versions": 6
+    },
+    {
+      "path": "tools/README.md",
+      "repos": 9,
+      "versions": 2
+    },
+    {
+      "path": "tools/audit_design.py",
+      "repos": 10,
+      "versions": 3
+    },
+    {
+      "path": "tools/check_log_shape.py",
+      "repos": 10,
+      "versions": 2
+    },
+    {
+      "path": "tools/classify_internal.py",
+      "repos": 10,
+      "versions": 3
+    },
+    {
+      "path": "tools/contradictions.py",
+      "repos": 10,
+      "versions": 2
+    },
+    {
+      "path": "tools/export.py",
+      "repos": 10,
+      "versions": 2
+    },
+    {
+      "path": "tools/make_social_card.py",
+      "repos": 8,
+      "versions": 3
+    },
+    {
+      "path": "tools/pdf_to_md.py",
+      "repos": 9,
+      "versions": 2
+    },
+    {
+      "path": "tools/scan_public_leaks.py",
+      "repos": 10,
+      "versions": 3
+    },
+    {
+      "path": "tools/sync_index_counts.py",
+      "repos": 2,
+      "versions": 2
+    },
+    {
+      "path": "tools/sync_log_index.py",
+      "repos": 10,
+      "versions": 2
+    },
+    {
+      "path": "tools/test_export.py",
+      "repos": 10,
+      "versions": 2
+    },
+    {
+      "path": "tools/test_sync_index_counts.py",
+      "repos": 2,
+      "versions": 2
+    },
+    {
+      "path": "tools/test_validation_weighting.py",
+      "repos": 10,
+      "versions": 2
+    }
+  ]
+}
