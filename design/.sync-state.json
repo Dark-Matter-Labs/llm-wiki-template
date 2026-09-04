@@ -29,17 +29,18 @@
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
     "design/shared-layer.json": "e6d6398173819f4480a855b6945971d650d0f0a9688212fea79056cf486452b5",
-    "tools/drift-baseline.json": "87cfe39c377d9fa03edb783e4d6dd822fb9eb07af26182c2edab5f8634566d4b",
+    "tools/drift-baseline.json": "11e4fae2c697d446d7c3297a15c401d61c1959bb86c206f7eefb5dc2b8fb10b5",
     "tools/check_drift.py": "a5ea79887ecc0a9281752c0e8f1f1abd17b26a2ec1e72966fb257309551cc3ed",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
-    ".claude/skills/metacognition/SKILL.md": "46c92f227bad615f703605700c74e55b3392f13b4b117616dfd350358643f298",
-    ".claude/skills/learn/SKILL.md": "aad02fa9747b27755d9a18ab50c617b6e066a989dd1d1d33f9db7097b2113726",
+    ".claude/skills/metacognition/SKILL.md": "524ab449c3b8ca2fdf1f9ad1119ef0ee07632eb73efec88a67d298bd39ec06c2",
+    ".claude/skills/learn/SKILL.md": "d14b75625392c08a745c0053497ccb33f4b56e3b764cc343328d9e6e99d8910e",
     ".claude/skills/rebuild-parity/SKILL.md": "4020221d11e8209703094ec26d10623db6d2b073f0ead595cd53908076243b04",
     ".claude/skills/source-proportion/SKILL.md": "ce92b8f01c993faa7f8087ebd958eda38ef9cd35bf7eee59935270ba6d6f5c6c",
     "docs/assets/xco2.css": "5e1a076528b8a5ffff24c607534c8318c08206fe360792abd47a6d8ef5ffe512",
     "docs/assets/xco.css": "945ed7fa60108c4a9b7d234af093ee89e0015a097c8ccb705fcefdcfdb18be76",
     "docs/assets/xco-dusk.css": "cf58ae57e334087500a6f677c10404affb9dc9e461455085d084701240e93b62",
-    "tools/propose_upstream.py": "13b16034fcb5e7be7568d72ffc5212c1dfd836e0505e63a3e781feaf2e0632f9",
-    "tools/test_propose_upstream.py": "be1c1631e4c0dc48044334a3e606728f01744dbd5d46486bde15fde57494ea42"
+    "tools/propose_upstream.py": "40e4a8fae0d52e68c72d7aaf534f223de9bcd839b3167e9e900fc34b2217d57e",
+    "tools/test_propose_upstream.py": "be1c1631e4c0dc48044334a3e606728f01744dbd5d46486bde15fde57494ea42",
+    ".claude/skills/reflect/SKILL.md": "a0e33a31f8851e998e61ac6f8eb85416301b3b432d45540a10c864a8d848ac35"
   }
 }

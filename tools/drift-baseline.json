@@ -87,12 +87,6 @@
       "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
-      "path": ".claude/skills/reflect/SKILL.md",
-      "repos": 10,
-      "versions": 7,
-      "reason": "NEEDS A MERGE, NOT A SYNC — michelle-llm-wiki's copy is LARGER than the source (76 lines vs 74). Syncing from indy would delete a spoke's improvement."
-    },
-    {
       "path": ".github/workflows/checks.yml",
       "repos": 10,
       "versions": 4,
@@ -121,6 +115,12 @@
       "repos": 9,
       "versions": 2,
       "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
+    },
+    {
+      "path": "design/.sync-state.json",
+      "repos": 9,
+      "versions": 9,
+      "reason": "CORRECT AND PERMANENT — the merge base. It records what the sync last WROTE into THIS repo, so a local change can be told apart from the source moving on. Identical copies would mean the record was not per-repo, which is the bug it exists to prevent."
     },
     {
       "path": "design/federation.json",
