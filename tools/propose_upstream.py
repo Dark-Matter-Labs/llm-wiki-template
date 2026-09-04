@@ -27,6 +27,15 @@ diff and decide, and a tool that can write to nine repositories should not be ab
 Provenance is stamped, never invented: which wiki, which revision, who. And only files in the
 shared layer are eligible — a local tool that was never shared is nobody else's business.
 
+## What it does not cover
+
+Only the shared layer. A file that differs between repos but was never synced has no merge base,
+so there is nothing to diff against and no upstream to address -- that is the drift register's
+business (`tools/check_drift.py`, `tools/drift-baseline.json`). The route for such a file is:
+triage it in the register, agree a canonical version, add it to SHARED, and from then on this
+tool covers it. `reflect` is the live example: michelle's copy is the better one, it is not in
+SHARED, and so it needs the register's route first.
+
 Usage:
   python3 tools/propose_upstream.py                # what could be proposed
   python3 tools/propose_upstream.py --stage --by "Name"
