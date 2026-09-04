@@ -30,7 +30,7 @@
       "path": ".github/workflows/deploy-pages.yml",
       "repos": 7,
       "versions": 2,
-      "reason": "BY ROLE, AND A DECISION NOT MINE — a Pages deploy workflow. power-project-wiki has a docs/ directory but deliberately no deploy; syncing this would START PUBLISHING a repo that is not published today. Turning on a publication surface is a decision for a person, not a sync."
+      "reason": "BY ROLE — a Pages deploy workflow, present only where a wiki publishes a site. power-project-wiki was given one on 2026-09-04 by an explicit decision (the repo has a docs/ directory and was not publishing). Kept out of the shared layer on purpose: turning on a publication surface must stay a decision someone makes, not something a sync does."
     },
     {
       "path": ".github/workflows/export-shared.yml",
@@ -48,7 +48,7 @@
       "path": ".github/workflows/validation-pass.yml",
       "repos": 9,
       "versions": 2,
-      "reason": "TRIAGED — held pending one decision. Runs daily with contents:write and pull-requests:write. Nine wikis have it; xco-team-wiki does not, so sharing it would create a daily write-permission job in the shared commons. The drift between the nine is small (the source is a superset); share it the moment someone decides xco-team should have it."
+      "reason": "BY ROLE, DECISION TAKEN — runs daily with contents:write and pull-requests:write. Held until 2026-09-04, when xco-team-wiki was given it deliberately; all ten wikis now have it. Stays out of the shared layer for the same reason as deploy-pages: a job that opens PRs in someone's repo should arrive by decision, not by sync."
     },
     {
       "path": "design/.sync-state.json",

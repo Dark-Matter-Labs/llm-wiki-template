@@ -3,35 +3,21 @@
 # Every line below (blank lines and #-comments ignored) is matched, case-insensitively,
 # against every PUBLIC surface: the whole published docs/ site AND any wiki page marked
 # `public` or `unlisted`. A match fails `tools/scan_public_leaks.py` (and CI), so sensitive
-# material can't reach the open web unnoticed.
+# material can't reach the open web or the colleague mirror unnoticed.
 #
-# This is a BACKSTOP, not the main control. The main control is the ACCESS boundary (who
-# can open the repo at all) plus the `visibility` tier on every page. See
-# SHARING-AND-ACCESS.md.
+# This is a backstop, not the main control. The main control is the ACCESS boundary
+# (only Indy can open the source repo — see SHARING-AND-ACCESS.md). Add a term here
+# whenever something must never appear on a public surface, even by accident.
 #
-# ---------------------------------------------------------------------------
-# ⚠ READ THIS BEFORE ADDING TERMS — the deny-list paradox
-# ---------------------------------------------------------------------------
-# This file is versioned. If your wiki repo is ever public — or becomes public later, or
-# is forked, or its history is shared — then THIS LIST IS PUBLIC TOO. A list of "things we
-# must never say" is itself a disclosure: it tells a reader precisely where to look.
-#
-# So:
-#   • Prefer terms that are meaningless to an outsider. A project codename is a good
-#     entry; the sentence explaining what the codename means is a bad one.
-#   • Never paste a sensitive sentence in here just to block it. Blocking the phrase
-#     publishes the phrase.
-#   • If a term can't be named here without leaking, don't name it. Keep the page
-#     `private` (the default) and let the tier boundary do the work — that control does
-#     not require writing the secret down.
-#   • Keep entries specific enough not to fire on innocent prose. Multi-word phrases and
-#     codenames are best; single common words will cause false alarms and get ignored.
-#
-# ---------------------------------------------------------------------------
-# Your terms go below. The template ships with none on purpose — an empty tripwire is
-# honest, whereas an inherited one gives false confidence that it covers YOUR risks.
-# ---------------------------------------------------------------------------
+# Keep entries specific enough not to fire on innocent prose. Multi-word phrases are best.
 
-# Examples of the RIGHT shape (commented out — uncomment and replace):
-# project nightjar
-# acquisition of northwind
+# --- July 2026 DM/XCO restructuring (private strategy) ---
+reverse takeover
+non-cannibalization of intellectual property
+non-cannibalization of ip
+legacy-option conversion
+legacy DM options
+winding down DM
+preserving DM
+asset relationship rather than a revenue relationship
+greater value in a mission sense
