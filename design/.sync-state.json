@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "88e6ac6523dc903c3869c536c96808fe01dff87db7b1ffea647a7bf1e8133d54",
+    "design/shared-layer.json": "bef4bb2cc3fff5e3e2afb451a64f84da96e4b96088979f7b244fc5ca25a9639b",
     "tools/drift-baseline.json": "c1cbf76fe0d1a65c68e51b1076f7a15b47b5c6b222a6173a1d7b1aaa195db537",
     "tools/check_drift.py": "a5ea79887ecc0a9281752c0e8f1f1abd17b26a2ec1e72966fb257309551cc3ed",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -58,6 +58,8 @@
     ".claude/skills/joker/SKILL.md": "ab85d0f1e69c098c79130bb70e46e10e907fb18f7b23e7e33aefff8f1b2dec2d",
     ".claude/skills/office-hours/SKILL.md": "f95e1aeabfe5f2c5bfc439bb5f065be916473f97285b69274a39143fca1c9777",
     ".claude/skills/cross-check/SKILL.md": "044e0125fc4be66e5c24c74b924e5c1a920d37a4be8fff2363153379c3035a8c",
-    "tools/make_social_card.py": "357f29b7d54815f1e65a31ce140c698f0a5ab9baac1dfab472e12c24cd3bce95"
+    "tools/make_social_card.py": "357f29b7d54815f1e65a31ce140c698f0a5ab9baac1dfab472e12c24cd3bce95",
+    "tools/wiki_context.py": "c1576a7e74c746582bceff4f36170162393ce3a7cbebf35e81c0c20a0c6335e3",
+    "tools/test_wiki_context.py": "894e8de744fda1f53abc58c9e33378356e5475d77ab9cb8517265ebd5d0c0dc1"
   }
 }
