@@ -136,10 +136,22 @@ def audit() -> "tuple[list[dict], int, int]":
 
 
 def load_baseline() -> set:
+    return set(load_reasons())
+
+
+def load_reasons() -> "dict[str, str]":
+    """path -> why it is still drifting.
+
+    A register of thirty-six paths with no reasons is a list, and a list gets skimmed. The
+    triage on 2026-09-04 found only three of them were cosmetic; the rest need someone to pick
+    a variant or merge two, and at least twice the SPOKE's version was the better one. That is
+    not something a count can carry, so each entry carries a sentence and regeneration
+    preserves it.
+    """
     if not BASELINE.exists():
-        return set()
+        return {}
     d = json.loads(BASELINE.read_text(encoding="utf-8"))
-    return {e["path"] for e in d.get("drifted", [])}
+    return {e["path"]: e.get("reason", "") for e in d.get("drifted", [])}
 
 
 def main(argv=None) -> int:
@@ -163,6 +175,7 @@ def main(argv=None) -> int:
           f"{len(drift)} disagreeing")
 
     if args.update_baseline:
+        reasons = load_reasons()          # never lose a sentence someone wrote
         BASELINE.write_text(json.dumps({
             "_comment": "Files present in two or more wikis, outside SHARED, whose contents "
                         "disagree. A debt register, not an exemption: it must only ever shrink. "
@@ -170,7 +183,8 @@ def main(argv=None) -> int:
                         "per-repo by design -- but recording that is a claim someone makes on "
                         "purpose. --check fails on anything not listed.",
             "recorded": "2026-09-04",
-            "drifted": [{"path": d["path"], "repos": d["repos"], "versions": d["versions"]}
+            "drifted": [{"path": d["path"], "repos": d["repos"], "versions": d["versions"],
+                         "reason": reasons.get(d["path"], "")}
                         for d in sorted(drift, key=lambda x: x["path"])],
         }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"\nbaseline written: {len(drift)} path(s).")
