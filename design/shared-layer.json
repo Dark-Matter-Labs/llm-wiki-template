@@ -33,6 +33,8 @@
     "tools/test_check_links.py",
     "tools/export_shared.py",
     "tools/test_export_shared.py",
+    "tools/sync_commons.py",
+    "tools/test_sync_commons.py",
     "design/shared-layer.json",
     "tools/drift-baseline.json",
     "tools/check_drift.py",
