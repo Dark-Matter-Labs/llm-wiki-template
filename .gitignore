@@ -59,3 +59,8 @@ shared_out/
 # Staged contribution bundles (tools/contribute.py) — output, never committed.
 contrib/
 .staleness-cache.json
+
+# The commons cache: a read-only cut of each commons this wiki reads, fetched by
+# tools/sync_commons.py. Never edited, never a source of truth, never committed --
+# duplicating a commons is what the federation exists to avoid.
+.commons/
