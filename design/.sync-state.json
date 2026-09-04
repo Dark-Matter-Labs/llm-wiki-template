@@ -28,8 +28,8 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "e6d6398173819f4480a855b6945971d650d0f0a9688212fea79056cf486452b5",
-    "tools/drift-baseline.json": "11e4fae2c697d446d7c3297a15c401d61c1959bb86c206f7eefb5dc2b8fb10b5",
+    "design/shared-layer.json": "5dcc31a036973cb417b13164ed6b4a2eaed00140e988b3664a01fa9f8ecf0d93",
+    "tools/drift-baseline.json": "cdd18a436f9912e02e82aa056908aebeb1fb53d37b48ddd12a9bf377473cc727",
     "tools/check_drift.py": "a5ea79887ecc0a9281752c0e8f1f1abd17b26a2ec1e72966fb257309551cc3ed",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
     ".claude/skills/metacognition/SKILL.md": "524ab449c3b8ca2fdf1f9ad1119ef0ee07632eb73efec88a67d298bd39ec06c2",
@@ -41,6 +41,12 @@
     "docs/assets/xco-dusk.css": "cf58ae57e334087500a6f677c10404affb9dc9e461455085d084701240e93b62",
     "tools/propose_upstream.py": "40e4a8fae0d52e68c72d7aaf534f223de9bcd839b3167e9e900fc34b2217d57e",
     "tools/test_propose_upstream.py": "be1c1631e4c0dc48044334a3e606728f01744dbd5d46486bde15fde57494ea42",
-    ".claude/skills/reflect/SKILL.md": "a0e33a31f8851e998e61ac6f8eb85416301b3b432d45540a10c864a8d848ac35"
+    ".claude/skills/reflect/SKILL.md": "a0e33a31f8851e998e61ac6f8eb85416301b3b432d45540a10c864a8d848ac35",
+    "tools/test_export.py": "e342509538e017d86f9d79c1e613dd547adec91f3931fc4285bcc9d6efa9f90b",
+    "tools/audit_design.py": "5c3fb4bd267825521d987b7242ad96ad4798bbdc3c783ed013908396ce154c48",
+    "tools/check_log_shape.py": "df667951749fe215c3a89d3a05de33e686e265193ba8c344705079d15b32d8fd",
+    "tools/sync_log_index.py": "0dc2a98e918078a9b344e589da99ce304fc247a5e6e7d7b2d74832376dd53637",
+    ".claude/skills/gravity/compute_gravity.py": "7180939228b4acf17a0f307bd55f25afe00e0b59389095e094319e0431513fdb",
+    "tools/scan_public_leaks.py": "8074e417f11a5568f95ce5b90c80eaa9df710aab6d0a46f27f18f6c04efd0fbd"
   }
 }

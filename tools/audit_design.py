@@ -92,19 +92,33 @@ def audit_page(path):
                         f'skip link points at #{target}, which no element has'))
     elif 'class="skip-link"' in s:
         out.append((SEV_ERROR, "skip-target-missing", "skip link has no href"))
+    # A skip link that is never hidden sits visible at the top of the page. Found on
+    # 31 bespoke pages that had copied the markup without the rule — the target check
+    # above passed on every one of them, because the link worked. It just also showed.
+    if 'class="skip-link"' in s and not re.search(r"\.skip-link[^{]*\{", s):
+        if not re.search(r'assets/xco(?:-dusk|2)?\.css', s):
+            out.append((SEV_ERROR, "skip-link-unstyled",
+                        "skip link has no CSS rule — it renders visibly on the page"))
     if re.search(r"<table", s) and "scope=" not in s:
         out.append((SEV_WARN, "table-no-scope", "table without th scope"))
     if 'target="_blank"' in s:
         out.append((SEV_WARN, "new-tab", "opens a new tab — steals the back button"))
 
     # --- colour discipline ---------------------------------------------------
-    # Orange as text on the light register fails AA (2.60:1). Structure use is fine.
+    # In v2 every domain hue is >= 3:1 against its ground, which makes it safe as a
+    # stroke or border and still NOT safe as body text. Each has an `-ink` form at
+    # >= 4.5:1 for exactly that. Using the structural token as a text colour is the
+    # mistake this catches — the same one v1 made with orange, which is why the
+    # `-ink` convention was carried forward.
+    STRUCTURAL = r"#d56c53|#1f9a91|#7375b7|#cd6a95|#F27F3D|" \
+                 r"var\(--(?:midtone|accent|bio|inst|tech|culture)\)"
     if light:
-        for m in re.finditer(r"color:\s*(#F27F3D|var\(--midtone\))(?!\w)", s, re.I):
+        for m in re.finditer(rf"color:\s*(?:{STRUCTURAL})(?!\w|-ink)", s, re.I):
             frag = s[max(0, m.start() - 90):m.start()]
             if "dark-card" not in frag and "footer" not in frag and "slide-dark" not in frag:
-                out.append((SEV_WARN, "orange-text-on-paper",
-                            "orange used as text colour on the light register (2.60:1)"))
+                out.append((SEV_WARN, "structural-hue-as-text",
+                            "a structural hue used as text on the light register — "
+                            "use its -ink form (>= 4.5:1)"))
                 break
     if re.search(r"(background|color)\s*:\s*#fff(f{3})?\b", s, re.I):
         out.append((SEV_INFO, "pure-white", "hardcodes pure #FFF rather than the tinted paper"))
@@ -139,6 +153,15 @@ def main(argv=None):
     pages = sorted(p for p in glob.glob(os.path.join(args.docs, "*.html"))
                    if os.path.basename(p) != "index.html")
     if not os.path.isdir(args.docs):
+        # A text commons has no site, and that is not a configuration error -- this tool
+        # travels to every wiki in the federation, and hard-failing where there is nothing
+        # to audit turns a legitimate state into a red gate for whoever wires it into CI.
+        # Being in the wrong directory still is an error, so the two are told apart by
+        # whether this looks like a repo root at all.
+        if os.path.isdir("tools") and os.path.isdir("wiki"):
+            print(f"no {args.docs}/ in this wiki — it publishes no site, so there is "
+                  f"nothing to audit.")
+            return 0
         print(f"error: no {args.docs!r} directory (cwd is {os.getcwd()}).\n"
               f"       Run from the repo root: python3 tools/audit_design.py", file=sys.stderr)
         return 2
