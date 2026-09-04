@@ -226,5 +226,94 @@ def run_empty():
         return 0
 
 
+COMMITMENT = """---
+type: commitment
+title: A Contracted Lead For Something
+description: A commitment page carrying the full ledger field set.
+tags: [ledger]
+status: draft
+visibility: internal
+confidence: high
+validation: machine
+timestamp: 2026-09-02
+commits_to: "A Real Public Goal"
+resources: One contracted lead, starting next month.
+until: Open-ended.
+state: held
+sources: []
+---
+
+The body.
+"""
+
+GOAL = """---
+type: goal
+title: A Real Public Goal
+description: The goal the commitment above commits to.
+tags: [ledger]
+status: draft
+visibility: public
+confidence: high
+validation: machine
+timestamp: 2026-09-02
+horizon: mid
+sources: []
+---
+
+The goal body.
+"""
+
+
+def run_ledger():
+    """A contributed commitment must arrive with its ledger fields intact.
+
+    The whitelist predated the goal/commitment schema, so commits_to, resources, until
+    and state were silently dropped on the way into a commons — and the RECEIVING repo's
+    schema check requires commits_to and state on a commitment. A contribution would
+    therefore land red, which is a large part of why the ledger had never moved off a
+    personal wiki. Dropping a field is invisible; landing red is not, but only after the
+    fact and in someone else's repository.
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        wiki = os.path.join(tmp, "wiki")
+        out = os.path.join(tmp, "shared")
+        os.makedirs(wiki)
+        _write(wiki, "a-real-public-goal.md", GOAL)
+        _write(wiki, "a-contracted-lead.md", COMMITMENT)
+        export_shared.write_shared(wiki, out)
+
+        with open(os.path.join(out, "wiki", "a-contracted-lead.md"), encoding="utf-8") as fh:
+            got = fh.read()
+
+        failures = []
+        for field, value in [("commits_to", "A Real Public Goal"), ("state", "held"),
+                             ("until", "Open-ended."),
+                             ("resources", "One contracted lead, starting next month.")]:
+            if f"{field}:" not in got:
+                failures.append(f"{field} dropped from the contributed commitment")
+            elif value not in got:
+                failures.append(f"{field} present but value mangled (wanted {value!r})")
+        if "type: commitment" not in got:
+            failures.append("type downgraded — the receiving ledger will not see this page")
+
+        # The goal keeps its optional horizon; a page without ledger fields gains none.
+        with open(os.path.join(out, "wiki", "a-real-public-goal.md"), encoding="utf-8") as fh:
+            goal = fh.read()
+        if "horizon: mid" not in goal:
+            failures.append("goal lost its horizon")
+        if "state:" in goal or "commits_to:" in goal:
+            failures.append("ledger fields invented on a page that had none")
+
+        if failures:
+            print("FAIL — ledger fields do not survive contribution:")
+            for f in failures:
+                print("  -", f)
+            return 1
+        print("PASS — a contributed commitment keeps commits_to, resources, until and state")
+        return 0
+
+
 if __name__ == "__main__":
-    raise SystemExit(run() or run_empty())
+    # Every scenario runs, even after one fails. An `or` chain short-circuits, so the
+    # first failure would hide the others and each CI run would surface one at a time.
+    raise SystemExit(max(run(), run_empty(), run_ledger()))
