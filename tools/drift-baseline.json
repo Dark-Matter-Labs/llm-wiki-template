@@ -5,182 +5,200 @@
     {
       "path": ".claude/skills/brief/SKILL.md",
       "repos": 10,
-      "versions": 5
+      "versions": 5,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".claude/skills/contribute/SKILL.md",
       "repos": 9,
-      "versions": 6
+      "versions": 6,
+      "reason": "BY ROLE — up-flow tooling; a top commons has nothing above it."
     },
     {
       "path": ".claude/skills/crm/SKILL.md",
       "repos": 9,
-      "versions": 4
+      "versions": 4,
+      "reason": "DELIBERATELY PERSONAL — the CRM must never reach a commons, and shipping the skill invites the pages."
     },
     {
       "path": ".claude/skills/cross-check/SKILL.md",
       "repos": 10,
-      "versions": 2
+      "versions": 2,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".claude/skills/delta/SKILL.md",
       "repos": 10,
-      "versions": 3
+      "versions": 3,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".claude/skills/gravity/SKILL.md",
       "repos": 10,
-      "versions": 3
+      "versions": 3,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".claude/skills/gravity/compute_gravity.py",
       "repos": 10,
-      "versions": 4
+      "versions": 4,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".claude/skills/ingest/SKILL.md",
       "repos": 10,
-      "versions": 5
+      "versions": 5,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".claude/skills/joker/SKILL.md",
       "repos": 10,
-      "versions": 3
+      "versions": 3,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".claude/skills/lint/SKILL.md",
       "repos": 10,
-      "versions": 6
+      "versions": 6,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".claude/skills/office-hours/SKILL.md",
       "repos": 10,
-      "versions": 3
+      "versions": 3,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".claude/skills/publish-check/SKILL.md",
       "repos": 10,
-      "versions": 5
+      "versions": 5,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".claude/skills/publish-web/SKILL.md",
       "repos": 9,
-      "versions": 6
+      "versions": 6,
+      "reason": "BY ROLE — a publishing surface, not a discipline."
     },
     {
       "path": ".claude/skills/query/SKILL.md",
       "repos": 10,
-      "versions": 5
+      "versions": 5,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".claude/skills/reflect/SKILL.md",
       "repos": 10,
-      "versions": 7
+      "versions": 7,
+      "reason": "NEEDS A MERGE, NOT A SYNC — michelle-llm-wiki's copy is LARGER than the source (76 lines vs 74). Syncing from indy would delete a spoke's improvement."
     },
     {
       "path": ".github/workflows/checks.yml",
       "repos": 10,
-      "versions": 4
+      "versions": 4,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".github/workflows/deploy-pages.yml",
       "repos": 7,
-      "versions": 2
+      "versions": 2,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".github/workflows/export-shared.yml",
       "repos": 9,
-      "versions": 4
+      "versions": 4,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".github/workflows/export.yml",
       "repos": 10,
-      "versions": 4
+      "versions": 4,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": ".github/workflows/validation-pass.yml",
       "repos": 9,
-      "versions": 2
+      "versions": 2,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": "design/federation.json",
       "repos": 10,
-      "versions": 10
+      "versions": 10,
+      "reason": "CORRECT AND PERMANENT — a wiki's position in the graph does not travel. Ten versions across ten repos is the designed state."
     },
     {
       "path": "design/social-card.json",
       "repos": 8,
-      "versions": 6
+      "versions": 6,
+      "reason": "CORRECT — per-repo branding for the social card."
     },
     {
       "path": "tools/README.md",
       "repos": 9,
-      "versions": 2
+      "versions": 2,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": "tools/audit_design.py",
       "repos": 10,
-      "versions": 3
+      "versions": 3,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": "tools/check_log_shape.py",
       "repos": 10,
-      "versions": 2
+      "versions": 2,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": "tools/classify_internal.py",
       "repos": 10,
-      "versions": 3
-    },
-    {
-      "path": "tools/contradictions.py",
-      "repos": 10,
-      "versions": 2
+      "versions": 3,
+      "reason": "DELIBERATE DIVERGENCE — learning-system-wiki's copy is de-projectised on purpose and says so: 'no project-specific strategy vocabulary … this file is versioned, and in an open repo'."
     },
     {
       "path": "tools/export.py",
       "repos": 10,
-      "versions": 2
+      "versions": 2,
+      "reason": "BY ROLE — a commons emits wiki.shared.json and provenance; a spoke does not. Documented in the file's own header."
     },
     {
       "path": "tools/make_social_card.py",
       "repos": 8,
-      "versions": 3
-    },
-    {
-      "path": "tools/pdf_to_md.py",
-      "repos": 9,
-      "versions": 2
+      "versions": 3,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": "tools/scan_public_leaks.py",
       "repos": 10,
-      "versions": 3
+      "versions": 3,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": "tools/sync_index_counts.py",
       "repos": 2,
-      "versions": 2
+      "versions": 2,
+      "reason": "BY ROLE — carries a repo-specific PATTERNS block matching that router's headings."
     },
     {
       "path": "tools/sync_log_index.py",
       "repos": 10,
-      "versions": 2
+      "versions": 2,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": "tools/test_export.py",
       "repos": 10,
-      "versions": 2
+      "versions": 2,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": "tools/test_sync_index_counts.py",
       "repos": 2,
-      "versions": 2
-    },
-    {
-      "path": "tools/test_validation_weighting.py",
-      "repos": 10,
-      "versions": 2
+      "versions": 2,
+      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     }
   ]
 }
