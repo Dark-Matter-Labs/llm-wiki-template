@@ -41,7 +41,7 @@
     "docs/assets/xco-dusk.css": "cf58ae57e334087500a6f677c10404affb9dc9e461455085d084701240e93b62",
     "tools/propose_upstream.py": "40e4a8fae0d52e68c72d7aaf534f223de9bcd839b3167e9e900fc34b2217d57e",
     "tools/test_propose_upstream.py": "be1c1631e4c0dc48044334a3e606728f01744dbd5d46486bde15fde57494ea42",
-    ".claude/skills/reflect/SKILL.md": "a0e33a31f8851e998e61ac6f8eb85416301b3b432d45540a10c864a8d848ac35",
+    ".claude/skills/reflect/SKILL.md": "f333b2da927d999c977898d909869b77d76ebba1dda1e378e3ebaca98bdb0493",
     "tools/test_export.py": "e342509538e017d86f9d79c1e613dd547adec91f3931fc4285bcc9d6efa9f90b",
     "tools/audit_design.py": "5c3fb4bd267825521d987b7242ad96ad4798bbdc3c783ed013908396ce154c48",
     "tools/check_log_shape.py": "df667951749fe215c3a89d3a05de33e686e265193ba8c344705079d15b32d8fd",

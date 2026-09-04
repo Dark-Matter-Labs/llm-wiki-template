@@ -76,6 +76,20 @@ Three things this block must never become:
   paste that as written. "Cannot check" is the useful answer; a number that reads as a gap when
   it is not would train people to ignore the block.
 
+### And, where this wiki has `tools/verification.py` — "Claims awaiting verification"
+
+Also **not a seventh section**, and also outside the compared contract. Run
+`python3 tools/verification.py --sample 3` and paste the output under a
+`## Claims awaiting verification` heading. Three unverified claims, one per page, weighted toward the
+pages most linked to and already validated — the ones a misquote would do the most damage in. The
+reflection is the cheapest weekly place to put three citations in front of the person who can check
+them. Skip the block, and say so, where the tool is absent: it lives in the source wiki first and
+travels once it has been used on real pages.
+
+Two things this block must never do: **write a mark** — `{✓ …}` is a person's signature, and a model
+writing it is the shortcut the whole layer exists to refuse — or **pad the three to more**. Three a
+week is a habit; a backlog is a refusal.
+
 ## After writing
 File it, add it to `index.md`, and log `## [YYYY-MM-DD] reflect | week YYYY-Www` in today's
 day file (`wiki/log/YYYY-MM-DD.md`), then run `python3 tools/sync_log_index.py` so the month
