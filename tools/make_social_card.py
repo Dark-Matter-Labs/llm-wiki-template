@@ -22,6 +22,7 @@ Requires Pillow. If it isn't installed:
   pip install Pillow --break-system-packages
 """
 
+import json
 import argparse
 import os
 import sys
@@ -100,12 +101,34 @@ def build(args):
               "look crude. Install a TTF and re-run.")
 
 
+def _card():
+    """This wiki's card wording, from design/social-card.json.
+
+    These used to be hardcoded argparse defaults, which duplicated a config file that already
+    existed and already said it was per-repo -- so the generator carried one wiki's tagline into
+    every other wiki that took a copy. Reading the config is what lets the generator itself be
+    identical across the federation; the wording stays local, which is the whole point of the
+    split. (Same move as PRE_SPLIT_MONTHS in the log tools: the per-repo fact goes to per-repo
+    config, and the code travels.)
+    """
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        "design", "social-card.json")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            c = json.load(fh)
+    except (OSError, ValueError):
+        c = {}
+    lines = list(c.get("lines") or ["", ""]) + ["", ""]
+    return (c.get("kicker", ""), lines[0], lines[1], c.get("footer", ""))
+
+
 def main(argv=None):
+    eyebrow, line1, line2, url = _card()
     p = argparse.ArgumentParser(description="Generate the Open Graph social card.")
-    p.add_argument("--eyebrow", default="YOUR ORGANISATION  ·  SECTION")
-    p.add_argument("--line1", default="Your one-line")
-    p.add_argument("--line2", default="statement here.")
-    p.add_argument("--url", default="YOUR-ORG.github.io")
+    p.add_argument("--eyebrow", default=eyebrow)
+    p.add_argument("--line1", default=line1)
+    p.add_argument("--line2", default=line2)
+    p.add_argument("--url", default=url)
     p.add_argument("--out", default="docs/assets/social-card.png")
     build(p.parse_args(argv))
     return 0

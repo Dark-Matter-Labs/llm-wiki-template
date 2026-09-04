@@ -24,7 +24,7 @@
       "path": ".github/workflows/checks.yml",
       "repos": 10,
       "versions": 4,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
+      "reason": "BY ROLE — the gate set is not the same in every wiki, because the tools are not. This repo runs check_sources.py and sync_index_counts.py, which most wikis do not have. The one part that WAS shared drift — a hand-kept list of test files that covered 8 of 17 suites — was fixed on 2026-09-04 by making the step discover tools/test_*.py. What remains is each repo's own gates."
     },
     {
       "path": ".github/workflows/deploy-pages.yml",
@@ -36,13 +36,13 @@
       "path": ".github/workflows/export-shared.yml",
       "repos": 9,
       "versions": 4,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
+      "reason": "BY ROLE — the colleague mirror. Which repo it pushes to, and whether it runs at all, is a fact about this wiki's position in the graph, not a shared behaviour."
     },
     {
       "path": ".github/workflows/export.yml",
       "repos": 10,
       "versions": 4,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
+      "reason": "BY ROLE — a commons publishes two graphs to its export branch (wiki.public.json AND wiki.shared.json); a spoke publishes one. Same division already recorded for tools/export.py, and the workflow's own SECURITY comment states it."
     },
     {
       "path": ".github/workflows/validation-pass.yml",
@@ -72,7 +72,7 @@
       "path": "tools/README.md",
       "repos": 9,
       "versions": 2,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
+      "reason": "CORRECT AND PER-REPO — a catalogue of THIS wiki's tools. The tool sets differ, so the READMEs must. (The naming difference that also showed here is not drift: a personal wiki's README may name its owner.)"
     },
     {
       "path": "tools/classify_internal.py",
@@ -87,12 +87,6 @@
       "reason": "BY ROLE — a commons emits wiki.shared.json and provenance; a spoke does not. Documented in the file's own header."
     },
     {
-      "path": "tools/make_social_card.py",
-      "repos": 8,
-      "versions": 3,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
       "path": "tools/sync_index_counts.py",
       "repos": 2,
       "versions": 2,
@@ -102,7 +96,7 @@
       "path": "tools/test_sync_index_counts.py",
       "repos": 2,
       "versions": 2,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
+      "reason": "BY ROLE — pairs with sync_index_counts.py, already recorded as by-role: it carries a repo-specific PATTERNS block matching that router's headings. Only the two tiered-index wikis have either. A test cannot travel further than the tool it tests."
     }
   ]
 }
