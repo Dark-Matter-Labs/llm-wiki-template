@@ -43,6 +43,8 @@
     "tools/drift-baseline.json",
     "tools/check_drift.py",
     "tools/test_check_drift.py",
+    "tools/wiki_context.py",
+    "tools/test_wiki_context.py",
     "tools/propose_upstream.py",
     "tools/test_propose_upstream.py",
     "tools/scan_public_leaks.py",
