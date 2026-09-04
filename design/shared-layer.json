@@ -51,6 +51,7 @@
     "tools/check_log_shape.py",
     "tools/sync_log_index.py",
     ".claude/skills/gravity/compute_gravity.py",
+    "tools/make_social_card.py",
     ".claude/skills/brief/SKILL.md",
     ".claude/skills/ingest/SKILL.md",
     ".claude/skills/lint/SKILL.md",
