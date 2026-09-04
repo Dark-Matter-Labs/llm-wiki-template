@@ -36,6 +36,9 @@ you your yours would could may might must shall one two three per via vs eg ie e
 pdf html png jpg svg csv raw docs wiki assets http https www com org""".split())
 
 EXCLUDE = {"index.md", "log.md"}
+# The tiered index (2026-08-23): wiki/index/*.md are catalogues, not content. They
+# quote every description in the corpus, so counting them would let the map vote on
+# where the territory's centre of gravity is.
 EXCLUDE_DIRS = {"index", "log"}
 
 def tokenize(text):
@@ -62,7 +65,7 @@ def wiki_files_from_dir(root):
     out = {}
     wiki = os.path.join(root, "wiki")
     for dirpath, _, files in os.walk(wiki):
-        # wiki/log/ holds the monthly log files — catalogue prose, not corpus content.
+        # wiki/log/ and wiki/index/ hold catalogue prose, not corpus content.
         if os.path.basename(dirpath) in EXCLUDE_DIRS and os.path.dirname(dirpath) == wiki:
             continue
         for f in files:
@@ -94,7 +97,7 @@ def page_meta(text, fallback):
 
 # How much a page counts toward the corpus's centre, by who has stood behind it.
 # Unvalidated material is admitted, indexed and searchable — it simply does not yet
-# move the centre. This is the mechanical form of the failure the owner named: a bulk
+# move the centre. This is the mechanical form of the named failure: a bulk
 # load of well-formed but out-of-date thinking should not drag the whole model
 # backwards just because it is voluminous.
 #

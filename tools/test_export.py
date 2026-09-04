@@ -114,6 +114,35 @@ class ExportTests(unittest.TestCase):
             self.assertEqual(nodes["q"]["visibility"], "private")   # comment stripped
             self.assertEqual(nodes["q"]["title"], "Quoted: Title")  # quotes stripped
 
+    def test_bracket_list_with_trailing_comment(self):
+        """`sources: []   # why` must parse as an empty list, not the string "[]".
+
+        The scalar comment-stripper is deliberately not applied to bracket lists, so a
+        trailing comment made the value fail the endswith("]") test and fall through to
+        the scalar branch. The whole string then became a one-element list, turning an
+        EMPTY sources list into the phantom source "[]" -- which check_sources.py duly
+        went looking for on disk. Found when contributing a commitment page whose empty
+        sources carried a comment explaining why it was empty.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            write(d, "c.md",
+                  "type: summary\ntitle: Commented\ndescription: d\ntags: [x]  # a note\n"
+                  "status: draft\nvisibility: private\nconfidence: high\n"
+                  "timestamp: 2026-07-10\nsources: []   # held in another repo\n")
+            nodes, _ = export.build_nodes(d)
+            self.assertEqual(nodes["c"]["sources"], [])
+            self.assertEqual(nodes["c"]["tags"], ["x"])
+
+    def test_hash_inside_a_bracket_list_survives(self):
+        """Only text after the FINAL "]" is treated as a comment."""
+        with tempfile.TemporaryDirectory() as d:
+            write(d, "h.md",
+                  "type: summary\ntitle: Hashy\ndescription: d\ntags: [a]\n"
+                  "status: draft\nvisibility: private\nconfidence: high\n"
+                  "timestamp: 2026-07-10\nsources: [raw/note#1.pdf, raw/b.pdf]\n")
+            nodes, _ = export.build_nodes(d)
+            self.assertEqual(nodes["h"]["sources"], ["raw/note#1.pdf", "raw/b.pdf"])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

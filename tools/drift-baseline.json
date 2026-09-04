@@ -39,12 +39,6 @@
       "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
-      "path": ".claude/skills/gravity/compute_gravity.py",
-      "repos": 10,
-      "versions": 4,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
       "path": ".claude/skills/ingest/SKILL.md",
       "repos": 10,
       "versions": 5,
@@ -96,7 +90,7 @@
       "path": ".github/workflows/deploy-pages.yml",
       "repos": 7,
       "versions": 2,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
+      "reason": "BY ROLE, AND A DECISION NOT MINE — a Pages deploy workflow. power-project-wiki has a docs/ directory but deliberately no deploy; syncing this would START PUBLISHING a repo that is not published today. Turning on a publication surface is a decision for a person, not a sync."
     },
     {
       "path": ".github/workflows/export-shared.yml",
@@ -114,7 +108,7 @@
       "path": ".github/workflows/validation-pass.yml",
       "repos": 9,
       "versions": 2,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
+      "reason": "TRIAGED — held pending one decision. Runs daily with contents:write and pull-requests:write. Nine wikis have it; xco-team-wiki does not, so sharing it would create a daily write-permission job in the shared commons. The drift between the nine is small (the source is a superset); share it the moment someone decides xco-team should have it."
     },
     {
       "path": "design/.sync-state.json",
@@ -141,18 +135,6 @@
       "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
-      "path": "tools/audit_design.py",
-      "repos": 10,
-      "versions": 3,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
-      "path": "tools/check_log_shape.py",
-      "repos": 10,
-      "versions": 2,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
       "path": "tools/classify_internal.py",
       "repos": 10,
       "versions": 3,
@@ -171,28 +153,10 @@
       "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
-      "path": "tools/scan_public_leaks.py",
-      "repos": 10,
-      "versions": 3,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
       "path": "tools/sync_index_counts.py",
       "repos": 2,
       "versions": 2,
       "reason": "BY ROLE — carries a repo-specific PATTERNS block matching that router's headings."
-    },
-    {
-      "path": "tools/sync_log_index.py",
-      "repos": 10,
-      "versions": 2,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
-    },
-    {
-      "path": "tools/test_export.py",
-      "repos": 10,
-      "versions": 2,
-      "reason": "UNTRIAGED — substantive difference, not a hardcoded name. Needs someone to pick a variant or merge two before it can join SHARED."
     },
     {
       "path": "tools/test_sync_index_counts.py",

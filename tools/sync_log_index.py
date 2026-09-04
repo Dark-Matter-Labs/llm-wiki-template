@@ -36,6 +36,8 @@ Usage:
 
 from __future__ import annotations
 
+import os
+import json
 import argparse
 import pathlib
 import re
@@ -45,7 +47,24 @@ LOG = pathlib.Path(__file__).resolve().parent.parent / "wiki" / "log"
 
 # Kept in sync with tools/check_log_shape.py — months written before the per-day
 # split; single files by design, never retrofitted.
-PRE_SPLIT_MONTHS: "set[str]" = set()   # migrated whole; no month here predates the split
+def _pre_split_months():
+    """Months that predate the per-day log split, read from this wiki's own federation.json.
+
+    This used to be a constant in the source, which meant the value -- a fact about ONE wiki's
+    history -- was baked into a file that wants to travel. indy-llm-wiki has July 2026 as a single
+    month file; every wiki created after the split has none, and their copies of this tool differed
+    only in that set. Moving the fact to per-repo config lets the code be identical everywhere.
+    """
+    p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                     "design", "federation.json")
+    try:
+        with open(p, encoding="utf-8") as fh:
+            return set(json.load(fh).get("pre_split_months", []))
+    except (OSError, ValueError):
+        return set()
+
+
+PRE_SPLIT_MONTHS = _pre_split_months()
 
 DAY = re.compile(r"^(\d{4}-\d{2}-\d{2})\.md$")
 # `+` is in the class because compound operations are an established convention in the
