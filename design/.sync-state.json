@@ -63,6 +63,6 @@
     "tools/test_wiki_context.py": "894e8de744fda1f53abc58c9e33378356e5475d77ab9cb8517265ebd5d0c0dc1",
     "tools/init_wiki.py": "aca9b80ca58045f4d9c0f15572528ebced67e85689c6b4a90eacc4e350094a45",
     "tools/test_init_wiki.py": "12915d23280b0efe225b3fef6571af549b6b3308f7e04617a13ce2ceb4bf848b",
-    ".github/workflows/sync-commons.yml": "7246e4d74ec74deaf9a82d2dfab318b8ad806c8eea5e8062d4a9b91609473602"
+    ".github/workflows/sync-commons.yml": "84745fc7d430135678af55db840d52e040d1d16e00f787b45829fcc997f51ff7"
   }
 }

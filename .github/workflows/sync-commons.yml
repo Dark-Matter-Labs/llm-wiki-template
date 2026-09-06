@@ -99,6 +99,16 @@ jobs:
           fi
           echo "### Commons synced" >> "$GITHUB_STEP_SUMMARY"
           UNREADABLE=""
+
+          # actions/checkout runs with persist-credentials: true, which writes an auth
+          # http.https://github.com/.extraheader into the workspace's git config. That header
+          # OVERRIDES credentials embedded in a URL, so every git call made from inside the
+          # workspace authenticates as the job's own GITHUB_TOKEN -- which can read this repo and
+          # nothing else. COMMONS_READ_TOKEN was never being used.
+          #
+          # This is why the failure said "Repository not found": not a scope problem, an identity
+          # problem. Clearing the header for these calls is what makes the URL's token apply.
+          NOHDR="-c http.https://github.com/.extraheader="
           for NAME in $TARGETS; do
             DEST=".commons/${NAME}/export"
             URL="https://x-access-token:${TOKEN}@github.com/${OWNER}/${NAME}.git"
@@ -115,25 +125,33 @@ jobs:
             # from a workstation, where the syncer uses a person's own credentials.
             #
             # Found on 2026-09-06 by the first run of the weekly federation drift audit.
-            if ! git ls-remote --heads --exit-code "$URL" export >/dev/null 2>&1; then
-              if git ls-remote --heads "$URL" >/dev/null 2>&1; then
+            # ONE call, and its stderr is KEPT. The first version of this fix made two calls and
+            # sent both to /dev/null -- reproducing, inside the fix, the exact defect it was
+            # written to remove: a failure reported without the reason for it. The reason is the
+            # entire product here, so it is captured, stripped of the token, and printed.
+            if REFS=$(git $NOHDR ls-remote --heads "$URL" 2>/tmp/lsr.err); then
+              if printf '%s' "$REFS" | grep -q 'refs/heads/export$'; then
+                : # export branch present — fall through to the clone below
+              else
                 # Readable, but no export branch. The legitimate "not exported yet" case.
                 echo "- \`${NAME}\` — readable, but no \`export\` branch yet" >> "$GITHUB_STEP_SUMMARY"
                 echo "::warning::${OWNER}/${NAME} is readable but has no export branch - nothing to sync from it yet."
-              else
-                # Cannot read the repo at all. This wiki DECLARES it as a commons, so this is a
-                # broken down-flow, not an empty one.
-                echo "- \`${NAME}\` — **cannot be read: the token has no access**" >> "$GITHUB_STEP_SUMMARY"
-                echo "::error::Cannot read ${OWNER}/${NAME}. This wiki declares it as a commons in design/federation.json, but COMMONS_READ_TOKEN cannot reach it."
-                UNREADABLE="$UNREADABLE $NAME"
+                continue
               fi
+            else
+              # Cannot read the repo at all. This wiki DECLARES it as a commons, so this is a
+              # broken down-flow, not an empty one.
+              WHY=$(sed "s#${TOKEN}#TOKEN#g" /tmp/lsr.err | tr '\n' ' ' | cut -c1-300)
+              echo "- \`${NAME}\` — **cannot be read** — \`${WHY}\`" >> "$GITHUB_STEP_SUMMARY"
+              echo "::error::Cannot read ${OWNER}/${NAME}. Declared as a commons in design/federation.json. git said: ${WHY}"
+              UNREADABLE="$UNREADABLE $NAME"
               continue
             fi
 
             # Read the orphan `export` branch, never the working tree: it is the
             # boundary-filtered cut, so a private page in a commons cannot reach a
             # spoke even by accident.
-            if git clone --quiet --depth 1 --branch export "$URL" "$DEST"; then
+            if git $NOHDR clone --quiet --depth 1 --branch export "$URL" "$DEST"; then
               echo "- \`${NAME}\` — fetched" >> "$GITHUB_STEP_SUMMARY"
               echo "Fetched ${NAME}."
             else
