@@ -98,21 +98,68 @@ jobs:
             exit 0
           fi
           echo "### Commons synced" >> "$GITHUB_STEP_SUMMARY"
+          UNREADABLE=""
           for NAME in $TARGETS; do
             DEST=".commons/${NAME}/export"
+            URL="https://x-access-token:${TOKEN}@github.com/${OWNER}/${NAME}.git"
             mkdir -p "$(dirname "$DEST")"
+
+            # Ask the remote what it has BEFORE cloning, so that "this token cannot read the
+            # repo" and "the repo has no export branch yet" stop being the same message.
+            #
+            # They were the same message, and it hid a live failure for weeks. git's stderr went
+            # to /dev/null and EVERY clone failure was reported as a missing branch, as a
+            # warning, on a job that stays green. power-project-wiki has had an export branch
+            # since August and returns 403 to this token: the down-flow from it has never once
+            # run in CI, while the daily summary named a cause that was not true. It looked fine
+            # from a workstation, where the syncer uses a person's own credentials.
+            #
+            # Found on 2026-09-06 by the first run of the weekly federation drift audit.
+            if ! git ls-remote --heads --exit-code "$URL" export >/dev/null 2>&1; then
+              if git ls-remote --heads "$URL" >/dev/null 2>&1; then
+                # Readable, but no export branch. The legitimate "not exported yet" case.
+                echo "- \`${NAME}\` — readable, but no \`export\` branch yet" >> "$GITHUB_STEP_SUMMARY"
+                echo "::warning::${OWNER}/${NAME} is readable but has no export branch - nothing to sync from it yet."
+              else
+                # Cannot read the repo at all. This wiki DECLARES it as a commons, so this is a
+                # broken down-flow, not an empty one.
+                echo "- \`${NAME}\` — **cannot be read: the token has no access**" >> "$GITHUB_STEP_SUMMARY"
+                echo "::error::Cannot read ${OWNER}/${NAME}. This wiki declares it as a commons in design/federation.json, but COMMONS_READ_TOKEN cannot reach it."
+                UNREADABLE="$UNREADABLE $NAME"
+              fi
+              continue
+            fi
+
             # Read the orphan `export` branch, never the working tree: it is the
             # boundary-filtered cut, so a private page in a commons cannot reach a
             # spoke even by accident.
-            if git clone --depth 1 --branch export \
-                 "https://x-access-token:${TOKEN}@github.com/${OWNER}/${NAME}.git" "$DEST" 2>/dev/null; then
+            if git clone --quiet --depth 1 --branch export "$URL" "$DEST"; then
               echo "- \`${NAME}\` — fetched" >> "$GITHUB_STEP_SUMMARY"
               echo "Fetched ${NAME}."
             else
-              echo "- \`${NAME}\` — **no export branch yet**" >> "$GITHUB_STEP_SUMMARY"
-              echo "::warning::No export branch on ${OWNER}/${NAME} - nothing to sync from it."
+              echo "- \`${NAME}\` — **export branch exists but the clone failed**" >> "$GITHUB_STEP_SUMMARY"
+              echo "::error::Clone of ${OWNER}/${NAME} failed after its export branch resolved."
+              UNREADABLE="$UNREADABLE $NAME"
             fi
           done
+
+          if [ -n "$UNREADABLE" ]; then
+            {
+              echo ""
+              echo "**The down-flow is broken, not empty.** This wiki declares these commons and"
+              echo "cannot read them:"
+              for f in $UNREADABLE; do echo "- \`$f\`"; done
+              echo ""
+              echo "Instruments that read the cached export — search, gravity, delta, the weekly"
+              echo "contribution prompt's overlap check, and contribute.py's collision check —"
+              echo "are running without them, and will keep saying so rather than quietly"
+              echo "returning less."
+              echo ""
+              echo "Fix it either way: widen \`COMMONS_READ_TOKEN\` to cover them, or remove from"
+              echo "\`design/federation.json\` any commons this wiki is not actually part of."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
 
       - name: Report what the commons hold
         run: python3 tools/commons_report.py
