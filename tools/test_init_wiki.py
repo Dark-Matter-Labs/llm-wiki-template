@@ -37,9 +37,14 @@ def check(label, cond, detail=""):
         FAILED.append(label)
 
 
+DECISION = {"decided": "2026-09-04", "by": "Indy",
+            "why": "The studio needs a public face for the option."}
+
+
 def wiki(tmp, dirname, *, name=None, role="spoke", display_name="Alex's LLM Wiki",
          ups=("xco-team-wiki",), export=None, card_line="Something of our own.",
-         deploy_pages=False, manifest=True, federation=True, bad_json=False):
+         deploy_pages=False, manifest=True, federation=True, bad_json=False,
+         publishes=None):
     """A minimal wiki on disk. The directory name matters: `name` is checked against it."""
     root = pathlib.Path(tmp) / dirname
     (root / "design").mkdir(parents=True)
@@ -50,12 +55,15 @@ def wiki(tmp, dirname, *, name=None, role="spoke", display_name="Alex's LLM Wiki
         if bad_json:
             p.write_text("{ not json", encoding="utf-8")
         else:
-            p.write_text(json.dumps({
+            fed = {
                 "name": name if name is not None else dirname,
                 "display_name": display_name,
                 "role": role,
                 "contributes_to": list(ups),
-            }), encoding="utf-8")
+            }
+            if publishes is not None:
+                fed["publishes_site"] = publishes
+            p.write_text(json.dumps(fed), encoding="utf-8")
 
     if card_line is not None:
         (root / "design" / "social-card.json").write_text(
@@ -159,7 +167,87 @@ def main():
                           deploy_pages=True, card_line="An LLM wiki."))
         check("a commons publishing a site is an advisory, not a failure",
               not r.failures and len(r.advisories) == 2,
-              "power-project-wiki was given one by an explicit decision")
+              "it may have been decided on purpose; the tool asks, it does not rule")
+
+    # ---- publishing: decided, or merely happening? --------------------------------------
+    # The default is right -- a commons is not a publishing surface. But power-project-wiki was
+    # given one deliberately, and an advisory that can never be closed is noise, so the decision
+    # is recordable. What must NOT become possible is closing it with a record nobody stands
+    # behind: that would convert a question into a rubber stamp, which is worse than the noise.
+    def commons(t, **kw):
+        kw.setdefault("role", "commons"); kw.setdefault("ups", ())
+        kw.setdefault("export", COMMONS_EXPORT)
+        return wiki(t, "some-commons", **kw)
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(commons(t, deploy_pages=True))
+        check("an undecided publishing commons is asked, and told exactly what to write",
+              len(r.advisories) == 1 and "publishes_site" in r.advisories[0]
+              and '"decided"' in r.advisories[0])
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(commons(t, deploy_pages=True, publishes=DECISION))
+        check("a recorded decision closes the advisory", not r.advisories and not r.failures)
+        check("and the passing line names who decided it and when",
+              any("Indy" in m and "2026-09-04" in m for m in r.passed),
+              "closing it silently would lose the only thing the record is for")
+
+    for missing in ("decided", "by", "why"):
+        with tempfile.TemporaryDirectory() as t:
+            partial = {k: v for k, v in DECISION.items() if k != missing}
+            r = iw.check(commons(t, deploy_pages=True, publishes=partial))
+            check(f"a decision missing `{missing}` FAILS rather than passing",
+                  fails_with(r, missing),
+                  "a partial record reads as a decision while naming nobody accountable")
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(commons(t, deploy_pages=True, publishes={**DECISION, "by": "Claude"}))
+        check("a model-shaped decider is REFUSED, as validated_by refuses it",
+              fails_with(r, "model-shaped"),
+              "the one-line shortcut that would make the record decoration")
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(commons(t, deploy_pages=True, publishes={**DECISION, "by": "GPT-5.2 review"}))
+        check("and it is caught inside a longer string too", fails_with(r, "model-shaped"))
+
+    # THE FAIL-OPEN. The first version of this emitted the "unverified" note and then fell
+    # through to the passing line anyway, so a decision whose author could not be checked still
+    # closed the question. Caught by review, not by these tests, because nothing here had ever
+    # made the name-checker unavailable. A branch with no fixture is a branch nobody tested.
+    with tempfile.TemporaryDirectory() as t:
+        real = iw._model_shaped
+        try:
+            iw._model_shaped = lambda name: None          # cross_check.py unimportable
+            r = iw.check(commons(t, deploy_pages=True, publishes=DECISION))
+        finally:
+            iw._model_shaped = real
+        check("an UNCHECKABLE decider does not close the question",
+              not any("commons publishes a site" in m for m in r.passed),
+              "unverifiable must not read as verified")
+        check("and it is reported as unconfirmed, so the gap is visible",
+              any("UNCONFIRMED" in m for m in r.advisories))
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(commons(t, deploy_pages=False, publishes=DECISION))
+        check("a decision to publish with no deploy workflow is flagged as stale",
+              any("stale" in m for m in r.advisories),
+              "the register may only shrink; a record for something not happening is debt")
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(commons(t, deploy_pages=False))
+        check("a commons that does not publish is simply correct",
+              not r.advisories and any("correctly not a publishing surface" in m
+                                       for m in r.passed))
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "alex-llm-wiki", publishes=DECISION))
+        check("a SPOKE carrying the declaration is told it says nothing",
+              len(r.advisories) == 1 and "spoke" in r.advisories[0])
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "alex-llm-wiki"))
+        check("and a spoke without one is told the check was skipped, not passed",
+              any("publishing decision not checked" in m for m in r.skipped))
 
     # ---- broken input fails cleanly ----------------------------------------------------
     with tempfile.TemporaryDirectory() as t:

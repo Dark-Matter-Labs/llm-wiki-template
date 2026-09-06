@@ -61,7 +61,7 @@
     "tools/make_social_card.py": "357f29b7d54815f1e65a31ce140c698f0a5ab9baac1dfab472e12c24cd3bce95",
     "tools/wiki_context.py": "c1576a7e74c746582bceff4f36170162393ce3a7cbebf35e81c0c20a0c6335e3",
     "tools/test_wiki_context.py": "894e8de744fda1f53abc58c9e33378356e5475d77ab9cb8517265ebd5d0c0dc1",
-    "tools/init_wiki.py": "adf0c156ed2eacd74f8c27fca47b6ae8a38a21798398d0bc0345c351184b9951",
-    "tools/test_init_wiki.py": "904721dabeedb853ed44f0c449dc68b1b1d6e827a32040d63c5c2f756d4d9268"
+    "tools/init_wiki.py": "aca9b80ca58045f4d9c0f15572528ebced67e85689c6b4a90eacc4e350094a45",
+    "tools/test_init_wiki.py": "12915d23280b0efe225b3fef6571af549b6b3308f7e04617a13ce2ceb4bf848b"
   }
 }

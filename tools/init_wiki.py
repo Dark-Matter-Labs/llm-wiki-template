@@ -61,6 +61,17 @@ DEPLOY_PAGES = ".github/workflows/deploy-pages.yml"
 
 ROLES = ("spoke", "commons")
 
+# A commons publishing a public site is a decision, not a default. It can be recorded in
+# design/federation.json so the advisory closes on the record rather than being suppressed:
+#
+#   "publishes_site": { "decided": "2026-09-04", "by": "<person>", "why": "<one line>" }
+#
+# All three keys are required, and `by` may not name anything model-shaped -- the same gate
+# `validated_by` and the verification mark carry, for the same reason. A model recording that a
+# model decided to publish is the one-line shortcut that turns a decision into a rubber stamp.
+PUBLISHES = "publishes_site"
+PUBLISHES_KEYS = ("decided", "by", "why")
+
 # The strings the template ships. Left in place they are not errors in any mechanical sense --
 # the file parses, the tools run -- which is exactly why they need naming.
 PLACEHOLDER_DISPLAY_NAMES = {"this llm wiki", "llm wiki", ""}
@@ -115,6 +126,85 @@ def known_federation(root=None) -> set[str]:
     if not data:
         return set()
     return set(data.get("siblings") or []) | ({data["source"]} if data.get("source") else set())
+
+
+def _model_shaped(name: str):
+    """Delegate to cross_check.py, or say we could not check.
+
+    Returns True, False, or None for "unverifiable". `cross_check.py` owns the marker list and
+    travels in the same shared layer as this file, so the import normally succeeds. If it has
+    been stripped, this reports UNVERIFIED rather than falling back to a weaker copy of the
+    list -- a degraded check that still says "pass" is how a gate stops meaning anything, and a
+    duplicated marker list is a second place for it to go out of date.
+    """
+    try:
+        sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+        from cross_check import looks_like_a_model
+    except ImportError:
+        return None
+    return looks_like_a_model(name)
+
+
+def _publishing(r: "Report", root, fed, is_commons):
+    """A commons publishing a public site: decided, or merely happening?
+
+    SETUP.md says a commons is not a publishing surface, and the default is right -- work that
+    should reach the open web goes out through a member's own wiki, after `publish-check`. But
+    power-project-wiki was given a site on 2026-09-04 on purpose. So this is a question, and the
+    only two honest answers are "somebody decided this, here is who and when" or "nobody did".
+    """
+    has_site = (root / DEPLOY_PAGES).exists()
+    decl = fed.get(PUBLISHES)
+
+    if not is_commons:
+        if decl:
+            r.advise(f"`{PUBLISHES}` is declared but this is a spoke, where publishing needs no "
+                     f"special decision. The declaration says nothing and should be removed.")
+        else:
+            r.skip("publishing decision not checked — a spoke may publish without one")
+        return
+
+    if not has_site:
+        if decl:
+            r.advise(f"`{PUBLISHES}` records a decision to publish, but there is no "
+                     f"{DEPLOY_PAGES}. Either the workflow was removed and the declaration is "
+                     f"stale, or the decision was never carried out.")
+        else:
+            r.ok("commons, and correctly not a publishing surface")
+        return
+
+    if not decl:
+        r.advise(f"a commons with {DEPLOY_PAGES} and no recorded decision. SETUP.md says a "
+                 f"commons is not a publishing surface, so this is a question rather than a "
+                 f"defect — but it should be answered in writing. Add to {FEDERATION}:\n"
+                 f'      "{PUBLISHES}": {{ "decided": "YYYY-MM-DD", "by": "<person>", '
+                 f'"why": "<one line>" }}')
+        return
+
+    if not isinstance(decl, dict) or [k for k in PUBLISHES_KEYS if not str(decl.get(k, "")).strip()]:
+        missing = ", ".join(k for k in PUBLISHES_KEYS
+                            if not isinstance(decl, dict) or not str(decl.get(k, "")).strip())
+        r.fail(f"`{PUBLISHES}` is incomplete — missing {missing}. A partial record reads as a "
+               f"decision while naming nobody accountable for it, which is worse than no record.")
+        return
+
+    who = str(decl["by"]).strip()
+    shaped = _model_shaped(who)
+    if shaped is None:
+        # NOT a skip-and-continue. An earlier version emitted the skip and then fell through to
+        # the `ok` below, so a decision whose author could not be checked still closed the
+        # question -- the exact fail-open this function was written to prevent, shipped inside
+        # it. An unverifiable record leaves the question open; it does not answer it.
+        r.advise(f"`{PUBLISHES}` records a decision by `{who}`, but cross_check.py is missing so "
+                 f"the name could not be checked against the model markers. The decision stands "
+                 f"UNCONFIRMED, and this question stays open until it can be checked.")
+        return
+    if shaped:
+        r.fail(f"`{PUBLISHES}.by` is `{who}`, which is model-shaped. Publishing to the open web "
+               f"is a person's decision; a model recording that a model decided it is the "
+               f"shortcut `validated_by` already refuses.")
+        return
+    r.ok(f"commons publishes a site — decided {decl['decided']} by {who}: {decl['why']}")
 
 
 def check(root=None) -> Report:
@@ -218,10 +308,7 @@ def check(root=None) -> Report:
                f"      cp ../xco-team-wiki/.github/workflows/export.yml .github/workflows/")
 
     # ---- advisories: real cases exist on both sides -------------------------------------
-    if is_commons and (root / DEPLOY_PAGES).exists():
-        r.advise(f"a commons with {DEPLOY_PAGES}. SETUP.md says a commons is not a publishing "
-                 f"surface — but power-project-wiki was given one on 2026-09-04 by an explicit "
-                 f"decision, so this is a question, not a defect. Confirm it was decided.")
+    _publishing(r, root, fed, is_commons)
 
     card, card_err = _read_json(SOCIAL_CARD, root)
     if card_err:
