@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "bef4bb2cc3fff5e3e2afb451a64f84da96e4b96088979f7b244fc5ca25a9639b",
+    "design/shared-layer.json": "e6fb6481e83801d82a184b2a8ad4d9e3d2805b6fba84958f3028b4f012927dd9",
     "tools/drift-baseline.json": "c1cbf76fe0d1a65c68e51b1076f7a15b47b5c6b222a6173a1d7b1aaa195db537",
     "tools/check_drift.py": "a5ea79887ecc0a9281752c0e8f1f1abd17b26a2ec1e72966fb257309551cc3ed",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -51,7 +51,7 @@
     ".claude/skills/brief/SKILL.md": "cfe98e13ed5cc4b5469a2f05f7052921e7e0ab1b24649b0534acecfb84a28b0e",
     ".claude/skills/ingest/SKILL.md": "40cf9e81823875a09b6f335330efbec3eba4a6e304f1ef8439d44ea520e0dafe",
     ".claude/skills/lint/SKILL.md": "e961f1ea768ca127236fe94c9482bf086430e94a1904093d7d8d182ba80c8f41",
-    ".claude/skills/publish-check/SKILL.md": "2b53c0796cbecc45450fa47f162c35b428364cc5bab0a03864de4face3887fd4",
+    ".claude/skills/publish-check/SKILL.md": "14929a1731511b9cca2bab36799bdddf031710e16b0b205128f833976f10130c",
     ".claude/skills/query/SKILL.md": "5b6279482e924b000ce979c2de002c1a8b43df5c84637226406642edcf113666",
     ".claude/skills/delta/SKILL.md": "8594c198425ab3527ef971e0ef7bbb38958bacb1aa041cc24376852c6b62b4b4",
     ".claude/skills/gravity/SKILL.md": "df7244bea6470d42e5f85d3961099c98504bcf0c4290b89e8a4e7f799ebfe004",
@@ -60,6 +60,8 @@
     ".claude/skills/cross-check/SKILL.md": "044e0125fc4be66e5c24c74b924e5c1a920d37a4be8fff2363153379c3035a8c",
     "tools/make_social_card.py": "357f29b7d54815f1e65a31ce140c698f0a5ab9baac1dfab472e12c24cd3bce95",
     "tools/wiki_context.py": "c1576a7e74c746582bceff4f36170162393ce3a7cbebf35e81c0c20a0c6335e3",
-    "tools/test_wiki_context.py": "894e8de744fda1f53abc58c9e33378356e5475d77ab9cb8517265ebd5d0c0dc1"
+    "tools/test_wiki_context.py": "894e8de744fda1f53abc58c9e33378356e5475d77ab9cb8517265ebd5d0c0dc1",
+    "tools/init_wiki.py": "adf0c156ed2eacd74f8c27fca47b6ae8a38a21798398d0bc0345c351184b9951",
+    "tools/test_init_wiki.py": "904721dabeedb853ed44f0c449dc68b1b1d6e827a32040d63c5c2f756d4d9268"
   }
 }

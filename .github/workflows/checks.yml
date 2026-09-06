@@ -30,6 +30,14 @@ jobs:
         with:
           python-version: "3.12"
 
+
+      - name: This wiki's own configuration is coherent
+        # Three failures that look like success: a wiki still named llm-wiki-template, which
+        # contributes as the template; a commons running the spoke exporter, which publishes an
+        # empty public graph while every spoke is told the sync succeeded; and a colleague
+        # mirror still titled "this LLM Wiki". All three parse, run and pass every other gate.
+        # Reports which checks its role skipped, so a vacuous pass stays visible.
+        run: python3 tools/init_wiki.py --check
       - name: House rules — civilization with a z, xCO with a lowercase x
         # From xco-style-guide#11. Skips raw/, generated exports, blockquotes,
         # slugs and paths — see tools/house_rules.py. No untrusted input.

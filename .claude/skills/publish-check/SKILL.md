@@ -80,6 +80,10 @@ the today's log file (`wiki/log/YYYY-MM-DD.md`; see `wiki/log.md`).
 
 ## Rules
 - Err toward caution. Better to flag a borderline claim than let an unsupported one ship.
+- **Publication is one-way.** A page pushed to a public branch stays reachable by SHA in
+  every clone and fork after any deletion or force-push, and a crawler or archive may have
+  taken a copy within the hour. Unpublishing removes the link, not the content. Treat a leak
+  as unrecoverable and spend the effort here, before it ships.
 - Never "fix" a sourcing gap by inventing a source. Flag it and let the owner supply one.
 - Don't use words like "guarantees", "ensures", "prevents", or "eliminates" about the
   content's effects unless a source explicitly supports that framing.
