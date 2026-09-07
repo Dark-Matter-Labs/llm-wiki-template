@@ -134,7 +134,7 @@ def main():
         subprocess.run(["git", "add", "-A"], cwd=root, check=True)
         b = wc.render()
         check("gitignored sources are invisible to the block, so CI and local agree",
-              "1 source file(s)" in b and "over 40KB" not in b,
+              "1 source file" in b and "over 40KB" not in b,
               "a 90KB ignored PDF must not appear")
 
     with tempfile.TemporaryDirectory() as t:
@@ -147,6 +147,38 @@ def main():
         root = pathlib.Path(t); wc.ROOT = root
         (root / "design").mkdir()
         check("a repo with no CLAUDE.md is left alone rather than given one", wc.main([]) == 0)
+
+    # ── the banding, which exists to stop the gate failing on every ingest ──────────────
+    check("a small corpus is reported exactly — every page is a visible share of it",
+          wc.count(18, "page") == "18 pages" and wc.count(1, "page") == "1 page")
+    check("a large corpus is reported as a magnitude, and says so",
+          wc.count(795, "page") == "about 800 pages")
+    check("halves round UP, so 25 does not read as 20",
+          wc.count(25, "page") == "about 30 pages",
+          f"got {wc.count(25, 'page')}")
+    check("the band is stable across the churn of ordinary work",
+          {wc.band(n)[0] for n in range(790, 811)} == {800},
+          "twenty pages either side of 800 must not move it")
+
+    with tempfile.TemporaryDirectory() as t:
+        root = repo(t, {"name": "w", "role": "spoke", "contributes_to": ["c"]}, pages=300)
+        wc.main([])
+        before = (root / "CLAUDE.md").read_text()
+        # THE PROPERTY THIS FIX EXISTS FOR. Adding a page used to make --check exit 1, so
+        # every pull request that ingested anything failed a gate nobody had touched.
+        for i in range(300, 305):
+            (root / "wiki" / f"p{i}.md").write_text("x", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+        check("adding five pages does NOT make the block stale", wc.main(["--check"]) == 0)
+        check("...and the block was not silently rewritten either",
+              (root / "CLAUDE.md").read_text() == before)
+
+        # And the other half: it must still catch a corpus that has genuinely changed size,
+        # or the figure rots into a lie that nothing can ever surface.
+        for i in range(305, 400):
+            (root / "wiki" / f"p{i}.md").write_text("x", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+        check("but a corpus a third larger DOES make it stale", wc.main(["--check"]) == 1)
 
     print()
     if FAILED:
