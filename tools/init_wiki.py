@@ -83,6 +83,15 @@ TEMPLATE_NAME = "llm-wiki-template"
 # internal -- which is the entire reason the `internal` tier exists.
 SHARED_CUT_MARKER = "wiki.shared.json"
 
+# The template ships a worked demo -- six pages about a fictional Greenline urban-forestry
+# programme in Lisbon, Tallinn and Cork -- so a new wiki has something to read before it has
+# anything of its own. SETUP.md step 8 is "clean up the scaffolding", and it is the step nobody
+# does: on 7 Sept 2026 five of nine wikis still carried it, including the top commons with 622
+# real pages beside six fictional ones at `visibility: internal`, which reaches the colleague
+# mirror. Standing the repo up feels like finishing; it is not.
+SCAFFOLD_DIR = "wiki/examples"
+SCAFFOLD_SOURCES = "EXAMPLE-"
+
 
 class Report:
     """Failures stop the gate; advisories are surfaced for a person to decide.
@@ -309,6 +318,24 @@ def check(root=None) -> Report:
 
     # ---- advisories: real cases exist on both sides -------------------------------------
     _publishing(r, root, fed, is_commons)
+
+    ex = root / SCAFFOLD_DIR
+    demo = sorted(p.name for p in ex.glob("*.md")) if ex.is_dir() else []
+    leftover_sources = sorted(p.name for p in (root / "raw").glob(f"{SCAFFOLD_SOURCES}*")) \
+        if (root / "raw").is_dir() else []
+    if demo or leftover_sources:
+        if is_template:
+            r.ok(f"template: {len(demo)} example page(s) present, which is what a template ships")
+        else:
+            r.advise(
+                f"still carrying the template's worked demo — {len(demo)} page(s) in "
+                f"{SCAFFOLD_DIR}/" + (f" and {len(leftover_sources)} EXAMPLE- source(s)"
+                                      if leftover_sources else "") +
+                ". They are fictional (a Greenline urban-forestry programme in Lisbon, Tallinn "
+                "and Cork) and they are indexed, searchable and inside the tier boundary like "
+                "any other page. SETUP.md step 8 removes them.")
+    elif not is_template:
+        r.ok("the template's worked demo has been cleared")
 
     card, card_err = _read_json(SOCIAL_CARD, root)
     if card_err:
