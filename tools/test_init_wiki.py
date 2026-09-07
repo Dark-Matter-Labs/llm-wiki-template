@@ -44,7 +44,7 @@ DECISION = {"decided": "2026-09-04", "by": "Indy",
 def wiki(tmp, dirname, *, name=None, role="spoke", display_name="Alex's LLM Wiki",
          ups=("xco-team-wiki",), export=None, card_line="Something of our own.",
          deploy_pages=False, manifest=True, federation=True, bad_json=False,
-         publishes=None):
+         publishes=None, demo=0, demo_sources=0):
     """A minimal wiki on disk. The directory name matters: `name` is checked against it."""
     root = pathlib.Path(tmp) / dirname
     (root / "design").mkdir(parents=True)
@@ -76,6 +76,15 @@ def wiki(tmp, dirname, *, name=None, role="spoke", display_name="Alex's LLM Wiki
 
     if export is not None:
         (root / "tools" / "export.py").write_text(export, encoding="utf-8")
+
+    if demo:
+        (root / "wiki" / "examples").mkdir(parents=True, exist_ok=True)
+        for i in range(demo):
+            (root / "wiki" / "examples" / f"e{i}.md").write_text("x", encoding="utf-8")
+    if demo_sources:
+        (root / "raw").mkdir(exist_ok=True)
+        for i in range(demo_sources):
+            (root / "raw" / f"EXAMPLE-src{i}.md").write_text("x", encoding="utf-8")
 
     if deploy_pages:
         (root / ".github" / "workflows").mkdir(parents=True)
@@ -248,6 +257,36 @@ def main():
         r = iw.check(wiki(t, "alex-llm-wiki"))
         check("and a spoke without one is told the check was skipped, not passed",
               any("publishing decision not checked" in m for m in r.skipped))
+
+    # ---- THE STEP NOBODY DOES ------------------------------------------------------------
+    # SETUP.md step 8 is "clean up the scaffolding". On 7 Sept 2026 five of nine wikis still
+    # carried the template's fictional Greenline demo -- including the top commons, with 622
+    # real pages beside six invented ones at `visibility: internal`, which reaches the
+    # colleague mirror. Standing the repo up feels like finishing.
+    def has_demo(r):
+        return any("worked demo" in a for a in r.advisories)
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "alex-llm-wiki", demo=6))
+        check("a wiki still carrying the template's demo is told so", has_demo(r))
+        check("and it is an advisory, not a failure", not r.failures,
+              "a wiki set up this morning has not done anything wrong yet")
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "alex-llm-wiki", demo=0, demo_sources=2))
+        check("leftover EXAMPLE- sources count too, with no examples/ left",
+              has_demo(r), "half-cleaned is still not cleaned")
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "alex-llm-wiki"))
+        check("a cleared wiki is told the demo is gone, not left silent",
+              not has_demo(r) and any("demo has been cleared" in m for m in r.passed))
+
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "llm-wiki-template", display_name="this LLM Wiki",
+                          card_line="An LLM wiki.", demo=6, demo_sources=1))
+        check("the template keeps its demo without complaint", not has_demo(r),
+              "a template with no worked example is a worse template")
 
     # ---- broken input fails cleanly ----------------------------------------------------
     with tempfile.TemporaryDirectory() as t:
