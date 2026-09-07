@@ -134,7 +134,7 @@ def main():
         subprocess.run(["git", "add", "-A"], cwd=root, check=True)
         b = wc.render()
         check("gitignored sources are invisible to the block, so CI and local agree",
-              "1 source file" in b and "over 40KB" not in b,
+              "fewer than 25 source files" in b and "over 40KB" not in b,
               "a 90KB ignored PDF must not appear")
 
     with tempfile.TemporaryDirectory() as t:
@@ -149,8 +149,11 @@ def main():
         check("a repo with no CLAUDE.md is left alone rather than given one", wc.main([]) == 0)
 
     # ── the banding, which exists to stop the gate failing on every ingest ──────────────
-    check("a small corpus is reported exactly — every page is a visible share of it",
-          wc.count(18, "page") == "18 pages" and wc.count(1, "page") == "1 page")
+    check("a small corpus reports no figure — the guidance is the same at 2 pages as at 18",
+          wc.count(18, "page") == "fewer than 25 pages"
+          and wc.count(2, "page") == "fewer than 25 pages")
+    check("an empty wiki says so, because that is a real state",
+          wc.count(0, "page") == "no pages yet")
     check("a large corpus is reported as a magnitude, and says so",
           wc.count(795, "page") == "about 800 pages")
     check("halves round UP, so 25 does not read as 20",
@@ -159,6 +162,17 @@ def main():
     check("the band is stable across the churn of ordinary work",
           {wc.band(n)[0] for n in range(790, 811)} == {800},
           "twenty pages either side of 800 must not move it")
+
+    # A two-page wiki is where the gate bit hardest: every one of its first ingests moved
+    # the figure. Oliver's and Prateek's are both in exactly this state.
+    with tempfile.TemporaryDirectory() as t:
+        root = repo(t, {"name": "w", "role": "spoke", "contributes_to": ["c"]}, pages=2)
+        wc.main([])
+        for i in range(2, 8):
+            (root / "wiki" / f"p{i}.md").write_text("x", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+        check("a brand-new wiki's first ingests do not trip the gate",
+              wc.main(["--check"]) == 0)
 
     with tempfile.TemporaryDirectory() as t:
         root = repo(t, {"name": "w", "role": "spoke", "contributes_to": ["c"]}, pages=300)
