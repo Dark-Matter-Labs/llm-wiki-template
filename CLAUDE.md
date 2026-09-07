@@ -40,7 +40,7 @@ markdown pages that sits between the owner and their raw sources.
 
 ### What this corpus is shaped like
 
-- **8 pages** in `wiki/`, and **2 source files** in `raw/`.
+- **fewer than 25 pages** in `wiki/`, and **fewer than 25 source files** in `raw/`.
 - No single source is large enough to need special handling; read them whole.
 
 <!-- wiki-context:end -->
