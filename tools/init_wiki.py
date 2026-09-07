@@ -407,7 +407,29 @@ def init(name, role, display_name, ups, force=False, root=None) -> tuple[int, li
         p.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         written.append(rel)
 
+    # Regenerate the block CLAUDE.md carries, because what we just rewrote is exactly what
+    # it is generated FROM. Without this, configuring a wiki makes its own CI fail on the
+    # next push -- which is what happened to oliver-llm-wiki within a minute of setup, and
+    # is a poor first impression of a system whose whole argument is that its gates hold.
+    regenerated = False
+    if written:
+        try:
+            sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+            import wiki_context
+            prev, wiki_context.ROOT = wiki_context.ROOT, root
+            try:
+                if (root / "CLAUDE.md").exists():
+                    wiki_context.apply_to(root / "CLAUDE.md")
+                    regenerated = True
+            finally:
+                wiki_context.ROOT = prev
+        except (ImportError, OSError) as e:
+            refused.append(f"could not regenerate CLAUDE.md's wiki-context block ({e}) — "
+                           f"run: python3 tools/wiki_context.py")
+
     lines = [f"wrote {r}" for r in written] + refused
+    if regenerated:
+        lines.append("regenerated CLAUDE.md's wiki-context block")
     return 0, lines
 
 

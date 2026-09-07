@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "e8d25774018ec6751cd7783621f05659be166f043087e8bed5b300f1a8631b2e",
+    "design/shared-layer.json": "a8d33aab4a64cd88c2a31c1d87ba97d6c91e88311a723b1e91bd4249e09d5a1a",
     "tools/drift-baseline.json": "c1cbf76fe0d1a65c68e51b1076f7a15b47b5c6b222a6173a1d7b1aaa195db537",
     "tools/check_drift.py": "a5ea79887ecc0a9281752c0e8f1f1abd17b26a2ec1e72966fb257309551cc3ed",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -61,8 +61,8 @@
     "tools/make_social_card.py": "357f29b7d54815f1e65a31ce140c698f0a5ab9baac1dfab472e12c24cd3bce95",
     "tools/wiki_context.py": "c1576a7e74c746582bceff4f36170162393ce3a7cbebf35e81c0c20a0c6335e3",
     "tools/test_wiki_context.py": "894e8de744fda1f53abc58c9e33378356e5475d77ab9cb8517265ebd5d0c0dc1",
-    "tools/init_wiki.py": "032d8d03910ca0a96ffb19a8c922cd75ca78c009dd577f88f986b1f8dd14423b",
-    "tools/test_init_wiki.py": "fba9b910789abaa5b19872f4e25963a31cdd279da47e47cadf4c483d1a96abbb",
+    "tools/init_wiki.py": "1449f5ff96e9a0207ab47ccc4e9c0c5ed35d8a419c9acf41f55ddef44ab11e98",
+    "tools/test_init_wiki.py": "6644af0434b1d814f985c8a33051fc2744cd8c2b49b6c89722881940d665fc14",
     ".github/workflows/sync-commons.yml": "84745fc7d430135678af55db840d52e040d1d16e00f787b45829fcc997f51ff7",
     ".claude/skills/onboard/SKILL.md": "6b4b464d3b2b92b13c379c78b1715fde78a65739eeb4eb5e11cc7c065fa009fd"
   }

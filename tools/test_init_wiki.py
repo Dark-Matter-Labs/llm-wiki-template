@@ -306,6 +306,8 @@ def main():
             json.dumps({"source": "indy-llm-wiki", "siblings": FEDERATION_MEMBERS,
                         "shared": []}), encoding="utf-8")
 
+        (root / "CLAUDE.md").write_text("# CLAUDE.md\n\nIntro.\n\n## Rules\n\nBe good.\n",
+                                        encoding="utf-8")
         code, _ = iw.init("alex-llm-wiki", "spoke", "Alex's LLM Wiki",
                           ["xco-team-wiki"], root=root)
         check("--init writes a configuration", code == 0 and
@@ -316,6 +318,19 @@ def main():
         r = iw.check(root)
         check("and what it generates passes its own --check", not r.failures,
               "; ".join(r.failures)[:160])
+
+        # ...and so must the OTHER generated file that reads what we just wrote.
+        # oliver-llm-wiki failed CI within a minute of being configured because
+        # --init rewrote design/federation.json and left CLAUDE.md's block quoting
+        # the old one. A setup step whose own next gate fails is not setup.
+        import wiki_context
+        prev, wiki_context.ROOT = wiki_context.ROOT, root
+        try:
+            fresh = wiki_context.main(["--check"]) == 0
+        finally:
+            wiki_context.ROOT = prev
+        check("and CLAUDE.md's generated block is regenerated, not left stale",
+              fresh, "configuring a wiki must not break its own next CI run")
 
         before = (root / "design" / "federation.json").read_text()
         code, lines = iw.init("alex-llm-wiki", "spoke", "Someone Else", ["xco-team-wiki"],
