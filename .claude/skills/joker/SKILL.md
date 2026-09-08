@@ -31,7 +31,8 @@ clever, well-read opponent who actually believes the other thing would argue.
 ## Method
 
 1. **Name the orthodoxy.** What does the target page/topic assume? Trace it to specific entries in
-   [[Axioms Register]] (e.g. "this rests on A1 optionality-is-the-unit and A9 many-to-many-coordination").
+   the Axioms Register (`wiki/axioms.md`, where this wiki has one) — e.g. "this rests on A1
+   optionality-is-the-unit and A9 many-to-many-coordination".
    State the orthodoxy in one or two sentences before challenging it.
 2. **Construct 1–3 rival orthodoxies.** Each is a *coherent alternative axiom set* — name it, state
    its founding assumptions. (Examples of axis: concentration over optionality; velocity over
