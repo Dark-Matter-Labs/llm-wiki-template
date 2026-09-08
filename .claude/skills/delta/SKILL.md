@@ -33,7 +33,8 @@ the contact ledger (which pages and axioms it touches, and how). Use both when i
    already in the wiki — use the raw/external original instead.
 
 3. **Read the contact surface.** Actually open the top nearest pages and the touched axiom cards in
-   [[Axioms Register]]. The numbers locate contact; only reading tells you its *kind*.
+   the Axioms Register (`wiki/axioms.md`, where this wiki has one). The numbers locate contact;
+   only reading tells you its *kind*.
 
 4. **Classify each meaningful contact** as one of — be specific about the exact claim/axiom touched:
    - **agree** — says what the wiki already holds (confirms the mass).

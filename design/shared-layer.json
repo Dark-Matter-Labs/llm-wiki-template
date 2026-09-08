@@ -74,6 +74,8 @@
     ".claude/skills/rebuild-parity/SKILL.md",
     ".claude/skills/source-proportion/SKILL.md",
     ".claude/skills/notion-sync/SKILL.md",
+    "tools/check_skill_links.py",
+    "tools/test_check_skill_links.py",
     ".claude/skills/onboard/SKILL.md",
     "docs/assets/xco2.css",
     "docs/assets/xco.css",
