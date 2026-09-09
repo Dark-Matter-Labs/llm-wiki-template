@@ -44,6 +44,14 @@ STALE_DAYS = 60          # no movement for this long and a live goal reads as st
 NON_FAILURE = export.NON_FAILURE_CLOSED
 OPEN_STATES = {"proposed", "held", "revised"}
 
+# How long a human endorsement of a goal stands before it is due for re-validation.
+# Decided on the 9 Sept 2026 INO call (Robyn: a longer review cycle where goals get
+# stabilised, then people come back in; Gurden: a quarter, on the 10x100 rhythm). One
+# hundred days is one 10x100 cycle. This is a READING, not a prompt: nothing nags anyone;
+# the ledger says "endorsement due" and the quarterly session is where it gets renewed.
+REVALIDATE_DAYS = 100
+HUMAN_VALIDATION = {"self", "peer", "collective"}
+
 
 def _days_since(iso):
     if not iso:
@@ -53,6 +61,33 @@ def _days_since(iso):
     except ValueError:
         return None
     return (datetime.date.today() - d).days
+
+
+def endorsement(g, today=None):
+    """Who stands behind this goal, and whether that endorsement is still within its cycle.
+
+    Three states, each meaning one thing:
+      none     — validation is `machine`: no person has stood behind it. The honest default.
+      current  — validated by a person within REVALIDATE_DAYS.
+      due      — validated by a person, but longer ago than one cycle. Not wrong, not
+                 revoked — due for the quarterly session to renew or revise.
+    `revalidate_by` is validated_at + REVALIDATE_DAYS, so the date is computed once, here,
+    and never typed into a page.
+    """
+    today = today or datetime.date.today()
+    tier = g.get("validation") or "machine"
+    at = g.get("validated_at")
+    if tier not in HUMAN_VALIDATION or not at:
+        return {"state": "none", "validated_at": None, "revalidate_by": None, "days_over": None}
+    try:
+        d = datetime.date.fromisoformat(str(at)[:10])
+    except ValueError:
+        return {"state": "none", "validated_at": str(at), "revalidate_by": None, "days_over": None}
+    by = d + datetime.timedelta(days=REVALIDATE_DAYS)
+    over = (today - by).days
+    return {"state": "due" if over > 0 else "current",
+            "validated_at": d.isoformat(), "revalidate_by": by.isoformat(),
+            "days_over": over if over > 0 else None}
 
 
 def _last_touched(slug, wiki_dir):
@@ -118,6 +153,7 @@ def build(wiki_dir="wiki", use_git=True):
             "slug": slug, "title": title,
             "horizon": g.get("horizon"), "parent": g.get("parent"),
             "visibility": g.get("visibility"), "validation": g.get("validation"),
+            "endorsement": endorsement(g),
             "health": health, "why": why,
             "last_movement": last, "days_since": age,
             "attached_pages": len(attached),
@@ -142,6 +178,8 @@ def build(wiki_dir="wiki", use_git=True):
         "unbacked": sum(1 for g in view["goals"] if g["health"] == "unbacked"),
         "stalled": sum(1 for g in view["goals"] if g["health"] == "stalled"),
         "attention": sum(1 for g in view["goals"] if g["health"] == "attention"),
+        "endorsed": sum(1 for g in view["goals"] if g["endorsement"]["state"] != "none"),
+        "endorsement_due": sum(1 for g in view["goals"] if g["endorsement"]["state"] == "due"),
     }
     return view
 
@@ -160,7 +198,13 @@ def render(v, only_stalled=False):
 
     out.append(f"  {c['goals']} goals · {c['commitments']} commitments · "
                f"{c['attention']} need attention · {c['stalled']} stalled · "
-               f"{c['unbacked']} unbacked\n")
+               f"{c['unbacked']} unbacked")
+    if c.get("endorsed", 0) == 0:
+        out.append(f"  no goal has been stood behind by a person yet — every one is "
+                   f"`validation: machine`, so the {REVALIDATE_DAYS}-day cycle has nothing to count\n")
+    else:
+        out.append(f"  {c['endorsed']} endorsed by a person · {c['endorsement_due']} due for "
+                   f"re-validation (endorsement older than {REVALIDATE_DAYS} days)\n")
 
     for g in v["goals"]:
         if only_stalled and g["health"] in {"live", "closed"}:
@@ -169,6 +213,12 @@ def render(v, only_stalled=False):
                 "live": " ·", "closed": " ✓"}[g["health"]]
         out.append(f"  {mark} {g['title']}   [{g['health']}]")
         out.append(f"       {g['why']}")
+        e = g["endorsement"]
+        if e["state"] == "due":
+            out.append(f"       endorsement DUE — validated {e['validated_at']}, cycle ended "
+                       f"{e['revalidate_by']}, {e['days_over']} days ago")
+        elif e["state"] == "current":
+            out.append(f"       endorsed {e['validated_at']} · re-validate by {e['revalidate_by']}")
         if g["horizon"]:
             out.append(f"       horizon: {g['horizon']}   attached pages: {g['attached_pages']}")
         for state, items in g["commitments"].items():
