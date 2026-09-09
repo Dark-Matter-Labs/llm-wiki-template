@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "c04af3913212b27c33b4a027a044646b1efbd935fb54dc3ef0832e1feadfdff2",
+    "design/shared-layer.json": "1ce391d40eb6e33db79b597180c0a51799a17d1d046bf548d7b6e0e75d941c1b",
     "tools/drift-baseline.json": "c1cbf76fe0d1a65c68e51b1076f7a15b47b5c6b222a6173a1d7b1aaa195db537",
     "tools/check_drift.py": "a5ea79887ecc0a9281752c0e8f1f1abd17b26a2ec1e72966fb257309551cc3ed",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -69,6 +69,11 @@
     "tools/check_skill_links.py": "96025c8e3a96bafc7280fd326606166aba49d2b9a1a118686afd659580eddce0",
     "tools/test_check_skill_links.py": "2c24ed52585096ebb0d82a4e8d975f2f5f3bbcfdf475f336069c872665cef543",
     "tools/dependency_staleness.py": "be61d4c3104613876301daf5c3b9da9484277d10d9db7743dfe0a87b41d4790a",
-    "tools/test_dependency_staleness.py": "9b5fa0446345b416f13d497cb71a9dce3aacf5840a88a8d50f908cc3aadd8333"
+    "tools/test_dependency_staleness.py": "9b5fa0446345b416f13d497cb71a9dce3aacf5840a88a8d50f908cc3aadd8333",
+    "tools/learning_outcomes.py": "b0b39e833a9cce0061604d5c63b870edd8198eb679349cf273a9d4aae640bee1",
+    "tools/test_learning_outcomes.py": "e1c7516eb5ee470d81eead125296e4cd0b9136cf84dee5aeb426d46a0b3886a9",
+    ".claude/skills/inquiry/SKILL.md": "f354e26564cff22e8e38a9832683416338f4553ec2fe0d449bac58985924b1fd",
+    "tools/goals.py": "aece13e48d4d06b0f42794969525086e79239ad078bdda030bf9a8211bf33b4f",
+    "tools/test_goals.py": "03b5e1cd93202235591103ebac990c6d6e9f21e2f3e6155df399b4ed2ae1eaec"
   }
 }

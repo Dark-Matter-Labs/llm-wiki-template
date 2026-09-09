@@ -138,6 +138,29 @@ def main():
               v["counts"]["orphan_commitments"] == 1
               and v["orphan_commitments"][0]["title"] == "Orphan C")
 
+        # --- the endorsement cycle (9 Sept 2026: goals stabilise for a quarter) ---------
+        import datetime as _dt
+        today = _dt.date(2026, 9, 9)
+        fresh = dict(validation="peer", validated_at="2026-08-01")   # 39 days ago
+        old_ = dict(validation="self", validated_at="2026-05-01")    # 131 days ago
+        e_none = goals.endorsement({"validation": "machine"}, today)
+        e_cur = goals.endorsement(fresh, today)
+        e_due = goals.endorsement(old_, today)
+        check("a machine-validated goal has no endorsement to cycle",
+              e_none["state"] == "none" and e_none["revalidate_by"] is None)
+        check("a recent human endorsement is current, with a computed re-validate date",
+              e_cur["state"] == "current" and e_cur["revalidate_by"] == "2026-11-09",
+              f"{e_cur}")
+        check("an endorsement older than one 10x100 cycle is DUE, not revoked",
+              e_due["state"] == "due" and e_due["days_over"] == 31
+              and e_due["revalidate_by"] == "2026-08-09",
+              f"{e_due}")
+        check("a leftover validated_at on a machine page is not an endorsement",
+              goals.endorsement({"validation": "machine", "validated_at": "2026-01-01"}, today)["state"] == "none")
+        check("the cycle length is one 10x100 cycle", goals.REVALIDATE_DAYS == 100)
+        check("the rendered view says when nothing has been endorsed yet",
+              "no goal has been stood behind by a person yet" in text)
+
         # --- determinism --------------------------------------------------------
         v2 = goals.build(wiki, use_git=False)
         check("the computation is deterministic for an unchanged corpus",
