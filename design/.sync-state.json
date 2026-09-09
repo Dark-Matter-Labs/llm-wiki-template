@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "4331a1b3260f478db7c4f1571a89d2e7c91a135ab0372c1ba2cc7e560aa7b723",
+    "design/shared-layer.json": "c04af3913212b27c33b4a027a044646b1efbd935fb54dc3ef0832e1feadfdff2",
     "tools/drift-baseline.json": "c1cbf76fe0d1a65c68e51b1076f7a15b47b5c6b222a6173a1d7b1aaa195db537",
     "tools/check_drift.py": "a5ea79887ecc0a9281752c0e8f1f1abd17b26a2ec1e72966fb257309551cc3ed",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -50,7 +50,7 @@
     "tools/scan_public_leaks.py": "6bbc04cb5c458a3fc8c3698193c2c8a8de424bdb98a00e501ad03b38c6d6a7f0",
     ".claude/skills/brief/SKILL.md": "cfe98e13ed5cc4b5469a2f05f7052921e7e0ab1b24649b0534acecfb84a28b0e",
     ".claude/skills/ingest/SKILL.md": "40cf9e81823875a09b6f335330efbec3eba4a6e304f1ef8439d44ea520e0dafe",
-    ".claude/skills/lint/SKILL.md": "e961f1ea768ca127236fe94c9482bf086430e94a1904093d7d8d182ba80c8f41",
+    ".claude/skills/lint/SKILL.md": "b9cfacbbae4566edfea1a6168e1e01c0898fcaaed136935cece69b91b018bb3a",
     ".claude/skills/publish-check/SKILL.md": "14929a1731511b9cca2bab36799bdddf031710e16b0b205128f833976f10130c",
     ".claude/skills/query/SKILL.md": "5b6279482e924b000ce979c2de002c1a8b43df5c84637226406642edcf113666",
     ".claude/skills/delta/SKILL.md": "0d6a1b83c13a9576c4ad9f741bad3fc1ca220bddf9cbdad08649bb4ffe70e98c",
@@ -67,6 +67,8 @@
     ".claude/skills/onboard/SKILL.md": "6b4b464d3b2b92b13c379c78b1715fde78a65739eeb4eb5e11cc7c065fa009fd",
     ".claude/skills/notion-sync/SKILL.md": "954056cb6924fe637293d3966126ebbde10ba4054b38fdd0e1ebc7a886c15f98",
     "tools/check_skill_links.py": "96025c8e3a96bafc7280fd326606166aba49d2b9a1a118686afd659580eddce0",
-    "tools/test_check_skill_links.py": "2c24ed52585096ebb0d82a4e8d975f2f5f3bbcfdf475f336069c872665cef543"
+    "tools/test_check_skill_links.py": "2c24ed52585096ebb0d82a4e8d975f2f5f3bbcfdf475f336069c872665cef543",
+    "tools/dependency_staleness.py": "be61d4c3104613876301daf5c3b9da9484277d10d9db7743dfe0a87b41d4790a",
+    "tools/test_dependency_staleness.py": "9b5fa0446345b416f13d497cb71a9dce3aacf5840a88a8d50f908cc3aadd8333"
   }
 }
