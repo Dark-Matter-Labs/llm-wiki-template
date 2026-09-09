@@ -45,10 +45,33 @@ excluded rather than pretending the excluded pages do not exist.
 This is a reading. It has no `--check` and proposes nothing; Robyn and the funders decide whether
 the shape is right, and the skill that would send it anywhere does not exist yet on purpose.
 
+## The shareable form
+
+Gurden, 9 Sept evening: *"they should be easy and engaging to read — a format we can share with
+people in Slack or email or a document; right now the page is too crude."* So the default output is
+no longer a table. It is a short **brief**: a title, one paragraph that says what happened, four
+short paragraphs with bold leads — what came in, what changed, who stood behind it, what did not
+move — and one line on what the read-out cannot see. The numbers sit inside the sentences.
+
+The same brief renders four ways, from the same computation, so the Slack message and the document
+cannot disagree:
+
+  --format text       plain prose, for email or a chat
+  --format markdown   bold leads and a heading, for a wiki page or a doc
+  --format slack      Slack's mrkdwn (*bold*, no headings), paste straight in
+  --format html       a standalone styled page (xCO type), for sharing as a document
+  --format table      the original tabular read-out, for checking the numbers
+  --json              the data
+
+`--out PATH` writes instead of printing. HTML defaults to `view/learning-outcomes.html`
+(gitignored, like the goal view) and **refuses to write under `docs/` unless the audience is
+`funder`**, because that directory is the open web and the internal shape names internal pages.
+
 Usage:
-  python3 tools/learning_outcomes.py                              # last 100 days, internal
-  python3 tools/learning_outcomes.py --since 2026-06-01           # a window
-  python3 tools/learning_outcomes.py --audience funder            # the shareable cut
+  python3 tools/learning_outcomes.py                              # the brief, last 100 days, internal
+  python3 tools/learning_outcomes.py --format slack --days 30     # paste into the weekly
+  python3 tools/learning_outcomes.py --audience funder --format html --out view/lo-funder.html
+  python3 tools/learning_outcomes.py --format table               # the numbers
   python3 tools/learning_outcomes.py --json
 """
 
@@ -268,6 +291,220 @@ def build(since: datetime.date, until: datetime.date, audience: str = "internal"
     }
 
 
+def _n(n: int, one: str, many: str | None = None) -> str:
+    """'1 source' / '4 sources' — the plural is the one thing prose cannot get wrong."""
+    return f"{n} {one if n == 1 else (many or one + 's')}"
+
+
+def _join(items: list[str]) -> str:
+    items = [i for i in items if i]
+    if not items:
+        return ""
+    if len(items) == 1:
+        return items[0]
+    return ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def wiki_name() -> str:
+    """This wiki's name from its git remote — a commons reads 'the xCO commons', a spoke its own name."""
+    out = git("remote", "get-url", "origin").strip()
+    name = out.rstrip("/").rsplit("/", 1)[-1].removesuffix(".git") if out else "this wiki"
+    return {"xco-team-wiki": "the xCO commons", "learning-system-wiki": "the learning-system commons",
+            "power-project-wiki": "the power-project commons"}.get(name, name)
+
+
+def narrative(v: dict, who: str | None = None) -> dict:
+    """The brief, as parts — title, lede, sections [(lead, body)], caveat — so each format lays it out.
+
+    Written to be read by someone who was not in the room. Every number is in a sentence; every
+    zero is said plainly and given its meaning, because "0 validations" in a table looks like a
+    missing feature and "nobody has yet stood behind a page" is a fact about the work.
+    """
+    who = who or wiki_name()
+    w, e, m, s, o = v["window"], v["entered"], v["moved"], v["stood_behind"], v["still_open"]
+    aud = v["audience"]
+    bt = e["by_type"]
+    since, until = _fmt_date(w["since"]), _fmt_date(w["until"])
+
+    title = f"What {who} learned — {since} to {until}"
+
+    # lede
+    parts = []
+    if bt.get("summary"):
+        parts.append(_n(bt["summary"], "source") + " read")
+    if bt.get("entity"):
+        parts.append(_n(bt["entity"], "organisation, person or place", "organisations, people and places") + " met")
+    if bt.get("concept"):
+        parts.append(_n(bt["concept"], "concept") + " named")
+    if bt.get("synthesis"):
+        parts.append(_n(bt["synthesis"], "synthesis", "syntheses") + " written")
+    if bt.get("goal") or bt.get("commitment"):
+        parts.append(_n(bt.get("goal", 0), "goal") + (f" and {_n(bt['commitment'], 'commitment')}" if bt.get("commitment") else "") + " set down")
+    total = e["total"]
+    if total:
+        lede = f"In {w['days']} days, {_n(total, 'page')} entered {who}: {_join(parts)}."
+        if e["fields"]:
+            top = [("AI" if f["tag"] == "ai" else f["tag"]) for f in e["fields"][:3]]
+            lede += f" The sources were mostly about {_join(top)}."
+        if e.get("not_shown_to_this_audience"):
+            lede += f" ({_n(e['not_shown_to_this_audience'], 'page')} counted here {'is' if e['not_shown_to_this_audience'] == 1 else 'are'} not named for this audience.)"
+    else:
+        lede = f"In {w['days']} days no new page entered {who}. Whatever moved below moved inside what was already there."
+
+    sections = []
+
+    # what came in
+    if total:
+        body = ""
+        if e["met"]:
+            names = e["met"][:5]
+            body += f"New on the map: {_join(names)}" + (f", and {len(e['met']) - 5} more" if len(e["met"]) > 5 else "") + ". "
+        if e["signals"]:
+            titles = [x["title"] for x in e["signals"][:3]]
+            body += f"Among the sources: {_join(titles)}."
+        if body:
+            sections.append(("What came in.", body.strip()))
+
+    # what changed
+    parts = []
+    if m["contradictions_declared"]:
+        c = m["contradictions_declared"]
+        named = [f"{x['page']} against {x['with']}" for x in c if x["page"] and x["with"]]
+        parts.append(_n(len(c), "contradiction") + " was declared" if len(c) == 1 else _n(len(c), "contradiction") + " were declared")
+        if named:
+            parts[-1] += f" — {_join(named[:3])}"
+    if m["positions_closed"]:
+        c = m["positions_closed"]
+        named = [f"{x['page']} ({x['how']} by {x['by']})" for x in c if x["page"]]
+        parts.append(f"{_n(len(c), 'position')} {'was' if len(c) == 1 else 'were'} closed by a person" + (f": {_join(named[:3])}" if named else ""))
+    if m["axioms"]:
+        ax = [f"{a['axiom']} {a['from'] or 'new'} → {a['to']}" for a in m["axioms"][:4]]
+        parts.append(f"{_n(len(m['axioms']), 'axiom')} changed evidence status ({_join(ax)})")
+    if parts:
+        body = "; ".join(parts) + "."
+    else:
+        body = ("No position changed hands: no contradiction was declared and none was closed. That is not "
+                "the same as nothing being learned — it means what came in fitted what was already held, "
+                "or nobody has yet said otherwise.")
+    sections.append(("What changed.", body))
+
+    # who stood behind it
+    nv, nc = len(s["validations"]), s["claims_verified"]
+    if nv or nc:
+        parts = []
+        if nv:
+            names = [f"{x['page']} ({x['tier']})" for x in s["validations"] if x["page"]][:4]
+            parts.append(f"{_n(nv, 'page')} {'was' if nv == 1 else 'were'} validated by a person" + (f" — {_join(names)}" if names else ""))
+        if nc:
+            parts.append(f"{_n(nc, 'claim')} {'was' if nc == 1 else 'were'} read against {'its' if nc == 1 else 'their'} source and held")
+        body = _join(parts) + "."
+    else:
+        body = ("Nobody stood behind a page in this window: no validation, no claim checked against its "
+                "source. Everything above is the model's filing — admitted and searchable, and not yet "
+                "moving the corpus's centre. That changes the first time a person signs one.")
+    sections.append(("Who stood behind it.", body))
+
+    # what did not move
+    parts = []
+    if o["unbacked_goals_total"]:
+        names = [g for g in o["unbacked_goals"] if g]
+        parts.append(f"{_n(o['unbacked_goals_total'], 'goal')} {'has' if o['unbacked_goals_total'] == 1 else 'have'} nothing committed against {'it' if o['unbacked_goals_total'] == 1 else 'them'}"
+                     + ((" — " + (", ".join(n.split(" — ")[0] for n in names[:4]) + " and others"
+                                   if len(names) > 4 else _join([n.split(" — ")[0] for n in names]))) if names else ""))
+    if o["contradictions"]:
+        parts.append(f"{_n(o['contradictions'], 'contradiction')} {'is' if o['contradictions'] == 1 else 'are'} still open")
+    if parts:
+        body = _join(parts) + ". A goal with nothing committed is not failing; a goal space where nothing is committed is a wish list."
+    else:
+        body = "Nothing is waiting: no goal without a commitment, no contradiction left open."
+    sections.append(("What did not move.", body))
+
+    # the caveat, one line
+    caveat = (f"Computed from the wiki on {_fmt_date(w['until'])}, nothing typed. Dates are when a page first "
+              f"entered the repository; pages carried in when the repository was created are not counted. "
+              + ("Internal pages are named. " if aud == "internal" else "Only public and unlisted pages are named; the rest are counted. ")
+              + "Private pages are never named.")
+
+    return {"title": title, "lede": lede, "sections": sections, "caveat": caveat,
+            "numbers": _numbers(v)}
+
+
+def _fmt_date(iso: str) -> str:
+    d = datetime.date.fromisoformat(iso)
+    return f"{d.day} {d.strftime('%B %Y')}"
+
+
+def _numbers(v: dict) -> list[tuple[str, str]]:
+    e, m, s, o = v["entered"], v["moved"], v["stood_behind"], v["still_open"]
+    return [("pages entered", str(e["total"])),
+            ("sources read", str(e["by_type"].get("summary", 0))),
+            ("positions changed", str(len(m["contradictions_declared"]) + len(m["positions_closed"]) + len(m["axioms"]))),
+            ("stood behind by a person", str(len(s["validations"]) + s["claims_verified"])),
+            ("goals with nothing committed", str(o["unbacked_goals_total"]))]
+
+
+def render_text(v: dict) -> str:
+    n = narrative(v)
+    out = [n["title"], "", n["lede"], ""]
+    for lead, body in n["sections"]:
+        out += [f"{lead} {body}", ""]
+    out += [n["caveat"]]
+    return "\n".join(out)
+
+
+def render_markdown(v: dict) -> str:
+    n = narrative(v)
+    out = [f"### {n['title']}", "", n["lede"], ""]
+    for lead, body in n["sections"]:
+        out += [f"**{lead}** {body}", ""]
+    out += [f"_{n['caveat']}_"]
+    return "\n".join(out)
+
+
+def render_slack(v: dict) -> str:
+    """Slack mrkdwn: *bold*, _italic_, no headings, no nested markup."""
+    n = narrative(v)
+    out = [f"*{n['title']}*", "", n["lede"], ""]
+    for lead, body in n["sections"]:
+        out += [f"*{lead}* {body}", ""]
+    out += [f"_{n['caveat']}_"]
+    return "\n".join(out)
+
+
+def render_html(v: dict) -> str:
+    """A standalone page in the xCO type — serif for the reading, mono for the numbers — that
+    survives being emailed or opened from a folder. Light and dark; no external CSS."""
+    import html as _h
+    n = narrative(v)
+    nums = "".join(f'<div class="n"><b>{_h.escape(val)}</b><span>{_h.escape(k)}</span></div>' for k, val in n["numbers"])
+    secs = "".join(f'<p><strong>{_h.escape(l)}</strong> {_h.escape(b)}</p>' for l, b in n["sections"])
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{_h.escape(n['title'])}</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&family=DM+Mono&display=swap">
+<style>
+:root{{--bg:#f6f4ee;--ink:#1f1e1b;--muted:#5d5a52;--faint:#8a877d;--line:rgba(31,30,27,.14);--accent:#4b5e9c}}
+@media (prefers-color-scheme:dark){{:root{{--bg:#1d1d1b;--ink:#efece4;--muted:#b8b4aa;--faint:#7e7b72;--line:rgba(239,236,228,.14);--accent:#8b9bd6}}}}
+body{{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 'Crimson Pro',Georgia,serif}}
+main{{max-width:40rem;margin:0 auto;padding:3.5rem 1.5rem 4rem}}
+.eyebrow{{font:500 11px/1 'DM Mono',ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}}
+h1{{font-weight:400;font-size:2rem;line-height:1.15;letter-spacing:-.01em;margin:.6rem 0 1.2rem}}
+.lede{{font-size:1.2rem;line-height:1.5;color:var(--ink)}}
+.nums{{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:.6rem;margin:1.6rem 0 2rem;padding:1rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}}
+.n b{{display:block;font:500 1.6rem/1 'Inter',system-ui,sans-serif;font-variant-numeric:tabular-nums}}
+.n span{{display:block;margin-top:.3rem;font:400 12px/1.3 'Inter',system-ui,sans-serif;color:var(--muted)}}
+p{{margin:0 0 1rem}} strong{{font-weight:600}}
+.caveat{{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);font:400 13px/1.5 'Inter',system-ui,sans-serif;color:var(--muted)}}
+</style></head><body><main>
+<div class="eyebrow">Learning outcomes · {_h.escape(v['audience'])} shape</div>
+<h1>{_h.escape(n['title'])}</h1>
+<p class="lede">{_h.escape(n['lede'])}</p>
+<div class="nums">{nums}</div>
+{secs}
+<p class="caveat">{_h.escape(n['caveat'])}</p>
+</main></body></html>
+"""
+
+
 def render(v: dict) -> str:
     w, e, m, s, o = v["window"], v["entered"], v["moved"], v["stood_behind"], v["still_open"]
     aud = v["audience"]
@@ -327,6 +564,8 @@ def main(argv=None) -> int:
     ap.add_argument("--until", help="ISO date; default: today")
     ap.add_argument("--days", type=int, default=DEFAULT_DAYS)
     ap.add_argument("--audience", choices=sorted(AUDIENCE_TIERS), default="internal")
+    ap.add_argument("--format", choices=("text", "markdown", "slack", "html", "table"), default="text")
+    ap.add_argument("--out", metavar="PATH", help="write here instead of printing (html defaults to view/learning-outcomes.html)")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
 
@@ -336,7 +575,24 @@ def main(argv=None) -> int:
         print("no wiki/ directory — run from the repo root", file=sys.stderr)
         return 2
     v = build(since, until, args.audience)
-    print(json.dumps(v, indent=1, ensure_ascii=False) if args.json else render(v))
+    if args.json:
+        print(json.dumps(v, indent=1, ensure_ascii=False))
+        return 0
+    text = {"text": render_text, "markdown": render_markdown, "slack": render_slack,
+            "html": render_html, "table": render}[args.format](v)
+    out = args.out or ("view/learning-outcomes.html" if args.format == "html" else None)
+    if not out:
+        print(text)
+        return 0
+    dest = (ROOT / out).resolve()
+    # docs/ is served to the open web. The internal shape names internal pages; it does not go there.
+    if args.audience != "funder" and (ROOT / "docs") in dest.parents:
+        print(f"refusing to write the {args.audience} shape under docs/ — that directory is the open web. "
+              f"Use --audience funder, or another --out.", file=sys.stderr)
+        return 2
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_text(text, encoding="utf-8")
+    print(f"wrote {dest.relative_to(ROOT)} ({len(text):,} chars, {args.format}, {args.audience})")
     return 0
 
 
