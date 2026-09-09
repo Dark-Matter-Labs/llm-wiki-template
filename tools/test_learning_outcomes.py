@@ -184,6 +184,38 @@ def main():
         check("...and neither private title appears anywhere in the rendered internal cut",
               "A Private Validated Page" not in lo.render(v) and "A Private Goal" not in lo.render(v))
 
+    # THE BRIEF: the shareable form. A funder's copy names no internal page in any format;
+    # Slack's markup has no headings; a zero is a sentence with a meaning, not a "0".
+    with tempfile.TemporaryDirectory() as t:
+        r = Repo(t)
+        r.write("seed", page("Seed", visibility="public"))
+        r.commit(T0)
+        r.write("pub", page("A Public Source", type="summary", visibility="public", tags="[finance]"))
+        r.write("int", page("An Internal Org", type="entity", visibility="internal"))
+        r.write("g", page("A Goal Nobody Backed — long subtitle", type="goal", visibility="internal"))
+        r.commit(T0 + 20 * DAY)
+        r.activate()
+        since, until = day(T0 + 10 * DAY), day(T0 + 30 * DAY)
+        f = lo.build(since, until, "funder")
+        i = lo.build(since, until, "internal")
+        for fmt, fn in (("text", lo.render_text), ("markdown", lo.render_markdown),
+                        ("slack", lo.render_slack), ("html", lo.render_html)):
+            out = fn(f)
+            check(f"the funder brief names no internal page — {fmt}",
+                  "An Internal Org" not in out and "A Goal Nobody Backed" not in out)
+        check("the funder brief still says what it is not naming",
+              "not named for this audience" in lo.render_text(f))
+        check("the internal brief names the internal goal by its short title, not its subtitle",
+              "A Goal Nobody Backed" in lo.render_text(i) and "long subtitle" not in lo.render_text(i))
+        sl = lo.render_slack(i)
+        check("Slack markup: bold with single asterisks, no markdown heading",
+              sl.startswith("*What ") and "###" not in sl and "**" not in sl)
+        check("a zero is said as a sentence with a meaning, not as a number",
+              "Nobody stood behind a page" in lo.render_text(i) and "0 page" not in lo.render_text(i))
+        check("the HTML is a standalone document", lo.render_html(i).startswith("<!doctype html>")
+              and "<script" not in lo.render_html(i))
+        check("the plural is right", "1 source read" in lo.render_text(i) and "1 organisation, person or place met" in lo.render_text(i))
+
     # Nothing is typed: the same corpus gives the same read-out.
     with tempfile.TemporaryDirectory() as t:
         r = Repo(t)
