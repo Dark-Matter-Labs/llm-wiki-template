@@ -15,10 +15,26 @@ MAY fix frontmatter metadata when the correct value is unambiguous.
    `title`, `description`, `tags`, `status`, `confidence`, `timestamp`, `sources`).
    Repair where the correct value is certain; flag where it's uncertain.
 
-2. **Staleness / contradiction.** Surface the oldest pages by `timestamp`. For each,
-   check whether newer sources now contradict or supersede it. Flag; propose specific
-   updates; don't apply unilaterally. Pay special attention to `confidence: low` pages —
-   they most need re-examination as sources accumulate.
+2. **Staleness / contradiction.** Check whether newer sources now contradict or supersede a
+   page. Flag; propose specific updates; don't apply unilaterally. Pay special attention to
+   `confidence: low` pages — they most need re-examination as sources accumulate.
+
+   **Do not rank by `timestamp`, which this step used to say.** For a source summary that field
+   is the essay's publication date, and a schema backfill rewrites frontmatter across a whole
+   corpus at once — on 2026-08-12 one such backfill made every page in the source wiki read the
+   same age. Use `python3 tools/staleness.py`, which reports when a page's *body* last changed
+   and ignores frontmatter-only commits. A signal a migration can reset measures migrations.
+
+2a. **Ground that moved underneath a page.** Run `python3 tools/dependency_staleness.py`. A
+   synthesis, comparison or overview can go stale without being touched, because the pages it was
+   built on were rewritten after it. The tool names those dependencies and the pages resting on
+   the older version, ranked by how far the dependency moved times how hard the page leans on it.
+
+   **It has no `--check` and is not a gate.** The staleness is created by *improving* the page
+   underneath, so a gate would fail the person who did the good thing. Treat the top few rows as
+   a reading list, and read the pair before proposing anything: a link is not a derivation, and
+   the churn figure is a proxy for meaning, not a measure of it. A small wiki will correctly
+   report nothing.
 
 2b. **Cited sources resolve.** *(Where this wiki has `tools/check_sources.py` — it is not yet in every wiki; skip the step and say so if it is absent.)* Run `python3 tools/check_sources.py --report`. It reports
    frontmatter `sources:` that do not resolve against the local `raw/` library, split into

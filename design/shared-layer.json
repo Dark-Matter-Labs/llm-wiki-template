@@ -27,6 +27,8 @@
     "tools/search.py",
     "tools/staleness.py",
     "tools/test_staleness.py",
+    "tools/dependency_staleness.py",
+    "tools/test_dependency_staleness.py",
     "tools/measure_scale.py",
     "tools/test_measure_scale.py",
     "tools/cross_check.py",
