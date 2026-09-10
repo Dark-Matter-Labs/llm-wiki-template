@@ -62,8 +62,8 @@
     {
       "path": ".github/workflows/export.yml",
       "repos": 11,
-      "versions": 6,
-      "reason": "BY ROLE, PLUS UNRECONCILED WORK — triaged 2026-09-10. Two of the six variants are role: a commons publishes two graphs to its export branch, a spoke one. The other four are not explained by role and are owed triage: indy-llm-wiki alone carries the DEPLOY_HOOK_URL loud-skip fix (every other wiki's export goes green while the lens silently fails to rebuild); fang-llm-wiki alone carries the two-graph publish as a spoke; and the three commons disagree with each other. Recorded at 6 so the ratchet catches a seventh — NOT accepted as correct."
+      "versions": 4,
+      "reason": "BY ROLE, PLUS ONE ANOMALY — retriaged 2026-09-10, down from six variants. Seven spokes are now byte-identical. The remaining four: one spoke standard, and three commons whose only differences are comment prose describing the same mechanism (xco-team-wiki's carries repo-specific history about the September Vercel exposure, so it legitimately differs). The anomaly is fang-llm-wiki, a SPOKE running power-project-wiki's commons workflow byte-for-byte since 2026-09-01 — it publishes wiki.shared.json, which the recorded role split says only a commons does. Left as found: the commit message reads as a deliberate choice, and reverting someone's decision is not a sync's call. Needs one conversation, not a patch."
     },
     {
       "path": "SHARING-AND-ACCESS.md",
