@@ -79,6 +79,18 @@ BASELINE = ROOT / "tools" / "drift-baseline.json"
 # Where shared machinery actually lives. Deliberately not the whole tree: wiki/ content is
 # SUPPOSED to differ, and comparing it would bury the signal under the corpus.
 SCAN_DIRS = ("tools", ".claude/skills", "design", ".github/workflows")
+# Root-level POLICY documents, named one by one. The repo root is not scanned wholesale
+# because CLAUDE.md, README.md, SETUP.md and the rest are supposed to differ per wiki — but
+# these two are the same document everywhere, modulo the owner's name and the mirror repo's
+# name, and a disagreement in them is a disagreement about what may leak.
+#
+# Added 2026-09-10, after indy-llm-wiki's SHARING-AND-ACCESS.md was found two tiers out of
+# date: it described a three-tier system in a wiki running four, told the reader to "ask for
+# an internal-only tier if you need one" when 327 pages were already `internal`, and pointed
+# anyone wanting colleagues-only visibility at `unlisted`, which is on the open web. Every
+# other wiki had the corrected version. This checker existed and did not look, because the
+# file sits at the root — the one place the scan deliberately skipped.
+SCAN_ROOT_FILES = ("SHARING-AND-ACCESS.md", "EDITING.md")
 SCAN_SUFFIXES = {".py", ".md", ".json", ".yml", ".yaml"}
 SKIP_PARTS = {"worktrees", "__pycache__", "node_modules"}
 # Generated or per-repo registers: their contents are a function of the repo, so "differs"
@@ -99,6 +111,10 @@ def _repos() -> "list[pathlib.Path]":
 
 def _files(repo: pathlib.Path) -> "dict[str, str]":
     found = {}
+    for name in SCAN_ROOT_FILES:
+        f = repo / name
+        if f.is_file():
+            found[name] = hashlib.md5(f.read_bytes()).hexdigest()
     for sub in SCAN_DIRS:
         base = repo / sub
         if not base.is_dir():
@@ -139,6 +155,27 @@ def load_baseline() -> set:
     return set(load_reasons())
 
 
+def load_ceilings() -> "dict[str, int]":
+    """path -> the version count that was reviewed and accepted.
+
+    The baseline is keyed by PATH, which means recording a file mutes it forever: after
+    2026-09-10's fix, deleting the `internal` row from one wiki's SHARING-AND-ACCESS.md still
+    passed, because the path was listed. That is the same mute that let indy-llm-wiki's copy
+    sit two tiers out of date — `check_links.py` learned it first and wrote it down as
+    "baselining a dead link can baseline a boundary leak."
+
+    So the baseline is a RATCHET, not a mute. An entry accepts the number of variants somebody
+    looked at. One more variant is a change nobody has looked at, and the gate says so.
+    """
+    if not BASELINE.exists():
+        return {}
+    d = json.loads(BASELINE.read_text(encoding="utf-8"))
+    # `per_repo` entries are exempt: one variant per repo is their designed state, so the
+    # count rises whenever a wiki joins and a ratchet on them would fail every onboarding.
+    return {e["path"]: e["versions"] for e in d.get("drifted", [])
+            if "versions" in e and not e.get("per_repo")}
+
+
 def load_reasons() -> "dict[str, str]":
     """path -> why it is still drifting.
 
@@ -170,7 +207,11 @@ def main(argv=None) -> int:
         return 0
 
     baseline = load_baseline()
+    ceilings = load_ceilings()
     new = [d for d in drift if d["path"] not in baseline]
+    # A baselined path that has gained a variant since it was reviewed.
+    risen = [d for d in drift
+             if d["path"] in baseline and d["versions"] > ceilings.get(d["path"], d["versions"])]
     print(f"drift — {n_repos} wikis, {multi} file(s) shared between two or more, "
           f"{len(drift)} disagreeing")
 
@@ -198,6 +239,18 @@ def main(argv=None) -> int:
         print("\n  * = not in the baseline")
 
     if args.check:
+        # Order matters: a risen count is a change nobody has read, and saying that first
+        # keeps it from being buried under the ordinary "not in the baseline" list.
+        if risen:
+            print(f"\nFAIL — {len(risen)} baselined file(s) gained a variant since anyone looked:")
+            for d in risen:
+                print(f"  {ceilings[d['path']]} -> {d['versions']} versions across "
+                      f"{d['repos']} repos   {d['path']}")
+                print(f"      accepted because: {load_reasons()[d['path']]}")
+            print("\nThe baseline records the number of variants that were REVIEWED, not "
+                  "permission to differ freely. Read the new variant, then either reconcile it "
+                  "or raise the count with a reason saying what you read.")
+            return 1
         if new:
             print(f"\nFAIL — {len(new)} file(s) disagree and are not in the baseline:")
             for d in new:
