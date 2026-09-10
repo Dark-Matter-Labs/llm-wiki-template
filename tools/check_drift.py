@@ -99,13 +99,37 @@ SKIP_NAMES = {"links-baseline.json", "sources-baseline.json", "drift-baseline.js
               ".staleness-cache.json"}
 
 
+def _source() -> str:
+    """The wiki the shared layer is pushed FROM. It is not in `siblings` — a push target list
+    does not name the pusher — so a repo that reads only `siblings` scans the federation minus
+    its origin."""
+    import json
+    if MANIFEST.exists():
+        return str(json.loads(MANIFEST.read_text(encoding="utf-8")).get("source", ""))
+    return ""
+
+
 def _repos() -> "list[pathlib.Path]":
+    """Every wiki on disk, each exactly once.
+
+    Two defects lived here until 2026-09-10, and both only bit when the tool ran somewhere
+    other than the source repo — which is ten of the eleven places it is installed. The
+    manifest's `siblings` is the *push target* list, so it names xco-team-wiki and omits
+    indy-llm-wiki: run from a spoke, this returned the current repo twice and never looked at
+    the source at all. The duplicate collapsed silently (results are keyed by repo name), so
+    the count still read plausibly and the missing wiki was invisible. The two errors even
+    cancelled on the day they were found — a variant lost with indy-llm-wiki, one gained from
+    a new file — and the ratchet stayed green over a corpus it had not read.
+    """
     here = ROOT
-    out = [here]
-    for name in _layer()[0]:
+    out, seen = [here], {here.name}
+    for name in [*_layer()[0], _source()]:
+        if not name or name in seen:
+            continue
         p = here.parent / name
         if p.is_dir():
             out.append(p)
+            seen.add(name)
     return out
 
 
