@@ -29,7 +29,7 @@
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
     "design/shared-layer.json": "1ce391d40eb6e33db79b597180c0a51799a17d1d046bf548d7b6e0e75d941c1b",
-    "tools/drift-baseline.json": "c56ad235514a2a1d9a30c609222878ff33410a21f09cce017fe5e31a107268cc",
+    "tools/drift-baseline.json": "b24280f810b84866615861dadd3af388835c11d5c8c262ef41ed1c26032fc621",
     "tools/check_drift.py": "f4c1107303fbe0c00450c8327970acee64bd5bbd4f0345b5e8f455b29bb9e037",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
     ".claude/skills/metacognition/SKILL.md": "20d721351217dacf24b36b7c2c26fcaf52e8a99f7a3bd39b5a3c4fd14dd75f26",
