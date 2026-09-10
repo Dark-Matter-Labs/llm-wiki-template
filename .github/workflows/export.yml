@@ -63,5 +63,12 @@ jobs:
           echo "Published wiki.public.json to the export branch (public graph only)."
 
       - name: Trigger lens rebuild (only if a deploy hook is configured)
-        if: ${{ env.DEPLOY_HOOK_URL != '' }}
-        run: curl -fsS -X POST "$DEPLOY_HOOK_URL"
+        # Announce the skip. Without this the export goes green either way, so a lens can sit
+        # weeks out of date while every check passes -- which is exactly what happened: the team
+        # lens told a reader "nothing has arrived through the up-flow" on a day 16 pages had.
+        run: |
+          if [ -n "$DEPLOY_HOOK_URL" ]; then
+            curl -fsS -X POST "$DEPLOY_HOOK_URL" && echo "lens rebuild triggered"
+          else
+            echo "::warning::DEPLOY_HOOK_URL is not set — the lens will NOT rebuild, so it keeps serving whatever it last built. Set the secret to close this gap."
+          fi
