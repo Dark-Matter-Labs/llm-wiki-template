@@ -67,9 +67,9 @@
     },
     {
       "path": "SHARING-AND-ACCESS.md",
-      "repos": 10,
-      "versions": 4,
-      "reason": "LOCALISED — the mirror repo's name in two places, plus a per-repo state note. Verified 2026-09-10. NOT permanent: this entry exists because localisation is legitimate, and the file must still be re-read whenever the canonical version changes. indy-llm-wiki's copy was two tiers out of date until today and nothing was watching."
+      "repos": 11,
+      "versions": 5,
+      "reason": "LOCALISED, plus one deliberate divergence. Nine spokes and the template differ only by the mirror repo's name and a per-repo state note. The fifth variant is xco-team-wiki's, written 2026-09-10 and NOT a localisation: in a commons the tiers invert — `internal` is the published tier, not the protected one, and `public` is published nowhere because there is no Pages site. Copying the spoke document there would have been worse than having none. Raised 4→5 with that variant, and it should not rise again: a sixth means a spoke has drifted, not that a commons was added. Note the count also rose 10→11 repos because `_repos()` was fixed the same day — it had been omitting the source wiki everywhere except the source wiki."
     },
     {
       "path": "tools/classify_internal.py",
