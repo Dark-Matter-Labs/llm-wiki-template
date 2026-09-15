@@ -77,6 +77,10 @@ SEEDS = tuple(range(1, 25))
 COARSE = 40
 #: Page types that, sitting inside a cluster, would be naming it.
 NAMING_TYPES = {"synthesis", "overview", "comparison", "concept"}
+#: A page outside the cluster must have at least this much of its own neighbourhood
+#: inside it before it counts as naming the idea. Without it every cluster is named
+#: by whichever hub page happens to touch it.
+NAMING_SPECIFICITY = 0.2
 
 
 def _crm(node) -> bool:
@@ -221,14 +225,34 @@ def score(cluster, cohesion, graph, by):
     sources = {src for m in members for src in (m.get("sources") or [])}
     origins = collections.Counter(m.get("origin") for m in members)
 
-    best, touched = None, 0
-    for m in members:
+    # The naming page is searched across the WHOLE corpus, not only inside the cluster.
+    # Until 2026-09-15 it was looked for among the members, which reported eleven clusters
+    # as unnamed when the corpus had named most of them: these clusters are built largely
+    # out of source summaries, and the concept page that names the idea sits one hop away,
+    # outside the group. "Nobody has said what this is" was the headline claim of the whole
+    # tool and it was wrong for two clusters in three.
+    #
+    # A hub is not a name. `Civilizational Optionality` carries 169 inbound links and brushes
+    # most clusters in the corpus, so reach alone would hand it the title everywhere. A
+    # candidate must therefore also be SPECIFIC: at least a fifth of its own neighbourhood
+    # has to lie inside the cluster. Ties are broken by specificity, then by title, so the
+    # answer does not depend on iteration order.
+    best, touched, best_spec = None, 0, 0.0
+    cl = set(cluster)
+    for m in sorted(by.values(), key=lambda x: x.get("title") or x["slug"]):
         if m.get("type") not in NAMING_TYPES:
             continue
         near = set(m.get("outbound_links") or []) | set(m.get("inbound_links") or [])
-        reach = len(near & set(cluster))
-        if reach > touched:
-            best, touched = m, reach
+        if not near:
+            continue
+        reach = len(near & cl)
+        if not reach:
+            continue
+        spec = reach / len(near)
+        if spec < NAMING_SPECIFICITY and m["slug"] not in cl:
+            continue
+        if (reach, spec) > (touched, best_spec):
+            best, touched, best_spec = m, reach, spec
 
     # Ties in `most_common` are broken by insertion order, which follows set iteration
     # and so follows PYTHONHASHSEED: the CLUSTERS were stable run to run but the tags
@@ -245,8 +269,11 @@ def score(cluster, cohesion, graph, by):
         "travels": len(origins) > 1,           # Strata's test: does it cross contexts?
         "naming_page": best.get("title") if best else None,
         "naming_coverage": round(touched / len(cluster), 3),
+        "naming_is_a_member": bool(best and best["slug"] in cl),
+        "naming_specificity": round(best_spec, 3),
         "tags": ranked[:6],
         "members": sorted(m.get("title") or m["slug"] for m in members),
+        "member_slugs": sorted(m["slug"] for m in members),
     }
 
 
