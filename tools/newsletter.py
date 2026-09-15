@@ -7,14 +7,17 @@ This is the cheap half of the monthly newsletter, and the split is the whole des
 each run — billed outside the Team plan — and produced eight reflections between weeks 28 and 36.
 Measured on 2026-09-15, across that whole run:
 
-    inbound links to any reflection, from anywhere in the corpus    0
+    ordinary pages citing a reflection (of 819)                     7
+    of the 30 inbound links, how many came from the joker pages
+      the same weekly run wrote                                    17
     times W35 and W36 were touched after being written              1 each
     times W30 was touched after being written                       4
     workflow runs                                                  15
     of which failed                                                 5   (33%)
 
-Attention decayed from four touches to one, nothing ever cited a reflection, and the most recent
-run — 11 September — failed with nobody noticing. A weekly artefact nobody reads is not a
+Attention decayed from four touches to one, seven ordinary pages of 819 ever cited one, and the
+most recent run, 11 September, failed with nobody noticing. A weekly artefact almost nobody reads
+is not a
 communication problem to solve with better prose; it is a cadence problem, and paying a model
 every Friday to produce it makes it worse rather than better.
 

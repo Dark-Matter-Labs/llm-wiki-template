@@ -244,6 +244,13 @@ def build_nodes(wiki_dir):
         # in every lens. The mechanism was fully described in CLAUDE.md and invisible
         # downstream, which is the same shape as a check that cannot fire.
         "status": fm.get("status"),
+            # Carried since 2026-09-15, found by a lint pass. `derivation` says whether a page
+            # is a reading of one source, a synthesis across several, or built only from other
+            # wiki pages, which CLAUDE.md calls "the layer where drift hides". The gate reads
+            # it straight off the file, so the check worked and nothing downstream could see
+            # the answer. A field the reading interfaces cannot see will never become anything
+            # else.
+            "derivation": fm.get("derivation"),
             "timestamp": fm.get("timestamp"),
             "description": fm.get("description"),
             "sources": fm.get("sources", []),
