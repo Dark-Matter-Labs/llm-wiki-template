@@ -152,6 +152,9 @@ def build(wiki_dir="wiki", use_git=True):
         view["goals"].append({
             "slug": slug, "title": title,
             "horizon": g.get("horizon"), "parent": g.get("parent"),
+            # political | system | capability — the goal's own layer, agreed 15 Sept 2026.
+            # Not `layer:`, which is already the frontend view a page belongs to.
+            "goal_layer": g.get("goal_layer"),
             "visibility": g.get("visibility"), "validation": g.get("validation"),
             "endorsement": endorsement(g),
             "health": health, "why": why,
@@ -159,6 +162,9 @@ def build(wiki_dir="wiki", use_git=True):
             "attached_pages": len(attached),
             "commitments": {k: [{"title": c.get("title"), "slug": c["slug"],
                                  "resources": c.get("resources"), "until": c.get("until"),
+                                 # Where it starts. With `commits_to` this makes the
+                                 # commitment a vector rather than a row that points.
+                                 "from": c.get("from"),
                                  "visibility": c.get("visibility")}
                                 for c in v] for k, v in sorted(by_state.items())},
             "counts": {"open": open_n, "lapsed": lapsed_n, "closed_ok": closed_ok},
@@ -219,14 +225,24 @@ def render(v, only_stalled=False):
                        f"{e['revalidate_by']}, {e['days_over']} days ago")
         elif e["state"] == "current":
             out.append(f"       endorsed {e['validated_at']} · re-validate by {e['revalidate_by']}")
+        bits = []
+        if g.get("goal_layer"):
+            bits.append(f"{g['goal_layer']}")
         if g["horizon"]:
-            out.append(f"       horizon: {g['horizon']}   attached pages: {g['attached_pages']}")
+            bits.append(f"horizon: {g['horizon']}")
+        bits.append(f"attached pages: {g['attached_pages']}")
+        out.append("       " + "   ".join(bits))
         for state, items in g["commitments"].items():
             note = "  (non-penalised)" if state in NON_FAILURE else ""
             for it in items:
                 until = f", until {it['until']}" if it["until"] else ""
+                # A commitment with an origin is a vector; show the direction, because
+                # that is the whole reason the field exists. Absent means unstated —
+                # deliberately not rendered as `now`, which would be a guess.
+                frm = it.get("from")
+                arrow = f"   [{frm} → this goal]" if frm else ""
                 out.append(f"         {state}{note}: {it['title']}"
-                           f"{' — ' + it['resources'] if it['resources'] else ''}{until}")
+                           f"{' — ' + it['resources'] if it['resources'] else ''}{until}{arrow}")
         out.append("")
 
     if v["orphan_commitments"]:

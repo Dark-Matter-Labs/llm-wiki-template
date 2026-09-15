@@ -73,7 +73,7 @@
     "tools/learning_outcomes.py": "3bf052e5c9b921437cffbae89de7132535a4c2712e75b55e4b0b846cdfd1ee6f",
     "tools/test_learning_outcomes.py": "0c9ae03d53d132d098adf412765738be6b7b874f513fe55fcd5c9e823b71ca2a",
     ".claude/skills/inquiry/SKILL.md": "f354e26564cff22e8e38a9832683416338f4553ec2fe0d449bac58985924b1fd",
-    "tools/goals.py": "aece13e48d4d06b0f42794969525086e79239ad078bdda030bf9a8211bf33b4f",
+    "tools/goals.py": "786ad883c56f4783c7a11709735b87f842aba241096a3d050ed75f6411a956a7",
     "tools/test_goals.py": "03b5e1cd93202235591103ebac990c6d6e9f21e2f3e6155df399b4ed2ae1eaec"
   }
 }
