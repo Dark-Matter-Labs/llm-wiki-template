@@ -113,7 +113,14 @@ def _written_by_tooling(name: str) -> bool:
         return False
     if _WRITTEN is None:
         _WRITTEN = ""
-        for d in (ROOT / "tools", ROOT / ".github" / "workflows"):
+        # `.claude/skills` is in here since 2026-09-15. A skill is an instruction to a
+        # model to CREATE something, so a path a present skill names is a path this repo
+        # can produce — `wiki/crm/roster.md` is the case that found it, named by the `crm`
+        # skill in eight wikis where nobody has yet added a contact. The capability is what
+        # the check is asking about; whether anyone has used it yet is not a documentation
+        # defect. Note the inconsistency this repairs: `wiki/crm/` already passed, because
+        # the bare name "crm" appears in the tools, while `wiki/crm/roster.md` failed.
+        for d in (ROOT / "tools", ROOT / ".github" / "workflows", ROOT / ".claude" / "skills"):
             if not d.is_dir():
                 continue
             for f in d.rglob("*"):
@@ -121,7 +128,7 @@ def _written_by_tooling(name: str) -> bool:
                 # and reading them back would let a fake name vouch for itself.
                 if f.name.startswith("test_") or f.name == "check_onboarding.py":
                     continue
-                if f.suffix in {".py", ".yml", ".mjs", ".sh"}:
+                if f.suffix in {".py", ".yml", ".mjs", ".sh", ".md"}:
                     try:
                         _WRITTEN += f.read_text(encoding="utf-8", errors="ignore")
                     except Exception:                    # noqa: BLE001
@@ -200,12 +207,30 @@ def _max_axiom() -> "int | None":
 #: "`wiki/boundary-review-external-readers.md` in indy-llm-wiki" — a deliberate pointer at
 #: another repository in the federation, not a broken local reference.
 ELSEWHERE = re.compile(r"\bin\s+[a-z0-9-]+-wiki\b", re.I)
+#: "(e.g. `wiki/log/2026-08-19.md`)" names a shape, not a file that must exist.
+EXAMPLE = re.compile(r"\b(?:e\.g\.|for example|such as|say)[^`]{0,12}$", re.I)
 
 
 def _elsewhere(path: str, text: str) -> bool:
     """True when the sentence naming this path says it lives in another wiki."""
     for line in text.splitlines():
         if f"`{path}`" in line and ELSEWHERE.search(line):
+            return True
+    return False
+
+
+def _example(path: str, text: str) -> bool:
+    """True when the doc introduces this path as an example rather than as a fact.
+
+    Added 2026-09-15. Eight wikis failed on `wiki/log/2026-08-19.md`, which their CLAUDE.md
+    names as "(e.g. `wiki/log/2026-08-19.md`)" while explaining the one-file-per-day layout.
+    It is a shape, and no wiki is obliged to have written anything on that particular day.
+    This wiki passed only because the date it happens to use exists here, which is a check
+    passing by coincidence rather than by holding.
+    """
+    for line in text.splitlines():
+        i = line.find(f"`{path}`")
+        if i != -1 and EXAMPLE.search(line[:i]):
             return True
     return False
 
@@ -232,7 +257,7 @@ def check_doc(name: str, text: str, tiers, skills, crons, max_axiom):
     #    anywhere in the tree, not only from the root. Otherwise the check drowns its real
     #    findings in noise and gets switched off, which is the usual way a check dies.
     for path in sorted(set(re.findall(r"`([A-Za-z0-9_./-]+\.(?:md|py|css|json|yml))`", text))):
-        if PLACEHOLDER.search(path) or _elsewhere(path, text):
+        if PLACEHOLDER.search(path) or _elsewhere(path, text) or _example(path, text):
             continue
         if not _resolves(path):
             out.append((f"mentions `{path}`", "no file of that name anywhere in the repo"))

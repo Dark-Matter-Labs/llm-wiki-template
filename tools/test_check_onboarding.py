@@ -9,8 +9,10 @@ the repo then believes it is covered. Half of the cases below are false-positive
 Usage:  python3 tools/test_check_onboarding.py
 """
 import os
+import pathlib
 import subprocess
 import sys
+import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import check_onboarding as K  # noqa: E402
@@ -102,6 +104,37 @@ def main():
     got = run("See `totally-made-up-output.json`.")
     check("an invented file is still caught despite the generated-file leniency",
           says(got, "totally-made-up-output.json"))
+
+    # An example is a shape, not a promise that a particular file exists. Eight wikis failed
+    # on the date their CLAUDE.md happens to use to illustrate the per-day log layout, and
+    # this one passed only because its example date exists here — a check holding by luck.
+    check("a path introduced as an example is not flagged",
+          not run("One file per day (e.g. `wiki/log/1999-01-02.md`), appended to."))
+    # And the guard: the same non-existent path, asserted rather than illustrated, still fails.
+    check("...but the same path asserted as fact is still caught",
+          says(run("Today's entries are in `wiki/log/1999-01-02.md`."), "1999-01-02"))
+    check("an example folder is still checked, since only files carry the shape problem",
+          says(run("Logs live in (e.g. `no-such-log-folder/`)."), "no-such-log-folder/"))
+
+    # A path a PRESENT SKILL names is a path this repo can produce. `wiki/crm/roster.md` is
+    # the case: named by the `crm` skill in eight wikis where nobody has added a contact yet.
+    # Built against a temporary tree rather than this repo, because which skills a wiki holds
+    # differs — a commons has no `crm` at all — and a travelling test may not assume one.
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        (root / ".claude" / "skills" / "crm").mkdir(parents=True)
+        (root / ".claude" / "skills" / "crm" / "SKILL.md").write_text(
+            "The catalogue is `wiki/crm/roster.md`.\n", encoding="utf-8")
+        old_root = K.ROOT
+        K.ROOT, K._WRITTEN, K._TREE = root, None, None
+        try:
+            check("a path a skill in this repo creates is not flagged",
+                  not run("`wiki/crm/roster.md` is its catalogue."))
+            check("...and the guard holds: a path no skill or tool names is still caught",
+                  says(run("The roster is `wiki/crm/nobody-writes-this.md`."),
+                       "nobody-writes-this"))
+        finally:
+            K.ROOT, K._WRITTEN, K._TREE = old_root, None, None
 
     check("a schedule that really exists is not flagged",
           not run("The newsletter goes out monthly, automatically.", crons=1))
