@@ -124,12 +124,31 @@ def prose(text: str) -> str:
     return "\n".join(l for l in text.splitlines() if not l.lstrip().startswith(">"))
 
 
+#: `## A Heading — with a separator`. A heading is a label, not a sentence.
+HEADING = re.compile(r"\s*#{1,6}\s")
+
+
+def sentences(text: str) -> str:
+    """Prose minus its headings, for the two rules that are about SENTENCES.
+
+    The em dash rule and the X-not-Y rule describe how a sentence is built, and a heading is
+    not one. The house log header is `# Log — 2026-09-16`, so under the old counting EVERY new
+    day file failed the ratchet on its own template, one em dash, forever. A gate that fires on
+    the act of starting a page teaches people to baseline, which is how a gate dies.
+
+    Banned words and phrases are still counted in headings, deliberately. "Leveraging Robust
+    Synergy" is bad writing wherever it sits, and nothing about a heading excuses it.
+    """
+    return "\n".join(l for l in prose(text).splitlines() if not HEADING.match(l))
+
+
 def count(text: str) -> dict:
     t = prose(text)
+    s = sentences(text)
     return {"words": len(WORD_RE.findall(t)),
             "phrases": len(PHRASE_RE.findall(t)),
-            "xnoty": len(XNOTY_RE.findall(t)),
-            "emdash": t.count("—")}
+            "xnoty": len(XNOTY_RE.findall(s)),
+            "emdash": s.count("—")}
 
 
 #: Catalogues, not prose. `ai-detox` names index shelves explicitly among the reference
