@@ -238,6 +238,12 @@ def build_nodes(wiki_dir):
             "superseded_by": fm.get("superseded_by"),
             "devalued_by": fm.get("devalued_by"),
             "visibility": fm.get("visibility", "private"),
+        # Carried since 2026-09-15. Dormancy is a weight-and-visibility change a person
+        # makes, and the reading interfaces could not see it: `status` was validated on
+        # ingest and then dropped here, so a retired page looked identical to a live one
+        # in every lens. The mechanism was fully described in CLAUDE.md and invisible
+        # downstream, which is the same shape as a check that cannot fire.
+        "status": fm.get("status"),
             "timestamp": fm.get("timestamp"),
             "description": fm.get("description"),
             "sources": fm.get("sources", []),
