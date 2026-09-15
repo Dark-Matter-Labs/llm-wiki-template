@@ -84,6 +84,9 @@
     "tools/check_skill_links.py",
     "tools/test_check_skill_links.py",
     ".claude/skills/onboard/SKILL.md",
+    "ONBOARDING.md",
+    "tools/check_onboarding.py",
+    "tools/test_check_onboarding.py",
     "docs/assets/xco2.css",
     "docs/assets/xco.css",
     "docs/assets/xco-dusk.css"

@@ -28,8 +28,8 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "1ce391d40eb6e33db79b597180c0a51799a17d1d046bf548d7b6e0e75d941c1b",
-    "tools/drift-baseline.json": "09732c1c3a92049be2ab31a31f8aae6526ae3f23d6afdf0dfb347ae3c4ad6d89",
+    "design/shared-layer.json": "7af032ac1b6dc1f9b430e3f4a2bdcddd79e7dbcef3606e1c11cf3b72142b09ed",
+    "tools/drift-baseline.json": "09f78f4839ee4e0f902193851d9dec8c2e35bb3855da83abe3a85fb1f60aa8fa",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
     ".claude/skills/metacognition/SKILL.md": "20d721351217dacf24b36b7c2c26fcaf52e8a99f7a3bd39b5a3c4fd14dd75f26",
@@ -74,6 +74,9 @@
     "tools/test_learning_outcomes.py": "0c9ae03d53d132d098adf412765738be6b7b874f513fe55fcd5c9e823b71ca2a",
     ".claude/skills/inquiry/SKILL.md": "f354e26564cff22e8e38a9832683416338f4553ec2fe0d449bac58985924b1fd",
     "tools/goals.py": "786ad883c56f4783c7a11709735b87f842aba241096a3d050ed75f6411a956a7",
-    "tools/test_goals.py": "03b5e1cd93202235591103ebac990c6d6e9f21e2f3e6155df399b4ed2ae1eaec"
+    "tools/test_goals.py": "03b5e1cd93202235591103ebac990c6d6e9f21e2f3e6155df399b4ed2ae1eaec",
+    "ONBOARDING.md": "646c42d54dd502ebc4a803475901ae962b4c673dfc43f5e2a600d69243c17c08",
+    "tools/check_onboarding.py": "8535d1457d1f71bd44c007ba900af0fd71ec04df15feb5c9af3b28b7e8111d9a",
+    "tools/test_check_onboarding.py": "f94f64b7368bb16864b6ea7a7dbf1983ed00947b730225a5ba02054085685536"
   }
 }
