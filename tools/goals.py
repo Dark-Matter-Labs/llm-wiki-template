@@ -205,6 +205,18 @@ def render(v, only_stalled=False):
     out.append(f"  {c['goals']} goals · {c['commitments']} commitments · "
                f"{c['attention']} need attention · {c['stalled']} stalled · "
                f"{c['unbacked']} unbacked")
+    # An empty ledger has two very different causes and this view cannot tell them apart.
+    # Said out loud since 2026-09-15, when the reading was checked against the corpus: the
+    # option book records six options carrying committed money and the ledger held two
+    # commitments, so at least part of "unbacked" was a RECORDING gap. The book is private
+    # and this view reads one repository, so neither fact can reach it. A reader who takes
+    # `unbacked` as "nobody has committed anything" will be wrong, and wrong in the
+    # direction that makes the work look emptier than it is.
+    if c["unbacked"]:
+        out.append(f"  `unbacked` means no commitment PAGE names the goal. It does not mean "
+                   f"nothing is committed:")
+        out.append(f"  a commitment recorded in another wiki, or held at a tier this view may "
+                   f"not read, is invisible here.")
     if c.get("endorsed", 0) == 0:
         out.append(f"  no goal has been stood behind by a person yet — every one is "
                    f"`validation: machine`, so the {REVALIDATE_DAYS}-day cycle has nothing to count\n")
