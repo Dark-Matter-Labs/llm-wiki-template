@@ -83,6 +83,24 @@ def main():
           C.count("- This is a robust sentence.\n")["words"] == 1)
     check("a link row that is not a page title is still prose",
           C.count("- [a thing](https://x.test) — robust and comprehensive\n")["emdash"] == 1)
+
+    # A heading is a label, not a sentence. The house log header is `# Log — 2026-09-16`, so
+    # under the old counting EVERY new day file failed the ratchet on its own template, one
+    # em dash, forever. A gate that fires on the act of starting a page teaches people to
+    # baseline. Added 2026-09-16, the first day a new log file tripped it.
+    check("a heading's em dash is not counted",
+          C.count("# Log — 2026-09-16\n")["emdash"] == 0)
+    check("...at any depth", C.count("#### A Section — and its label\n")["emdash"] == 0)
+    check("...and an X-not-Y shape in a heading is not counted either",
+          C.count("## This isn't just a rule, it's a paradigm\n")["xnoty"] == 0)
+    # The guards. Headings are exempt from the SENTENCE rules only.
+    check("a banned word in a heading is still counted",
+          C.count("## Leveraging Robust Synergy\n")["words"] == 3,
+          "bad writing is bad wherever it sits")
+    check("an em dash in the body is still counted",
+          C.count("# A heading\n\nA sentence — with a dash.\n")["emdash"] == 1)
+    check("a hash inside a line is not a heading",
+          C.count("The tag #hashtag — in prose.\n")["emdash"] == 1)
     # ...but the same words in the body ARE counted, or the exclusions above would be a hole.
     check("the same words in the body are counted",
           C.count("This is a robust and comprehensive tapestry.")["words"] == 3)
