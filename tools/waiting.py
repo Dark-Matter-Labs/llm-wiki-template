@@ -33,6 +33,7 @@ be making a judgement about somebody's unfinished thinking. It gives you the lin
     python3 tools/waiting.py --repo owner/x  # override the repository it asks about
 """
 import argparse
+import datetime as dt
 import json
 import os
 import re
@@ -198,9 +199,55 @@ def never_proposed(slug):
     return out
 
 
+#: How many pages to put in front of somebody. `verification.py --sample 3` settled this
+#: number for the same reason: a list of 400 is a list nobody starts.
+STAND_BEHIND_SAMPLE = 3
+
+
+def nothing_stands_behind(limit=STAND_BEHIND_SAMPLE):
+    """The load-bearing pages in this wiki nobody has confirmed, as a short sample.
+
+    Weight is inbound links: a page the rest of the corpus leans on matters more than one
+    nothing cites. `dormant` pages are skipped, and so is anything already validated.
+
+    NO AUTHORSHIP IS READ, and none may be. "Which pages did X write" is the question the
+    house rule refuses, and it would be the obvious way to build this. The list is per
+    repository instead, which is enough: in a personal wiki the owner is the only person who
+    could stand behind anything, and in a commons the question belongs to whoever opens it.
+
+    Empty, rather than wrong, when the graph has not been built: a fresh checkout has no
+    `export/wiki.json`, and guessing from filenames would put invented weights in front of a
+    person who has no way to check them.
+    """
+    f = ROOT_P / "export" / "wiki.json"
+    if not f.exists():
+        return {"available": False, "pages": [], "total_unvalidated": 0}
+    try:
+        d = json.loads(f.read_text(encoding="utf-8"))
+    except Exception:                                      # noqa: BLE001
+        return {"available": False, "pages": [], "total_unvalidated": 0}
+    nodes = d["nodes"] if isinstance(d, dict) and "nodes" in d else d
+    if isinstance(nodes, dict):
+        nodes = list(nodes.values())
+    live = [n for n in nodes
+            if (n.get("validation") or "machine") == "machine"
+            and n.get("status") != "dormant"]
+    ranked = sorted(live, key=lambda n: (-len(n.get("inbound_links") or []),
+                                         str(n.get("title") or "")))
+    return {
+        "available": True,
+        "total_unvalidated": len(live),
+        "total_pages": len(nodes),
+        "pages": [{"title": n.get("title"), "slug": n.get("slug"),
+                   "leaned_on_by": len(n.get("inbound_links") or []),
+                   "visibility": n.get("visibility", "private")}
+                  for n in ranked[:limit] if (n.get("inbound_links") or [])],
+    }
+
+
 def gather(slug):
     m = {"repo": slug, "proposals": open_proposals(slug), "never_proposed": [],
-         "decided": [], "unavailable": None}
+         "decided": [], "unavailable": None, "stand_behind": nothing_stands_behind()}
     try:
         found = never_proposed(slug)
     except Unavailable as exc:
@@ -255,6 +302,15 @@ def render(m) -> str:
                 out.append("       NOBODY HAS STOOD BEHIND THAT DECISION — it is recorded at")
                 out.append("       machine validation, so it is a proposal that has been")
                 out.append("       treated as settled. A person can confirm it or reopen it.")
+        out.append("")
+
+    sb = m.get("stand_behind") or {}
+    if sb.get("pages"):
+        out.append(f"  {sb['total_unvalidated']} page(s) nobody has stood behind, of "
+                   f"{sb['total_pages']}")
+        out.append("     Confirming one takes three lines and only a person can do it.")
+        for r in sb["pages"]:
+            out.append(f"     {r['leaned_on_by']:3d} other page(s) lean on: {str(r['title'])[:58]}")
         out.append("")
 
     if m.get("unavailable"):
@@ -329,6 +385,31 @@ def markdown(m, public_safe: bool = False) -> str:
                            "`validation: machine` — a proposal that has been treated as "
                            "settled. A person can confirm it, or reopen it.")
         out.append("")
+
+    sb = m.get("stand_behind") or {}
+    # Same boundary as the decision titles above: in a public repository the sample may name
+    # only pages that are themselves public. Without this the feature added on 2026-09-16
+    # would have published private page titles into llm-wiki-template's issue, which is the
+    # exact hole closed the day before for the decision page.
+    rows = [r for r in sb.get("pages", [])
+            if not public_safe or r.get("visibility") == "public"]
+    if rows:
+        out += [f"## {sb['total_unvalidated']} page(s) nobody has stood behind", "",
+                "Nothing here is broken. These are pages the rest of the wiki leans on that "
+                "**no person has confirmed**, so the system records them as written by a "
+                "machine and believed by nobody.", "",
+                "Confirming one is three lines at the top of the page, and it is one of the "
+                "few things a model may never do for you. Open a page, use the pencil icon, "
+                "and add:", "",
+                "```yaml", "validation: self", "validated_by: [Your Name]",
+                f"validated_at: {dt.date.today().isoformat()}", "```", "",
+                "The date is the one people leave out, and without it the confirmation is "
+                "invisible to every read-out.", "",
+                "| how many pages lean on it | page |", "|---|---|"]
+        for r in rows:
+            out.append(f"| {r['leaned_on_by']} | {r['title']} |")
+        out += ["", "Three, not a list of hundreds, because a list of hundreds is one nobody "
+                    "starts.", ""]
 
     if m.get("unavailable"):
         out += ["## Part of this list could not be worked out", "",
