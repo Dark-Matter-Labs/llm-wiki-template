@@ -92,16 +92,35 @@ XNOTY_RE = re.compile(
 
 CATEGORIES = ("words", "phrases", "xnoty", "emdash")
 
+#: `- [[Page Title]] — one line about it`, the house catalogue row. A separator, not a
+#: sentence. Anchored at the start so a bulleted sentence in ordinary prose still counts.
+CATALOGUE_ROW = re.compile(r"\s*[-*]\s*\[\[")
+
 
 def prose(text: str) -> str:
     """Only what a person reads through. Everything else is not prose and must not count."""
     text = re.sub(r"^---\n.*?\n---\n", "", text, flags=re.S)       # frontmatter
+    # Catalogue rows go FIRST, before `[[...]]` is blanked: the pattern that identifies a row
+    # is the wiki-link at its head, and stripping that first leaves a line nothing can match.
+    # The initial version did this last and silently counted every row it was written to skip.
+    text = "\n".join(l for l in text.splitlines() if not CATALOGUE_ROW.match(l))
     text = re.sub(r"```.*?```", " ", text, flags=re.S)             # fenced code
     text = re.sub(r"`[^`\n]*`", " ", text)                         # inline code
     text = re.sub(r"\[\[[^\]]*\]\]", " ", text)                    # page titles are names
     text = re.sub(r"\[([^\]]*)\]\([^)\s]*\)", r"\1", text)         # link text, never the target
     text = re.sub(r"https?://\S+", " ", text)
     # A quotation is somebody else's words. Same reason `raw/` is never corrected.
+    #
+    # A CATALOGUE ROW is not prose either. `- [[Some Page]] — what it is` is the house's
+    # navigation format, and the em dash in it is a separator rather than a sentence. Skipping
+    # whole files caught the shelves under `wiki/index/` but not `wiki/index.md`, which is the
+    # same object one level up and carries explanatory prose as well, so the file-level rule
+    # was both too coarse and too narrow. Matching the row is exact: the router's paragraphs
+    # stay in scope and filing six pages stops failing the ratchet.
+    #
+    # Added 2026-09-15, when six commitment rows raised the router's count by six and the only
+    # alternatives were baselining a debt nobody incurred or writing catalogue rows in a format
+    # the rest of the corpus does not use.
     return "\n".join(l for l in text.splitlines() if not l.lstrip().startswith(">"))
 
 

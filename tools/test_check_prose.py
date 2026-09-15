@@ -66,6 +66,23 @@ def main():
           C.count("> This is a robust, comprehensive tapestry.\n")["words"] == 0)
     check("frontmatter is not prose",
           C.count("---\ntags: [robust, landscape]\n---\n\nplain text\n")["words"] == 0)
+    # A catalogue row is navigation, and its em dash is a separator rather than a sentence.
+    # Added 2026-09-15: filing six commitment pages raised the router's em dash count by six,
+    # and the alternatives were baselining a debt nobody incurred or writing catalogue rows in
+    # a format the rest of the corpus does not use. The file-level skip caught the shelves
+    # under `wiki/index/` and missed `wiki/index.md`, which is the same object one level up.
+    check("a catalogue row is not prose",
+          C.count("- [[Some Page]] — one line about it\n")["emdash"] == 0)
+    check("...and neither is an indented one",
+          C.count("  - [[Some Page]] — one line about it\n")["emdash"] == 0)
+    # The guard: an ordinary bulleted sentence is still prose, or this is a hole big enough
+    # to hide a document in.
+    check("an ordinary bullet is still prose",
+          C.count("- This is a robust sentence — with an em dash.\n")["emdash"] == 1)
+    check("...and its banned words still count",
+          C.count("- This is a robust sentence.\n")["words"] == 1)
+    check("a link row that is not a page title is still prose",
+          C.count("- [a thing](https://x.test) — robust and comprehensive\n")["emdash"] == 1)
     # ...but the same words in the body ARE counted, or the exclusions above would be a hole.
     check("the same words in the body are counted",
           C.count("This is a robust and comprehensive tapestry.")["words"] == 3)
