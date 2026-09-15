@@ -34,6 +34,7 @@ be making a judgement about somebody's unfinished thinking. It gives you the lin
 """
 import argparse
 import datetime as dt
+import hashlib
 import json
 import os
 import re
@@ -245,9 +246,57 @@ def nothing_stands_behind(limit=STAND_BEHIND_SAMPLE):
     }
 
 
+def held_here():
+    """Files in this wiki that the shared layer will never correct again.
+
+    A held file is one somebody adapted locally. The sync is right to refuse to overwrite it
+    and was silent about the consequence: it is exempt from every later fix, and in a checkout
+    it looks identical to a current one. On 2026-09-15 a correction reached ten wikis and not
+    the eleventh for exactly that reason, and only a hand check across every repository found
+    it.
+
+    Computed from this repository alone, with no source checkout and no network: the travelling
+    manifest `design/shared-layer.json` says what is meant to be shared, and
+    `design/.sync-state.json` records the digest of what this wiki last accepted. A path with
+    a base whose file no longer matches it was changed here. A path with NO base was never
+    written at all, which is the older and quieter case, and the one that caused the miss.
+    """
+    root = ROOT_P
+    try:
+        man = json.loads((root / "design" / "shared-layer.json").read_text(encoding="utf-8"))
+        shared = man.get("shared") or []
+    except Exception:                                  # noqa: BLE001
+        return {"available": False, "files": [], "is_source": False}
+    # The SOURCE wiki emits the shared layer and never accepts from it, so it records no base
+    # for anything and every file would read as held. Nothing here is held; the question does
+    # not apply. The first version of this reported all 94 shared files as held in the source,
+    # which is the loudest possible way for a staleness report to be useless.
+    if man.get("source") and man["source"] == root.name:
+        return {"available": True, "files": [], "is_source": True,
+                "shared_total": len(shared)}
+    try:
+        base = json.loads(
+            (root / "design" / ".sync-state.json").read_text(encoding="utf-8")).get("written", {})
+    except Exception:                                  # noqa: BLE001
+        base = {}
+    out = []
+    for rel in sorted(shared):
+        f = root / rel
+        if not f.exists():
+            continue
+        recorded = base.get(rel)
+        if recorded is None:
+            out.append({"path": rel, "why": "never accepted from the shared layer"})
+        elif hashlib.sha256(f.read_bytes()).hexdigest() != recorded:
+            out.append({"path": rel, "why": "changed here since it was last accepted"})
+    return {"available": True, "files": out, "is_source": False,
+            "shared_total": len(shared)}
+
+
 def gather(slug):
     m = {"repo": slug, "proposals": open_proposals(slug), "never_proposed": [],
-         "decided": [], "unavailable": None, "stand_behind": nothing_stands_behind()}
+         "decided": [], "unavailable": None, "stand_behind": nothing_stands_behind(),
+         "held": held_here()}
     try:
         found = never_proposed(slug)
     except Unavailable as exc:
@@ -311,6 +360,14 @@ def render(m) -> str:
         out.append("     Confirming one takes three lines and only a person can do it.")
         for r in sb["pages"]:
             out.append(f"     {r['leaned_on_by']:3d} other page(s) lean on: {str(r['title'])[:58]}")
+        out.append("")
+
+    h = m.get("held") or {}
+    if h.get("files"):
+        out.append(f"  {len(h['files'])} shared file(s) this wiki will never be sent "
+                   f"corrections for")
+        for r in h["files"][:5]:
+            out.append(f"     {r['path']}  ({r['why']})")
         out.append("")
 
     if m.get("unavailable"):
@@ -410,6 +467,23 @@ def markdown(m, public_safe: bool = False) -> str:
             out.append(f"| {r['leaned_on_by']} | {r['title']} |")
         out += ["", "Three, not a list of hundreds, because a list of hundreds is one nobody "
                     "starts.", ""]
+
+    h = m.get("held") or {}
+    if h.get("files"):
+        out += [f"## {len(h['files'])} file(s) here will not receive shared corrections", "",
+                "These files are part of the shared layer that keeps every wiki's tooling and "
+                "guides the same, and this wiki's copies have been **changed locally or never "
+                "accepted**. That is allowed and often deliberate. The consequence is the part "
+                "worth knowing: a fix made elsewhere will not reach them, and a stale copy "
+                "looks exactly like a current one.", "",
+                "Nothing to do unless one of these looks out of date. If it does, ask Claude "
+                "to compare it with the shared version.", "",
+                "| file | why |", "|---|---|"]
+        for r in h["files"][:10]:
+            out.append(f"| `{r['path']}` | {r['why']} |")
+        if len(h["files"]) > 10:
+            out.append(f"| … and {len(h['files']) - 10} more | |")
+        out.append("")
 
     if m.get("unavailable"):
         out += ["## Part of this list could not be worked out", "",

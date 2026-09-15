@@ -318,6 +318,79 @@ def main():
     check("...and the title IS shown inside a private repository",
           "A Private Page" in W.markdown(m))
 
+    # --- held files, computed from this repository alone -----------------------------------
+    # A held file is exempt from every later shared-layer correction and looks identical to a
+    # current one. On 2026-09-15 a fix reached ten wikis and not the eleventh for that reason.
+    # The sync can only see this with every repo on one disk; a CI runner has one. So it is
+    # computed here from the travelling manifest plus the recorded base, with no source and
+    # no network.
+    def held_world(tmp, files, base, source="some-source", name="a-wiki"):
+        root = pathlib.Path(tmp) / name
+        (root / "design").mkdir(parents=True)
+        for rel, body in files.items():
+            f = root / rel
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text(body, encoding="utf-8")
+        (root / "design" / "shared-layer.json").write_text(
+            json.dumps({"source": source, "shared": sorted(files)}), encoding="utf-8")
+        (root / "design" / ".sync-state.json").write_text(
+            json.dumps({"written": base}), encoding="utf-8")
+        return root
+
+    def dig(s):
+        import hashlib
+        return hashlib.sha256(s.encode()).hexdigest()
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = held_world(tmp, {"a.md": "accepted\n", "b.md": "adapted\n",
+                                "c.md": "never written\n"},
+                          {"a.md": dig("accepted\n"), "b.md": dig("as sent\n")})
+        old_root = W.ROOT_P
+        W.ROOT_P = root
+        try:
+            h = W.held_here()
+        finally:
+            W.ROOT_P = old_root
+    paths = {r["path"]: r["why"] for r in h["files"]}
+    check("a file matching what was last accepted is not held", "a.md" not in paths, str(paths))
+    check("a file changed locally is reported as held",
+          "changed here" in paths.get("b.md", ""), str(paths))
+    check("a file that was never accepted is reported too, which is the quieter case",
+          "never accepted" in paths.get("c.md", ""), str(paths))
+
+    # The SOURCE emits the layer and accepts nothing, so nothing there is held. The first
+    # version reported all 94 shared files as held in the source wiki, which is the loudest
+    # possible way for a staleness report to be useless.
+    with tempfile.TemporaryDirectory() as tmp:
+        root = held_world(tmp, {"a.md": "x\n"}, {}, source="a-wiki", name="a-wiki")
+        old_root = W.ROOT_P
+        W.ROOT_P = root
+        try:
+            h = W.held_here()
+        finally:
+            W.ROOT_P = old_root
+    check("the source wiki reports nothing held, because the question does not apply",
+          h["files"] == [] and h["is_source"] is True, str(h))
+
+    # No manifest at all: say nothing rather than guess.
+    with tempfile.TemporaryDirectory() as tmp:
+        old_root = W.ROOT_P
+        W.ROOT_P = pathlib.Path(tmp)
+        try:
+            h = W.held_here()
+        finally:
+            W.ROOT_P = old_root
+    check("with no shared manifest it reports nothing rather than guessing",
+          h["available"] is False and h["files"] == [])
+
+    md = W.markdown({"repo": "o/r", "proposals": [], "never_proposed": [], "decided": [],
+                     "unavailable": None, "stand_behind": {},
+                     "held": {"available": True, "is_source": False, "shared_total": 9,
+                              "files": [{"path": "ONBOARDING.md",
+                                         "why": "never accepted from the shared layer"}]}})
+    check("the issue names the held file and says what it means",
+          "ONBOARDING.md" in md and "will not receive shared corrections" in md)
+
     # The workflow must actually pass the flag, or the tool's care is decoration.
     wf = pathlib.Path(__file__).resolve().parent.parent / ".github" / "workflows" / "waiting.yml"
     y = wf.read_text(encoding="utf-8")
