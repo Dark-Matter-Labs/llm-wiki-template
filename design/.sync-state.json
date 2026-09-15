@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "69ce3027a3c22bad182b6f9ccfca73b4af0361cf52a0fc49765e65dff26daaf4",
+    "design/shared-layer.json": "3a4c2781647f530fc697a426846d857e75ea78aada90688c624630bdfe7e9431",
     "tools/drift-baseline.json": "78a466c191314c8d306c584a4f275528639152269b604056f2d13221edf92ac1",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -85,6 +85,10 @@
     "tools/waiting.py": "c86de758e6bdbd15bb135d530c3bf4f2eff348a4cd755d407256fec53932cc0d",
     "tools/test_waiting.py": "457841abf70895955db8aafa86b5f222195c6f44ce3f66abb2dc1ca38c1cd534",
     ".github/workflows/waiting.yml": "13040098d9fe56dfbc5f5be4e498ee7a054ecef950b2b39fb687e283b7a45054",
-    ".claude/skills/waiting/SKILL.md": "b11e3ce8331f338bae7e1f0b5b591b473d91786bb23972bcc0dff5dfa2894997"
+    ".claude/skills/waiting/SKILL.md": "b11e3ce8331f338bae7e1f0b5b591b473d91786bb23972bcc0dff5dfa2894997",
+    "tools/newsletter.py": "659bdbf1e4afd350dafd73faa3c2aa0455293caabec34d85f8b35565e70dc9a3",
+    "tools/test_newsletter.py": "9ee25939c90d4a35c0deb91eea8c8d0c7bf90119401ff311d4b4118b60dc6a8b",
+    ".claude/skills/newsletter/SKILL.md": "98bd2ef9dd08e72d665f0b008d9182aed317660cdbd965b9658f2e39dc36ca1f",
+    ".github/workflows/monthly-newsletter.yml": "44675d19526bb2c65fc8943a5765f1dd0a3e647b9dda700557271c60a068a214"
   }
 }

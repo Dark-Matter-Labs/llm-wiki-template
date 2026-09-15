@@ -95,6 +95,10 @@
     "tools/test_waiting.py",
     ".github/workflows/waiting.yml",
     ".claude/skills/waiting/SKILL.md",
+    "tools/newsletter.py",
+    "tools/test_newsletter.py",
+    ".claude/skills/newsletter/SKILL.md",
+    ".github/workflows/monthly-newsletter.yml",
     "docs/assets/xco2.css",
     "docs/assets/xco.css",
     "docs/assets/xco-dusk.css"
