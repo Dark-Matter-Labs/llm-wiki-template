@@ -192,6 +192,19 @@ def main():
               priv and priv[0]["visibility"] == "private",
               "so any renderer can exclude it without guessing")
 
+        # --- what the ledger cannot see, said out loud --------------------------
+        # An empty ledger has two causes that look identical from inside one repository:
+        # nothing was committed, or the commitment was recorded somewhere this view cannot
+        # read. Checked against the real corpus on 2026-09-15: the option book recorded six
+        # options carrying committed money while the ledger held two commitments, so part of
+        # "unbacked" was a recording gap. A reader who reads it the other way concludes the
+        # work is emptier than it is, and that is the expensive direction to be wrong in.
+        txt = goals.render(goals.build(wiki, use_git=False))
+        if "unbacked" in txt:
+            check("the view says `unbacked` means no commitment page, not nothing committed",
+                  "does not mean" in txt and "invisible here" in txt,
+                  "an empty ledger must not be read as an empty portfolio")
+
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
