@@ -119,6 +119,13 @@
       "repos": 10,
       "versions": 2,
       "reason": "DEBT, OPENED DELIBERATELY 2026-09-15, AND IT SHOULD CLOSE. This wiki's copy lost its `schedule:` when the weekly reflection was retired (#461): across weeks 28-36 it produced eight reflections, drew ZERO inbound links from anywhere in the corpus, decayed from four touches on W30 to one each on W35 and W36, and failed five of fifteen runs including 11 September, which nobody noticed. The other ten copies still carry the cron, so ten wikis are still paying a model every Friday for an artefact the measurement says nobody reads. The fix is NOT to sync this file: retiring the weekly job without giving those wikis the monthly newsletter that replaces it would leave them with nothing. Closing this entry means rolling out tools/newsletter.py, the `newsletter` skill and monthly-newsletter.yml, then removing the cron everywhere \u2014 one decision, taken once, not a sync. Recorded rather than hidden so the debt is visible until someone takes it."
+    },
+    {
+      "path": "tools/prose-baseline.json",
+      "repos": 11,
+      "versions": 11,
+      "reason": "CORRECT AND PERMANENT, per-repo by design. It records per-FILE prose counts for one corpus, so eleven versions across eleven repos is the intended state and identical copies would mean the record was not per-repo, which is the bug it exists to prevent. Deliberately excluded from SHARED for the same reason: shipping indy-llm-wiki's 850-file baseline into a 12-page wiki would be nonsense. Each repo recorded its own on 2026-09-15, which is also the moment somebody decides what their starting debt is.",
+      "per_repo": true
     }
   ],
   "_ratchet": "`versions` is the number of variants somebody REVIEWED. --check fails if a path gains one, so recording a path mutes it at a level rather than forever. Entries with \"per_repo\": true are exempt: one variant per repo is their designed state, so the count rises whenever a wiki joins and gating on it would fail every onboarding."
