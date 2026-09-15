@@ -6,113 +6,119 @@
       "path": "design/federation.json",
       "repos": 10,
       "versions": 10,
-      "reason": "CORRECT AND PERMANENT — a wiki's position in the graph does not travel. Ten versions across ten repos is the designed state.",
+      "reason": "CORRECT AND PERMANENT \u2014 a wiki's position in the graph does not travel. Ten versions across ten repos is the designed state.",
       "per_repo": true
     },
     {
       "path": "design/.sync-state.json",
       "repos": 9,
       "versions": 9,
-      "reason": "CORRECT AND PERMANENT — the merge base. It records what the sync last WROTE into THIS repo, so a local change can be told apart from the source moving on. Identical copies would mean the record was not per-repo, which is the bug it exists to prevent.",
+      "reason": "CORRECT AND PERMANENT \u2014 the merge base. It records what the sync last WROTE into THIS repo, so a local change can be told apart from the source moving on. Identical copies would mean the record was not per-repo, which is the bug it exists to prevent.",
       "per_repo": true
     },
     {
       "path": "EDITING.md",
       "repos": 11,
       "versions": 8,
-      "reason": "LOCALISED — one line, `validated_by: [<owner name>]`. Verified 2026-09-10 across all eleven: every differing line is that substitution and nothing else. The guidance is identical everywhere."
+      "reason": "LOCALISED \u2014 one line, `validated_by: [<owner name>]`. Verified 2026-09-10 across all eleven: every differing line is that substitution and nothing else. The guidance is identical everywhere."
     },
     {
       "path": ".claude/skills/contribute/SKILL.md",
       "repos": 9,
       "versions": 6,
-      "reason": "BY ROLE — up-flow tooling; a top commons has nothing above it."
+      "reason": "BY ROLE \u2014 up-flow tooling; a top commons has nothing above it."
     },
     {
       "path": ".claude/skills/publish-web/SKILL.md",
       "repos": 9,
       "versions": 6,
-      "reason": "BY ROLE — a publishing surface, not a discipline."
+      "reason": "BY ROLE \u2014 a publishing surface, not a discipline."
     },
     {
       "path": "design/social-card.json",
       "repos": 8,
       "versions": 6,
-      "reason": "CORRECT — per-repo branding for the social card.",
+      "reason": "CORRECT \u2014 per-repo branding for the social card.",
       "per_repo": true
     },
     {
       "path": ".claude/skills/crm/SKILL.md",
       "repos": 9,
       "versions": 4,
-      "reason": "DELIBERATELY PERSONAL — the CRM must never reach a commons, and shipping the skill invites the pages."
+      "reason": "DELIBERATELY PERSONAL \u2014 the CRM must never reach a commons, and shipping the skill invites the pages."
     },
     {
       "path": ".github/workflows/checks.yml",
       "repos": 10,
       "versions": 4,
-      "reason": "BY ROLE — the gate set is not the same in every wiki, because the tools are not. This repo runs check_sources.py and sync_index_counts.py, which most wikis do not have. The one part that WAS shared drift — a hand-kept list of test files that covered 8 of 17 suites — was fixed on 2026-09-04 by making the step discover tools/test_*.py. What remains is each repo's own gates."
+      "reason": "BY ROLE \u2014 the gate set is not the same in every wiki, because the tools are not. This repo runs check_sources.py and sync_index_counts.py, which most wikis do not have. The one part that WAS shared drift \u2014 a hand-kept list of test files that covered 8 of 17 suites \u2014 was fixed on 2026-09-04 by making the step discover tools/test_*.py. What remains is each repo's own gates."
     },
     {
       "path": ".github/workflows/export-shared.yml",
       "repos": 9,
       "versions": 4,
-      "reason": "BY ROLE — the colleague mirror. Which repo it pushes to, and whether it runs at all, is a fact about this wiki's position in the graph, not a shared behaviour."
+      "reason": "BY ROLE \u2014 the colleague mirror. Which repo it pushes to, and whether it runs at all, is a fact about this wiki's position in the graph, not a shared behaviour."
     },
     {
       "path": ".github/workflows/export.yml",
       "repos": 11,
       "versions": 4,
-      "reason": "BY ROLE, PLUS ONE ANOMALY — retriaged 2026-09-10, down from six variants. Seven spokes are now byte-identical. The remaining four: one spoke standard, and three commons whose only differences are comment prose describing the same mechanism (xco-team-wiki's carries repo-specific history about the September Vercel exposure, so it legitimately differs). The anomaly is fang-llm-wiki, a SPOKE running power-project-wiki's commons workflow byte-for-byte since 2026-09-01 — it publishes wiki.shared.json, which the recorded role split says only a commons does. Left as found: the commit message reads as a deliberate choice, and reverting someone's decision is not a sync's call. Needs one conversation, not a patch."
+      "reason": "BY ROLE, PLUS ONE ANOMALY \u2014 retriaged 2026-09-10, down from six variants. Seven spokes are now byte-identical. The remaining four: one spoke standard, and three commons whose only differences are comment prose describing the same mechanism (xco-team-wiki's carries repo-specific history about the September Vercel exposure, so it legitimately differs). The anomaly is fang-llm-wiki, a SPOKE running power-project-wiki's commons workflow byte-for-byte since 2026-09-01 \u2014 it publishes wiki.shared.json, which the recorded role split says only a commons does. Left as found: the commit message reads as a deliberate choice, and reverting someone's decision is not a sync's call. Needs one conversation, not a patch."
     },
     {
       "path": "SHARING-AND-ACCESS.md",
       "repos": 11,
       "versions": 5,
-      "reason": "LOCALISED, plus one deliberate divergence. Nine spokes and the template differ only by the mirror repo's name and a per-repo state note. The fifth variant is xco-team-wiki's, written 2026-09-10 and NOT a localisation: in a commons the tiers invert — `internal` is the published tier, not the protected one, and `public` is published nowhere because there is no Pages site. Copying the spoke document there would have been worse than having none. Raised 4→5 with that variant, and it should not rise again: a sixth means a spoke has drifted, not that a commons was added. Note the count also rose 10→11 repos because `_repos()` was fixed the same day — it had been omitting the source wiki everywhere except the source wiki."
+      "reason": "LOCALISED, plus one deliberate divergence. Nine spokes and the template differ only by the mirror repo's name and a per-repo state note. The fifth variant is xco-team-wiki's, written 2026-09-10 and NOT a localisation: in a commons the tiers invert \u2014 `internal` is the published tier, not the protected one, and `public` is published nowhere because there is no Pages site. Copying the spoke document there would have been worse than having none. Raised 4\u21925 with that variant, and it should not rise again: a sixth means a spoke has drifted, not that a commons was added. Note the count also rose 10\u219211 repos because `_repos()` was fixed the same day \u2014 it had been omitting the source wiki everywhere except the source wiki."
     },
     {
       "path": "tools/classify_internal.py",
       "repos": 10,
       "versions": 3,
-      "reason": "DELIBERATE DIVERGENCE — learning-system-wiki's copy is de-projectised on purpose and says so: 'no project-specific strategy vocabulary … this file is versioned, and in an open repo'."
+      "reason": "DELIBERATE DIVERGENCE \u2014 learning-system-wiki's copy is de-projectised on purpose and says so: 'no project-specific strategy vocabulary \u2026 this file is versioned, and in an open repo'."
     },
     {
       "path": ".github/workflows/deploy-pages.yml",
       "repos": 7,
       "versions": 2,
-      "reason": "BY ROLE — a Pages deploy workflow, present only where a wiki publishes a site. power-project-wiki was given one on 2026-09-04 by an explicit decision (the repo has a docs/ directory and was not publishing). Kept out of the shared layer on purpose: turning on a publication surface must stay a decision someone makes, not something a sync does."
+      "reason": "BY ROLE \u2014 a Pages deploy workflow, present only where a wiki publishes a site. power-project-wiki was given one on 2026-09-04 by an explicit decision (the repo has a docs/ directory and was not publishing). Kept out of the shared layer on purpose: turning on a publication surface must stay a decision someone makes, not something a sync does."
     },
     {
       "path": ".github/workflows/validation-pass.yml",
       "repos": 9,
       "versions": 2,
-      "reason": "BY ROLE, DECISION TAKEN — runs daily with contents:write and pull-requests:write. Held until 2026-09-04, when xco-team-wiki was given it deliberately; all ten wikis now have it. Stays out of the shared layer for the same reason as deploy-pages: a job that opens PRs in someone's repo should arrive by decision, not by sync."
+      "reason": "BY ROLE, DECISION TAKEN \u2014 runs daily with contents:write and pull-requests:write. Held until 2026-09-04, when xco-team-wiki was given it deliberately; all ten wikis now have it. Stays out of the shared layer for the same reason as deploy-pages: a job that opens PRs in someone's repo should arrive by decision, not by sync."
     },
     {
       "path": "tools/README.md",
       "repos": 9,
       "versions": 2,
-      "reason": "CORRECT AND PER-REPO — a catalogue of THIS wiki's tools. The tool sets differ, so the READMEs must. (The naming difference that also showed here is not drift: a personal wiki's README may name its owner.)",
+      "reason": "CORRECT AND PER-REPO \u2014 a catalogue of THIS wiki's tools. The tool sets differ, so the READMEs must. (The naming difference that also showed here is not drift: a personal wiki's README may name its owner.)",
       "per_repo": true
     },
     {
       "path": "tools/export.py",
       "repos": 10,
       "versions": 2,
-      "reason": "BY ROLE — a commons emits wiki.shared.json and provenance; a spoke does not. Documented in the file's own header."
+      "reason": "BY ROLE \u2014 a commons emits wiki.shared.json and provenance; a spoke does not. Documented in the file's own header."
     },
     {
       "path": "tools/sync_index_counts.py",
       "repos": 2,
       "versions": 2,
-      "reason": "BY ROLE — carries a repo-specific PATTERNS block matching that router's headings."
+      "reason": "BY ROLE \u2014 carries a repo-specific PATTERNS block matching that router's headings."
     },
     {
       "path": "tools/test_sync_index_counts.py",
       "repos": 2,
       "versions": 2,
-      "reason": "BY ROLE — pairs with sync_index_counts.py, already recorded as by-role: it carries a repo-specific PATTERNS block matching that router's headings. Only the two tiered-index wikis have either. A test cannot travel further than the tool it tests."
+      "reason": "BY ROLE \u2014 pairs with sync_index_counts.py, already recorded as by-role: it carries a repo-specific PATTERNS block matching that router's headings. Only the two tiered-index wikis have either. A test cannot travel further than the tool it tests."
+    },
+    {
+      "path": ".github/workflows/weekly-reflect.yml",
+      "repos": 10,
+      "versions": 2,
+      "reason": "DEBT, OPENED DELIBERATELY 2026-09-15, AND IT SHOULD CLOSE. This wiki's copy lost its `schedule:` when the weekly reflection was retired (#461): across weeks 28-36 it produced eight reflections, drew ZERO inbound links from anywhere in the corpus, decayed from four touches on W30 to one each on W35 and W36, and failed five of fifteen runs including 11 September, which nobody noticed. The other ten copies still carry the cron, so ten wikis are still paying a model every Friday for an artefact the measurement says nobody reads. The fix is NOT to sync this file: retiring the weekly job without giving those wikis the monthly newsletter that replaces it would leave them with nothing. Closing this entry means rolling out tools/newsletter.py, the `newsletter` skill and monthly-newsletter.yml, then removing the cron everywhere \u2014 one decision, taken once, not a sync. Recorded rather than hidden so the debt is visible until someone takes it."
     }
   ],
   "_ratchet": "`versions` is the number of variants somebody REVIEWED. --check fails if a path gains one, so recording a path mutes it at a level rather than forever. Entries with \"per_repo\": true are exempt: one variant per repo is their designed state, so the count rises whenever a wiki joins and gating on it would fail every onboarding."
