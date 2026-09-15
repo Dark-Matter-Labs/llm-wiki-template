@@ -7,9 +7,24 @@ name: Weekly reflection
 # Cost note: this step calls the Claude API and consumes API credits billed OUTSIDE
 # the Claude Team plan (requires the ANTHROPIC_API_KEY secret). The export workflow is
 # free; this one is not. Remove the schedule to make reflections manual-only.
+# SCHEDULE RETIRED 2026-09-15, replaced by monthly-newsletter.yml.
+#
+# Measured across the nine spokes on the day it was retired: 35 scheduled runs, every one
+# reporting success, and NOT ONE reflection page produced in any of them. None of those
+# repositories holds ANTHROPIC_API_KEY, so every Friday the job checked for a key, found
+# none, wrote a notice into a log nobody opens, and went green. In the one wiki that did
+# hold a key, eight reflections were written between weeks 28 and 36, nothing in the corpus
+# ever linked to one, and five of fifteen runs failed unnoticed.
+#
+# A weekly artefact nobody reads is a cadence problem, not a prose problem. The monthly
+# newsletter replaces the slot and its cheap half runs whether or not a key is set, so a
+# wiki without one now gets usable material twelve times a year instead of nothing fifty-two
+# times.
+#
+# The skill is good and stays. `reflect` on demand is still the right tool for "what deviated
+# this week". What is removed is the standing order to run it whether or not there is
+# anything to reflect on.
 on:
-  schedule:
-    - cron: "0 15 * * 5"   # 15:00 UTC every Friday
   workflow_dispatch:
 
 permissions:

@@ -1,0 +1,167 @@
+name: Monthly newsletter
+
+# 09:00 UTC on the 2nd of each month, and on demand. Gathers the previous month's material
+# deterministically (tools/newsletter.py — no model, no cost), then runs the `newsletter`
+# skill to write the issue, and opens a PR. Nobody is sent anything: a person reads the PR,
+# edits it, and decides where it goes.
+#
+# Replaces the weekly reflection's schedule, retired the same day. Eight reflections were
+# produced between weeks 28 and 36; nothing in the corpus ever linked to one, W35 and W36
+# were written and never touched again, and five of fifteen runs failed — including
+# 11 September, which nobody noticed. Weekly was the defect, not the prose.
+#
+# The 2nd rather than the 1st: `newsletter.py` reports the last COMPLETE month, and running
+# on the 1st in a timezone behind UTC can land on the last day of the month it is meant to
+# be summarising.
+#
+# Cost note: the write step calls the Claude API and is billed OUTSIDE the Claude plan
+# (needs ANTHROPIC_API_KEY). The gather step is free and runs regardless, so the material
+# is on the run page even when the write step is switched off.
+on:
+  schedule:
+    - cron: "0 9 2 * *"
+  workflow_dispatch:
+    inputs:
+      month:
+        description: "Month to write, as YYYY-MM. Defaults to the last complete month."
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write        # required by claude-code-action for OIDC auth
+
+concurrency:
+  group: monthly-newsletter
+  cancel-in-progress: false
+
+jobs:
+  newsletter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # the read-out reads git history for the window
+
+      # Without a cached commons cut the material covers this wiki only, which is a much
+      # thinner newsletter. Reading the orphan `export` branch keeps the boundary: it is
+      # already filtered, so a private page in the commons cannot reach this runner.
+      - name: Fetch the commons exports
+        env:
+          TOKEN: ${{ secrets.COMMONS_READ_TOKEN }}
+          COMMONS: ${{ vars.COMMONS_REPO }}
+        run: |
+          COMMONS="${COMMONS:-Dark-Matter-Labs/xco-team-wiki}"
+          if [ -z "${TOKEN}" ]; then
+            echo "::notice::COMMONS_READ_TOKEN not set — the issue will cover this wiki only."
+            exit 0
+          fi
+          mkdir -p ".commons/${COMMONS##*/}"
+          if git clone --depth 1 --branch export \
+               "https://x-access-token:${TOKEN}@github.com/${COMMONS}.git" \
+               ".commons/${COMMONS##*/}/export" 2>/dev/null; then
+            echo "Fetched the commons export from ${COMMONS}."
+          else
+            echo "::warning::No export branch on ${COMMONS} — the issue will cover this wiki only."
+          fi
+
+      # Free, deterministic, and always run. Putting the material on the run page means a
+      # month with the write step switched off still leaves something a person can use.
+      - name: Gather the month's material
+        id: gather
+        env:
+          # Via env, never interpolated into the script: a workflow_dispatch input is
+          # attacker-controllable by anyone who can dispatch, and `${{ }}` inside `run:`
+          # is textual substitution — a crafted value would execute as shell.
+          MONTH_IN: ${{ github.event.inputs.month }}
+        run: |
+          set -euo pipefail
+          # Whitelist the shape before it reaches a command line. Anything else is refused
+          # outright rather than sanitised, because a half-accepted date is a guess.
+          ARG=""
+          if [ -n "${MONTH_IN:-}" ]; then
+            if printf '%s' "$MONTH_IN" | grep -qE '^[0-9]{4}-(0[1-9]|1[0-2])$'; then
+              ARG="--month $MONTH_IN"
+            else
+              echo "::error::month must look like YYYY-MM; got something else. Refusing to run."
+              exit 1
+            fi
+          fi
+          {
+            echo "### Newsletter material"
+            echo ""
+            echo '```'
+            python3 tools/newsletter.py $ARG
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          python3 tools/newsletter.py $ARG --json > /tmp/material.json
+          echo "month=$(python3 -c "import json;print(json.load(open('/tmp/material.json'))['month'])")" >> "$GITHUB_OUTPUT"
+
+      # A skipped run must never look like a completed one. That defect was found on
+      # 2026-08-21, when two spokes had reported success every Friday while producing
+      # nothing, and the only trace was a notice in a log nobody opens.
+      - name: Check for API key
+        id: guard
+        env:
+          KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            {
+              echo ""
+              echo "### No issue was written"
+              echo ""
+              echo "\`ANTHROPIC_API_KEY\` is not set, so the writing step did nothing."
+              echo "The material above was still gathered and costs nothing."
+              echo ""
+              echo "To switch it on: \`gh secret set ANTHROPIC_API_KEY\`"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::ANTHROPIC_API_KEY is not set - material gathered, no issue written."
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Write the issue
+        if: steps.guard.outputs.enabled == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --allowedTools Bash,Read,Edit,Write,Glob,Grep
+          prompt: |
+            Run the `newsletter` skill for ${{ steps.gather.outputs.month }}. The gathered
+            material is at /tmp/material.json and `python3 tools/newsletter.py --json` will
+            reproduce it.
+
+            WRITE into the working tree only: the issue at
+            wiki/newsletter/${{ steps.gather.outputs.month }}.md, and an entry in today's
+            log file. Do NOT git commit, push, or open a PR, and do NOT run gh — the next
+            step does that. Do NOT send anything anywhere.
+
+      - name: Commit and open the PR
+        if: steps.guard.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MONTH: ${{ steps.gather.outputs.month }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -z "$(git status --porcelain)" ] && git diff --quiet origin/main..HEAD; then
+            echo "Nothing written this run — no PR."
+            exit 0
+          fi
+          # MONTH comes from newsletter.py, which only ever emits YYYY-MM — but it is
+          # still a value reaching a branch name, so it is checked here too.
+          printf '%s' "$MONTH" | grep -qE '^[0-9]{4}-(0[1-9]|1[0-2])$' || {
+            echo "::error::unexpected month value from the gather step"; exit 1; }
+          BRANCH="newsletter/${MONTH}"
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "newsletter: ${MONTH}" || echo "(already committed by the model)"
+          # The Claude action reconfigures git auth during its run, so push with an
+          # explicit token URL rather than the checkout's credentials.
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${BRANCH}"
+          gh pr create --base main --head "$BRANCH" \
+            --title "Newsletter — ${MONTH}" \
+            --body "Automated monthly issue. **Nothing has been sent.** Read it, edit it, then decide where it goes — the skill deliberately has no delivery path, because a newsletter a model can mail to the team without a person reading it first is a mailing list nobody consented to."
