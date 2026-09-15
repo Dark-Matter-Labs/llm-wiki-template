@@ -80,6 +80,7 @@ ALLOWED_COMMITMENT_STATE = {"proposed", "held", "honoured", "revised",
 NON_FAILURE_CLOSED = {"honoured", "exited", "declined"}
 DEFAULT_VALIDATION = "machine"
 ALLOWED_HORIZON = {"near", "mid", "far"}
+ALLOWED_GOAL_LAYER = {"political", "system", "capability"}
 
 WIKILINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]*))?\]\]")
 
@@ -216,6 +217,10 @@ def build_nodes(wiki_dir):
             "layer": fm.get("layer"),          # optional -> None if absent
             "parent": fm.get("parent"),        # optional
             "horizon": fm.get("horizon"),      # optional
+            # A goal's own layer: political | system | capability (agreed 15 Sept 2026).
+            # Deliberately not `layer:`, which already means the frontend view a page
+            # belongs to — two meanings on one key is how a field stops meaning anything.
+            "goal_layer": fm.get("goal_layer"),  # optional
             "tags": fm.get("tags", []),
             "confidence": fm.get("confidence"),
             "validation": fm.get("validation", DEFAULT_VALIDATION),
@@ -223,6 +228,10 @@ def build_nodes(wiki_dir):
             "validated_at": fm.get("validated_at"),
             "contradicts": fm.get("contradicts"),
             "commits_to": fm.get("commits_to"),
+            # Where the commitment starts. `commits_to` alone gives a row that points;
+            # an origin makes it a vector, which is what lets a trajectory be drawn at all.
+            # `now` or another goal's exact title. Optional — absent means unstated, not `now`.
+            "from": fm.get("from"),
             "resources": fm.get("resources"),
             "until": fm.get("until"),
             "state": fm.get("state"),
@@ -325,7 +334,13 @@ SPLIT_LINK_RE = re.compile(r"\[\[[^\]]*\n[^\]]*\]\]")
 def validate(wiki_dir):
     """Return list of (slug, message) schema errors."""
     errors = []
-    for slug, _path, fm, body in discover(wiki_dir):
+    pages = list(discover(wiki_dir))
+    # `from` is checked against real goal titles rather than free text: a commitment
+    # pointing at a goal that does not exist is the same defect as a dead wiki-link,
+    # and it is only catchable here.
+    goal_titles = {fm.get("title") for _s, _p, fm, _b in pages
+                   if fm.get("type") == "goal" and fm.get("title")}
+    for slug, _path, fm, body in pages:
         for f in REQUIRED_FIELDS:
             if f not in fm:
                 errors.append((slug, f"missing required field: {f}"))
@@ -339,6 +354,11 @@ def validate(wiki_dir):
             errors.append((slug, f"invalid layer: {fm['layer']!r}"))
         if "horizon" in fm and fm["horizon"] not in ALLOWED_HORIZON:
             errors.append((slug, f"invalid horizon: {fm['horizon']!r}"))
+        if "goal_layer" in fm:
+            if fm.get("type") != "goal":
+                errors.append((slug, "goal_layer on a page that is not a goal"))
+            elif fm["goal_layer"] not in ALLOWED_GOAL_LAYER:
+                errors.append((slug, f"invalid goal_layer: {fm['goal_layer']!r}"))
         if fm.get("type") == "commitment":
             st = fm.get("state")
             if st is None:
@@ -347,8 +367,17 @@ def validate(wiki_dir):
                 errors.append((slug, f"invalid commitment state: {st!r}"))
             if not fm.get("commits_to"):
                 errors.append((slug, "a commitment must name the goal it `commits_to`"))
+            frm = fm.get("from")
+            if frm is not None and frm != "now" and frm not in goal_titles:
+                errors.append((slug, f"`from` must be `now` or an existing goal's exact "
+                                     f"title, not {frm!r}"))
+            if frm is not None and frm == fm.get("commits_to"):
+                errors.append((slug, "`from` and `commits_to` name the same goal — "
+                                     "a vector of length zero"))
         if "state" in fm and fm.get("type") != "commitment":
             errors.append((slug, "`state` is only meaningful on a commitment"))
+        if "from" in fm and fm.get("type") != "commitment":
+            errors.append((slug, "`from` is only meaningful on a commitment"))
         if "validation" in fm and fm["validation"] not in ALLOWED_VALIDATION:
             errors.append((slug, f"invalid validation: {fm['validation']!r}"))
         # A page validated above `machine` must say who did it: an unattributed
