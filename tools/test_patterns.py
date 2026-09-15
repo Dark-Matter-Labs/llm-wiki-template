@@ -115,6 +115,40 @@ def main():
           any(r["travels"] for r in m["candidates"]),
           f"candidates: {[(r['pages'], r['wikis']) for r in m['candidates']]}")
 
+    # 3c. REGRESSION. The naming page was searched among the cluster's MEMBERS only, so a
+    #     concept page that names the idea from one hop away read as "nobody has said what
+    #     this is" — the tool's headline claim, wrong in the most embarrassing direction.
+    #     It searches the whole corpus now.
+    #     The namer reaches three of the five and carries its own neighbourhood elsewhere,
+    #     which is the real shape: a concept page one hop away, not a sixth member.
+    nodes = clique("z", 5)
+    others = [page(f"o{i}", f"other {i}", []) for i in range(8)]
+    namer = page("namer", "The Thing They Share",
+                 ["z0", "z1", "z2"] + [f"o{i}" for i in range(8)], type="concept")
+    m = run(nodes + others + [namer])
+    row = next(r for r in m["candidates"] if "z page 0" in r["members"])
+    check("a naming page outside the cluster is found",
+          row["naming_page"] == "The Thing They Share", str(row["naming_page"]))
+    check("...and is reported as being outside it", row["naming_is_a_member"] is False,
+          f"members: {row['members']}")
+
+    #     And the guard that keeps that from naming everything: a hub touches every cluster
+    #     in a corpus and names none of them. `Civilizational Optionality` carries 169
+    #     inbound links in the real wiki and brushes most groups in it.
+    hub = page("hub", "A Hub That Touches Everything",
+               [f"z{i}" for i in range(5)] + [f"pad{i}" for i in range(60)], type="concept")
+    pads = [page(f"pad{i}", f"pad {i}", []) for i in range(60)]
+    m = run(nodes + [hub] + pads)
+    row = next(r for r in m["candidates"] if "z page 0" in r["members"])
+    check("a hub is not allowed to name a cluster it merely touches",
+          row["naming_page"] != "A Hub That Touches Everything", str(row["naming_page"]))
+    check("...so the cluster is still reported as unnamed", row["naming_coverage"] < 0.5,
+          str(row["naming_coverage"]))
+    #     A member always counts, however unspecific it is: it is in the group.
+    m = run(clique("y", 5, type="concept"))
+    row = next(r for r in m["candidates"] if "y page 0" in r["members"])
+    check("a member still names its own cluster", row["naming_is_a_member"] is True)
+
     # 4. REGRESSION. The output must not change between runs of the same corpus. It did:
     #    frozenset iteration follows PYTHONHASHSEED, so tied naming pages and tied tags
     #    swapped every run. A reproducibility tool that is not reproducible is worthless,
