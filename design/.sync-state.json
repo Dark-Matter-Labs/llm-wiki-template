@@ -82,9 +82,9 @@
     ".claude/skills/dm-style-guide/SKILL.md": "e39aa8d6aca9d1a837fe6469f978e24102723bb29fe3467075a4c51ec8ea16c3",
     "tools/check_prose.py": "da8f356c700d3e6338b58a76185813df0fe0ed16ba636fda3c97d4eb29b40d05",
     "tools/test_check_prose.py": "0208a114f5d7d30e01802d06ed496901159bb5d4dab343510cb7894c1028d39e",
-    "tools/waiting.py": "77fa7acaae415fa91a071df1a5ae242450832eb6b579c7db4522d23b1576e499",
-    "tools/test_waiting.py": "a5297f7ee4cebd5e74daa37039cb953e8af8ae2950d45ad53d8be6017c281630",
-    ".github/workflows/waiting.yml": "5ff8e27ca4dc1f2ba80d46fa63c478cdaa512a9f787c7418d39c73533b455385",
+    "tools/waiting.py": "c86de758e6bdbd15bb135d530c3bf4f2eff348a4cd755d407256fec53932cc0d",
+    "tools/test_waiting.py": "457841abf70895955db8aafa86b5f222195c6f44ce3f66abb2dc1ca38c1cd534",
+    ".github/workflows/waiting.yml": "13040098d9fe56dfbc5f5be4e498ee7a054ecef950b2b39fb687e283b7a45054",
     ".claude/skills/waiting/SKILL.md": "b11e3ce8331f338bae7e1f0b5b591b473d91786bb23972bcc0dff5dfa2894997"
   }
 }

@@ -103,8 +103,9 @@ def decisions():
         when = (re.search(r"^timestamp:\s*(\S+)", fm, re.M) or [None, "?"])[1]
         val = (re.search(r"^validation:\s*(\w+)", fm, re.M) or [None, "machine"])[1]
         by = (re.search(r"^validated_by:\s*(.+)$", fm, re.M) or [None, ""])[1].strip()
+        vis = (re.search(r"^visibility:\s*(\w+)", fm, re.M) or [None, "private"])[1]
         for b in branches:
-            out[b] = {"page": title, "when": when, "validation": val,
+            out[b] = {"page": title, "when": when, "validation": val, "visibility": vis,
                       "validated_by": by, "by_a_person": val != "machine" and bool(by)}
     return out
 
@@ -270,8 +271,19 @@ def render(m) -> str:
     return "\n".join(out)
 
 
-def markdown(m) -> str:
-    """The same list as a GitHub Issue body — the surface a non-coder actually uses."""
+def markdown(m, public_safe: bool = False) -> str:
+    """The same list as a GitHub Issue body — the surface a non-coder actually uses.
+
+    `public_safe` withholds the TITLE of any decision page that is not `visibility: public`.
+    The body is the same either way; only the name of the page is dropped.
+
+    Added 2026-09-15, the day this shipped to eleven repositories, one of which
+    (llm-wiki-template) is public. The decision page in this wiki is `private`, and its title
+    was going straight into an issue body with nothing in the path asking what tier it was.
+    In a private repository an issue is inside the same boundary as the pages, so the title
+    is shown; in a public one it is not, and the workflow decides which by asking GitHub
+    rather than by assuming.
+    """
     props, never = m["proposals"], m["never_proposed"]
     out = ["*Everything below needs a person. Nothing here happens on its own.*", ""]
 
@@ -302,14 +314,16 @@ def markdown(m) -> str:
         by_page = {}
         for d in dec:
             by_page.setdefault((d["decision"]["page"], d["decision"]["when"],
-                                d["decision"]["by_a_person"]), []).append(d)
+                                d["decision"]["by_a_person"],
+                                d["decision"].get("visibility", "private")), []).append(d)
         out += ["## Already decided about", "",
                 "Listed here rather than above, so this page does not keep asking you the "
                 "same closed question every week.", ""]
-        for (page, when, person), items in by_page.items():
+        for (page, when, person, vis), items in by_page.items():
             pages = sum(i["new_pages"] for i in items)
+            named = page if (vis == "public" or not public_safe) else "a page in this wiki"
             out.append(f"- **{len(items)} piece(s)**, {pages} page(s) — decided by "
-                       f"*{page}* ({when})")
+                       f"*{named}* ({when})")
             if not person:
                 out.append("  - **Nobody has stood behind that decision.** It is recorded at "
                            "`validation: machine` — a proposal that has been treated as "
@@ -338,6 +352,8 @@ def main(argv=None):
     ap.add_argument("--json", action="store_true", help="emit the list as JSON")
     ap.add_argument("--markdown", action="store_true",
                     help="emit a GitHub Issue body")
+    ap.add_argument("--public-safe", action="store_true",
+                    help="withhold the title of any decision page that is not public")
     a = ap.parse_args(argv)
     # Validate at the boundary. An empty or malformed --repo previously fell through to the
     # checkout's own origin and reported on a DIFFERENT repository than the one asked for,
@@ -354,7 +370,7 @@ def main(argv=None):
     if a.json:
         print(json.dumps(m, indent=2))
     elif a.markdown:
-        print(markdown(m))
+        print(markdown(m, public_safe=a.public_safe))
     else:
         print(render(m))
     return 0

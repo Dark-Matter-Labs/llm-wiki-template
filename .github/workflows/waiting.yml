@@ -41,12 +41,22 @@ jobs:
         with:
           fetch-depth: 0     # the report diffs every branch against main
 
+      # A public repository gets the list without the NAME of any decision page that is not
+      # itself public. The page that closes a question is usually private, and its title was
+      # going into an issue body with nothing in the path asking what tier it was. Asked of
+      # GitHub at run time rather than read off the event payload, so it is the same answer
+      # whether the run was scheduled or dispatched, and it fails closed: if the question
+      # cannot be answered, the safe flag is passed.
       - name: Work out what is waiting
         env:
           GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          python3 tools/waiting.py --markdown > /tmp/body.md
+          private=$(gh repo view "$REPO" --json isPrivate -q .isPrivate 2>/dev/null || echo "")
+          if [ "$private" = "true" ]; then safe=""; else safe="--public-safe"; fi
+          echo "repository private: ${private:-unknown} -> ${safe:-titles shown}"
+          python3 tools/waiting.py --markdown $safe > /tmp/body.md
           {
             echo "### What's waiting"
             echo ""
