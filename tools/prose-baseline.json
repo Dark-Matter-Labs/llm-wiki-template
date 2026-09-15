@@ -1,0 +1,115 @@
+{
+  "_comment": "house-rules: ignore-file (this file lists page PATHS, and four existing slugs spell civilisation with an s; slugs are exempt from the house spelling by design). Mechanical ai-detox findings per file. A debt register, not an exemption: it must only ever shrink. A file may fall and may never rise, and a new file starts at zero. Recording a new file with a count above zero is a deliberate act and needs a reason \u2014 recovering old work is the usual one. See tools/check_prose.py for why this is a ratchet and not a gate.",
+  "recorded": "2026-09-15",
+  "reason": "Starting debt, 2026-09-15, recorded when the ai-detox rules arrived with the shared layer. Prose written before the rules existed. Nothing here is a failure.",
+  "totals": {
+    "words": 0,
+    "phrases": 0,
+    "xnoty": 0,
+    "emdash": 76
+  },
+  "files": {
+    "wiki/axioms.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 8
+    },
+    "wiki/examples/citizens-as-monitoring-infrastructure.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 2
+    },
+    "wiki/examples/cork.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 3
+    },
+    "wiki/examples/greenline-summary.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 6
+    },
+    "wiki/examples/lisbon.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 3
+    },
+    "wiki/examples/outcomes-based-financing.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 1
+    },
+    "wiki/examples/tallinn.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 2
+    },
+    "wiki/index.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 14
+    },
+    "wiki/log/2026-08-07.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 1
+    },
+    "wiki/log/2026-08-18.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 2
+    },
+    "wiki/log/2026-08-20.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 5
+    },
+    "wiki/log/2026-08-21.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 5
+    },
+    "wiki/log/2026-08-25.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 13
+    },
+    "wiki/log/2026-08-26.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 4
+    },
+    "wiki/log/2026-08.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 1
+    },
+    "wiki/log.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 4
+    },
+    "wiki/overview.md": {
+      "words": 0,
+      "phrases": 0,
+      "xnoty": 0,
+      "emdash": 2
+    }
+  }
+}
