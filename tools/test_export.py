@@ -93,6 +93,25 @@ class ExportTests(unittest.TestCase):
             # index.md (no frontmatter) is not a node
             self.assertNotIn("index", nodes)
 
+    def test_lifecycle_fields_reach_the_graph(self):
+        """`status` and `derivation` must survive the export, or no reader can see them.
+
+        Both are gated at the file and were dropped here, so the checks passed while every
+        reading interface was blind to the answer. `status` was fixed on 2026-09-15 for
+        dormancy; a lint pass the same day found `derivation` in the same state, which is
+        the field CLAUDE.md calls the layer where drift hides.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            write(d, "derived.md",
+                  base_fm("synthesis", "Built from other pages", "internal",
+                          "status: dormant\nderivation: derivative"))
+            write(d, "plain.md", base_fm("concept", "Nothing declared", "internal"))
+            nodes, _ = export.build_nodes(d)
+            self.assertEqual(nodes["derived"]["derivation"], "derivative")
+            self.assertEqual(nodes["derived"]["status"], "dormant")
+            # A page that declares neither must read as absent, never as a default value.
+            self.assertIsNone(nodes["plain"]["derivation"])
+
     def test_check_catches_schema_errors(self):
         with tempfile.TemporaryDirectory() as d:
             # missing visibility + bad type

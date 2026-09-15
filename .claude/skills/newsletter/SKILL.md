@@ -11,12 +11,14 @@ The weekly reflection ran every Friday from week 28 to week 36. Measured on 2026
 
 | | |
 |---|---|
-| inbound links to any reflection, from anywhere in the corpus | **0** |
+| ordinary pages that ever cited a reflection, of 819 | **7** |
+| of its 30 inbound links, how many came from the joker pages the same run wrote | 17 |
 | times W35 and W36 were touched after being written | **1 each** |
 | times W30 was touched after being written | 4 |
 | workflow runs · of which failed | **15 · 5** |
 
-Attention decayed from four touches to one. Nothing in the corpus ever cited a reflection. The run
+Attention decayed from four touches to one. Seven pages of 819 ever cited one, and most of the
+links a reflection does have were written by the same Friday run. The run
 on 11 September failed and nobody noticed. It also called the model every Friday, billed outside
 the Team plan.
 
