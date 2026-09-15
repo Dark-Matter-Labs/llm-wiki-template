@@ -13,8 +13,8 @@ name: Weekly reflection
 # reporting success, and NOT ONE reflection page produced in any of them. None of those
 # repositories holds ANTHROPIC_API_KEY, so every Friday the job checked for a key, found
 # none, wrote a notice into a log nobody opens, and went green. In the one wiki that did
-# hold a key, eight reflections were written between weeks 28 and 36, nothing in the corpus
-# ever linked to one, and five of fifteen runs failed unnoticed.
+# hold a key, eight reflections were written between weeks 28 and 36, seven ordinary pages
+# of 819 ever cited one, and five of fifteen runs failed unnoticed.
 #
 # A weekly artefact nobody reads is a cadence problem, not a prose problem. The monthly
 # newsletter replaces the slot and its cheap half runs whether or not a key is set, so a
