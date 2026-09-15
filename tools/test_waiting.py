@@ -11,6 +11,7 @@ or on what happens to be in somebody's checkout.
 
 Usage:  python3 tools/test_waiting.py
 """
+import json
 import os
 import pathlib
 import subprocess
@@ -235,6 +236,87 @@ def main():
     finally:
         W._gh_json, W._ok, W._run = keep
         W.decisions = old
+
+    # --- the validation ask -------------------------------------------------------------
+    # Added 2026-09-16. 823 of 824 pages in this wiki had nobody behind them, and the docs told
+    # people to write `validated_by` without `validated_at`, which produced confirmations every
+    # read-out counted as zero. Docs alone did not move it; this puts the ask on the surface a
+    # non-git person already has.
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        (root / "export").mkdir()
+        nodes = [
+            {"slug": "heavy", "title": "Leaned On", "validation": "machine",
+             "inbound_links": ["a", "b", "c"], "visibility": "internal"},
+            {"slug": "light", "title": "Barely Cited", "validation": "machine",
+             "inbound_links": ["a"], "visibility": "internal"},
+            {"slug": "orphan", "title": "Nothing Cites This", "validation": "machine",
+             "inbound_links": [], "visibility": "internal"},
+            {"slug": "done", "title": "Already Confirmed", "validation": "self",
+             "inbound_links": ["a", "b", "c", "d"], "visibility": "internal"},
+            {"slug": "gone", "title": "Retired", "validation": "machine", "status": "dormant",
+             "inbound_links": ["a", "b", "c", "d", "e"], "visibility": "internal"},
+        ]
+        (root / "export" / "wiki.json").write_text(json.dumps({"nodes": nodes}))
+        old_root = W.ROOT_P
+        W.ROOT_P = root
+        try:
+            sb = W.nothing_stands_behind(limit=3)
+        finally:
+            W.ROOT_P = old_root
+    titles = [r["title"] for r in sb["pages"]]
+    check("the most leaned-on unconfirmed page is named first", titles[:1] == ["Leaned On"],
+          str(titles))
+    check("a page a person already stood behind is not asked about again",
+          "Already Confirmed" not in titles)
+    check("a retired page is not asked about", "Retired" not in titles)
+    check("a page nothing cites is not put in front of anybody",
+          "Nothing Cites This" not in titles, "weight is the whole point of a sample of three")
+    check("the total counts every unconfirmed live page, not just the sample",
+          sb["total_unvalidated"] == 3, str(sb))
+
+    # NO AUTHORSHIP. "Which pages did X write" is the question the house rule refuses, and it
+    # is the obvious way to build this feature.
+    src_w = pathlib.Path(__file__).resolve().parent.joinpath("waiting.py").read_text()
+    region = src_w[src_w.index("def nothing_stands_behind"):src_w.index("def gather")]
+    check("the ask reads no authorship field",
+          not any(k in region for k in ("contributed_by", "author", "validated_by\"")),
+          "knowledge, not surveillance")
+
+    # Without a built graph it must say nothing rather than guess.
+    with tempfile.TemporaryDirectory() as tmp:
+        old_root = W.ROOT_P
+        W.ROOT_P = pathlib.Path(tmp)
+        try:
+            sb = W.nothing_stands_behind()
+        finally:
+            W.ROOT_P = old_root
+    check("with no graph built it offers nothing rather than guessing",
+          sb["available"] is False and sb["pages"] == [])
+
+    # And the date, which is the whole reason this exists.
+    m = {"repo": "owner/repo", "proposals": [], "never_proposed": [], "decided": [],
+         "unavailable": None,
+         "stand_behind": {"available": True, "total_unvalidated": 9, "total_pages": 10,
+                          "pages": [{"title": "Leaned On", "slug": "heavy",
+                                     "leaned_on_by": 3, "visibility": "internal"}]}}
+    md = W.markdown(m)
+    check("the issue shows all three lines, including validated_at",
+          "validation: self" in md and "validated_by:" in md and "validated_at:" in md,
+          "a confirmation without a date is invisible to every read-out")
+    check("...and says only a person may do it", "may never do it for you" in md.lower()
+          or "never do for you" in md.lower())
+    # The boundary again. A public repository may name only public pages here, exactly as it
+    # may name only a public decision page. Missed on the first pass of this feature.
+    m["stand_behind"]["pages"] = [
+        {"title": "A Private Page", "slug": "p", "leaned_on_by": 9, "visibility": "private"},
+        {"title": "A Public Page", "slug": "q", "leaned_on_by": 2, "visibility": "public"}]
+    safe = W.markdown(m, public_safe=True)
+    check("a private page's title is not put in a public repository's issue",
+          "A Private Page" not in safe)
+    check("...but a public one still is", "A Public Page" in safe)
+    check("...and the title IS shown inside a private repository",
+          "A Private Page" in W.markdown(m))
 
     # The workflow must actually pass the flag, or the tool's care is decoration.
     wf = pathlib.Path(__file__).resolve().parent.parent / ".github" / "workflows" / "waiting.yml"

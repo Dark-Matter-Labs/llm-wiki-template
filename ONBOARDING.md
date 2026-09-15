@@ -166,6 +166,19 @@ and ask Claude. Nothing is lost either way.
 `machine` and propose `self`; it can **never** award `peer` or `collective`, because a model
 granting those would make the ladder meaningless.
 
+It takes three lines, and the third is the one people forget:
+
+```yaml
+validation: self
+validated_by: [Your Name]
+validated_at: 2026-09-16
+```
+
+Without the date the confirmation is invisible. Every read-out counts validation **by its
+date**, so a page confirmed without one is standing behind nothing as far as the system can
+tell. Ask Claude "what should I stand behind?" and it will name a few candidates; it will
+never do this part for you.
+
 **Settling a disagreement.** When two pages genuinely conflict, Claude declares it and stops.
 Which one wins is a judgement, and judgements belong to people.
 
