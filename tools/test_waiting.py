@@ -198,6 +198,49 @@ def main():
           got.get("claude/bbb", {}).get("by_a_person") is True)
     check("...and the deciding page is named, so the ruling can be read",
           got.get("claude/bbb", {}).get("page") == "A ruling somebody signed")
+    check("a page with no visibility is read as private, per the schema default",
+          got.get("claude/aaa", {}).get("visibility") == "private")
+
+    # 7e. THE BOUNDARY. This shipped to eleven repositories, one of them public, and the
+    #     decision page in the wiki that wrote it is `private`. Its title was going into an
+    #     issue body with nothing in the path asking what tier the page was.
+    old = W.decisions
+    W.decisions = lambda: {"old": {"page": "A private ruling", "when": "2026-09-03",
+                                   "validation": "self", "validated_by": "[gurden]",
+                                   "visibility": "private", "by_a_person": True}}
+    gh, ok, run = fake(["main", "old"], proposed=[], diffs={"old": ["wiki/a.md"]})
+    keep = (W._gh_json, W._ok, W._run)
+    W._gh_json, W._ok, W._run = gh, ok, run
+    try:
+        m = W.gather("owner/repo")
+        check("a private page's title is withheld under --public-safe",
+              "A private ruling" not in W.markdown(m, public_safe=True))
+        check("...but the decision is still reported, so nothing is hidden, only unnamed",
+              "Already decided" in W.markdown(m, public_safe=True))
+        check("...and the title IS shown without the flag, inside the repo boundary",
+              "A private ruling" in W.markdown(m))
+        W.decisions = lambda: {"old": {"page": "A public ruling", "when": "2026-09-03",
+                                       "validation": "self", "validated_by": "[gurden]",
+                                       "visibility": "public", "by_a_person": True}}
+        m = W.gather("owner/repo")
+        check("a public page is named even under --public-safe",
+              "A public ruling" in W.markdown(m, public_safe=True))
+        # The guard that matters most: an unmarked page must not read as publishable.
+        W.decisions = lambda: {"old": {"page": "An unmarked ruling", "when": "2026-09-03",
+                                       "validation": "self", "validated_by": "[gurden]",
+                                       "by_a_person": True}}
+        m = W.gather("owner/repo")
+        check("a decision with no visibility recorded is withheld, not published",
+              "An unmarked ruling" not in W.markdown(m, public_safe=True))
+    finally:
+        W._gh_json, W._ok, W._run = keep
+        W.decisions = old
+
+    # The workflow must actually pass the flag, or the tool's care is decoration.
+    wf = pathlib.Path(__file__).resolve().parent.parent / ".github" / "workflows" / "waiting.yml"
+    y = wf.read_text(encoding="utf-8")
+    check("the workflow asks GitHub whether the repository is private", "isPrivate" in y)
+    check("...and passes --public-safe when it is not", "--public-safe" in y)
 
     # 8. The language. This exists for someone who does not know what a branch is; leaking
     #    the vocabulary back into the output would defeat the entire exercise.
