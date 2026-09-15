@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "3a4c2781647f530fc697a426846d857e75ea78aada90688c624630bdfe7e9431",
+    "design/shared-layer.json": "7b94400cf495dbb67ea99a40c6e3cd2cbdcab0dc19925476b8cb8212bdaa53d8",
     "tools/drift-baseline.json": "78a466c191314c8d306c584a4f275528639152269b604056f2d13221edf92ac1",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -86,9 +86,15 @@
     "tools/test_waiting.py": "457841abf70895955db8aafa86b5f222195c6f44ce3f66abb2dc1ca38c1cd534",
     ".github/workflows/waiting.yml": "13040098d9fe56dfbc5f5be4e498ee7a054ecef950b2b39fb687e283b7a45054",
     ".claude/skills/waiting/SKILL.md": "b11e3ce8331f338bae7e1f0b5b591b473d91786bb23972bcc0dff5dfa2894997",
-    "tools/newsletter.py": "659bdbf1e4afd350dafd73faa3c2aa0455293caabec34d85f8b35565e70dc9a3",
-    "tools/test_newsletter.py": "9ee25939c90d4a35c0deb91eea8c8d0c7bf90119401ff311d4b4118b60dc6a8b",
-    ".claude/skills/newsletter/SKILL.md": "98bd2ef9dd08e72d665f0b008d9182aed317660cdbd965b9658f2e39dc36ca1f",
-    ".github/workflows/monthly-newsletter.yml": "44675d19526bb2c65fc8943a5765f1dd0a3e647b9dda700557271c60a068a214"
+    "tools/newsletter.py": "9539d8ef5caba17bcea7747a418e52a0b24209c8837367342d094a75c1dc6544",
+    "tools/test_newsletter.py": "e4305353a8ffc445d66331cf9f0d5b458cb309435b4004efad91062ea7060009",
+    ".claude/skills/newsletter/SKILL.md": "83fd86644db420412815e8a993040faeff4da1c0d5152ae94afa0317007d2fb0",
+    ".github/workflows/monthly-newsletter.yml": "44675d19526bb2c65fc8943a5765f1dd0a3e647b9dda700557271c60a068a214",
+    "tools/patterns.py": "02448772e4af96bae1c8df30e080da993c086c5f531d0ffef1a6104d1ec39857",
+    "tools/test_patterns.py": "ab5e084f11ab1af67bd4696b987ec6f7da37499a1754b779d0e2144ee583f352",
+    "tools/community.py": "b21c9ff37493ff9b2f120eaa82dad809a6cb6e96540852f5af70c6adfebd9441",
+    "tools/test_community.py": "dd45de07a873ce2192106050c050d3080a4c02094fd67d8e9b660d2c372722f7",
+    "tools/open_questions.py": "c6252799356ed49d289b929b29dfbd23f424f000ccb6108c7c731523f9090e2c",
+    "tools/test_open_questions.py": "e7a32c51a5df9e418f009ee322f2be25daa0e1879c0349d1b7d474c4dac90843"
   }
 }

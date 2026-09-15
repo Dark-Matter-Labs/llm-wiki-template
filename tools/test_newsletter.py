@@ -104,6 +104,114 @@ def main():
     check("...and it is still not read when a legitimate cut sits next to it",
           list(got) == ["xco-team-wiki"] and "A PRIVATE PAGE" not in json.dumps(got), str(got))
 
+    # --- the signals -----------------------------------------------------------------
+    # Added 2026-09-15, when the issue was rewritten to be about what the corpus is thinking
+    # rather than how many pages it gained. Counts are the least surprising thing about a
+    # month; these five are the interesting part, so they are the part that must be right.
+
+    # The correction rate. The log's rebuild/repair split exists so it is visible without a
+    # metacognition pass, and a window filter that leaks a neighbouring month would make the
+    # most self-critical number in the system quietly wrong.
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        (root / "wiki" / "log").mkdir(parents=True)
+        (root / "wiki" / "log" / "2026-08-04.md").write_text(
+            "## [2026-08-04] rebuild | Advanced the thing\n"
+            "## [2026-08-04] repair  | Put a thing back (mine)\n"
+            "## [2026-08-04] ingest  | A source\n", encoding="utf-8")
+        (root / "wiki" / "log" / "2026-08-20.md").write_text(
+            "## [2026-08-20] repair  | Somebody else's defect\n"
+            "Some prose that mentions ## [2026-08-20] rebuild | not a heading\n",
+            encoding="utf-8")
+        (root / "wiki" / "log" / "2026-09-01.md").write_text(
+            "## [2026-09-01] rebuild | The next month, which must not be counted\n",
+            encoding="utf-8")
+        # A PRE-SPLIT month file: July 2026 and earlier are one file per month, and the log
+        # is appended to by hand, so a mis-dated entry inside one is a real hazard. This is
+        # the only shape where the per-entry date filter does any work — the first version of
+        # this test asserted the filter and proved nothing, because the filename filter had
+        # already excluded the file it used.
+        (root / "wiki" / "log" / "2026-07.md").write_text(
+            "## [2026-07-09] rebuild | Inside July\n"
+            "## [2026-08-02] rebuild | Mis-dated into August, inside July's file\n",
+            encoding="utf-8")
+        old_root = N.ROOT
+        N.ROOT = root
+        try:
+            c = N.corrections(dt.date(2026, 8, 1), dt.date(2026, 8, 31))
+            july = N.corrections(dt.date(2026, 7, 1), dt.date(2026, 7, 31))
+        finally:
+            N.ROOT = old_root
+    check("advances and repairs are counted separately",
+          (c["entries"]["rebuild"], c["entries"]["repair"]) == (1, 2), str(c["entries"]))
+    check("the next month's file is not counted", c["entries"]["rebuild"] == 1, str(c["entries"]))
+    check("a pre-split month file is read", july["entries"]["rebuild"] == 1,
+          str(july["entries"]))
+    check("...and an entry mis-dated outside the window inside it is not counted",
+          july["entries"]["rebuild"] == 1 and c["entries"]["rebuild"] == 1,
+          f"july={july['entries']} august={c['entries']}")
+    check("a repair of the model's own error is counted as such",
+          c["repairs_of_my_own_error"] == 1, str(c))
+    check("the repair share is the honest fraction", c["repair_share"] == round(2 / 3, 3),
+          str(c["repair_share"]))
+    check("a log line quoted inside prose is not read as an entry",
+          c["entries"]["rebuild"] == 1, str(c["entries"]))
+
+    # Goals. `declined` and `exited` are NON-PENALISED: refusing, or leaving deliberately, is
+    # a valid outcome and must never be rendered as failure. Only `lapsed` counts against a
+    # goal. A newsletter that reported "2 commitments failed" here would be lying about two
+    # people who made a decision.
+    nodes = [
+        {"type": "goal", "title": "G1", "horizon": "near", "validation": "machine"},
+        {"type": "goal", "title": "G2", "horizon": "far", "validation": "peer"},
+        {"type": "commitment", "title": "C1", "commits_to": "G1", "state": "held",
+         "timestamp": "2026-08-10"},
+        {"type": "commitment", "title": "C2", "commits_to": "G1", "state": "declined",
+         "timestamp": "2026-08-12"},
+        {"type": "commitment", "title": "C3", "commits_to": "G1", "state": "exited",
+         "timestamp": "2026-07-02"},
+        {"type": "concept", "title": "not a goal", "timestamp": "2026-08-01"},
+    ]
+    g = N.goal_vectors({"a-commons": nodes}, dt.date(2026, 8, 1), dt.date(2026, 8, 31))["a-commons"]
+    check("goals and commitments are counted from the cut",
+          (g["goals"], g["commitments"]) == (2, 3), str(g))
+    check("a goal nothing is committed against is named as such",
+          g["goals_with_nothing_committed"] == 1, str(g))
+    check("every commitment state is reported, declined and exited included",
+          g["commitment_states"] == {"held": 1, "declined": 1, "exited": 1},
+          str(g["commitment_states"]))
+    shown = "\n".join(N._render_signals({
+        "patterns": None, "trajectory": None, "corrections": None, "unsettled": None,
+        "goals": N.goal_vectors({"a-commons": nodes}, dt.date(2026, 8, 1),
+                                dt.date(2026, 8, 31))})).lower()
+    check("...and the read-out never calls declined or exited a failure",
+          not any(w in shown for w in ("failure", "failed", "missed", "behind schedule")),
+          "refusing, or leaving deliberately, is a valid outcome; only lapsed counts against "
+          "a goal, and rendering the other two as failure would misreport a decision")
+    check("a goal a person stood behind is distinguished from one nobody has",
+          g["stood_behind_by_a_person"] == 1, str(g))
+    check("only this month's movements are listed",
+          [m["page"] for m in g["moved_this_month"]] == ["C1", "C2"],
+          str(g["moved_this_month"]))
+    check("a wiki with no goals is left out rather than reported as zero",
+          N.goal_vectors({"empty": [{"type": "concept"}]}, dt.date(2026, 8, 1),
+                         dt.date(2026, 8, 31)) == {})
+
+    # Every signal is optional. A wiki without the tool gets a stated blank, never a guess.
+    with tempfile.TemporaryDirectory() as tmp:
+        old_root = N.ROOT
+        N.ROOT = pathlib.Path(tmp)
+        try:
+            check("a missing tool returns nothing rather than failing the gather",
+                  N.patterns_now() is None and N.unsettled() is None and
+                  N.trajectory(dt.date(2026, 8, 1), dt.date(2026, 8, 31)) is None)
+        finally:
+            N.ROOT = old_root
+    check("...and the read-out says the tool is absent rather than printing a zero",
+          "not in this wiki" in "\n".join(N._render_signals(
+              {"patterns": None, "trajectory": None, "goals": {}, "corrections": None,
+               "unsettled": None})))
+
     # --- the refusals ----------------------------------------------------------------
     check("the tool has no delivery path",
           not any(w in src for w in ("smtplib", "sendgrid", "mailto:", "requests.post")))
