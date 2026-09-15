@@ -108,6 +108,11 @@ def main():
     check("a correct axiom range is not flagged", not run("The register runs A0–A27."))
 
     # --- the command itself -------------------------------------------------------
+    # CLAUDE.md is the constitution and was checked by nothing until 2026-09-15. Assert it
+    # stays in scope: removing it would silently stop checking the file every session reads.
+    src = open(os.path.join(HERE, "check_onboarding.py"), encoding="utf-8").read()
+    check("CLAUDE.md is one of the documents checked", '"CLAUDE.md"' in src)
+
     r = subprocess.run([sys.executable, os.path.join(HERE, "check_onboarding.py"), "--check"],
                        capture_output=True, text=True)
     check("--check passes on this repo as it stands", r.returncode == 0,

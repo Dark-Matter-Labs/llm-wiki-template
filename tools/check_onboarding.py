@@ -38,7 +38,11 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 #: The documents a person reads before they read anything else.
-DOCS = ("ONBOARDING.md", "EDITING.md", "START-HERE.md", "README.md", "SHARING-AND-ACCESS.md")
+#: CLAUDE.md is here since 2026-09-15. It is the constitution, it is read at the start of every
+#: session, and it was checked by nothing. The first run against it found `wiki/index/dormant.md`,
+#: a shelf the file had described since dormancy was designed and which did not exist.
+DOCS = ("ONBOARDING.md", "EDITING.md", "START-HERE.md", "README.md", "SHARING-AND-ACCESS.md",
+        "CLAUDE.md")
 
 #: Backticked things that look like paths but are illustrative, not references.
 PLACEHOLDER = re.compile(r"[<>…]|\bYYYY\b|\bfilename\b|\bsomething\b")

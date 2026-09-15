@@ -91,6 +91,10 @@
     "ONBOARDING.md",
     "tools/check_onboarding.py",
     "tools/test_check_onboarding.py",
+    "tools/waiting.py",
+    "tools/test_waiting.py",
+    ".github/workflows/waiting.yml",
+    ".claude/skills/waiting/SKILL.md",
     "docs/assets/xco2.css",
     "docs/assets/xco.css",
     "docs/assets/xco-dusk.css"

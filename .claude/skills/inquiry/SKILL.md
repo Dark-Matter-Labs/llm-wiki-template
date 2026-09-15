@@ -35,6 +35,19 @@ middle tier. Actions are not banned — they are instruments, and belong under t
   this*, run the framing check below on your own draft — the natural default, for a person or a
   model, is to write a task list with no question behind it.
 
+## Where to start when nobody has brought a problem
+
+`python3 tools/open_questions.py` lists what the corpus has already asked and not answered: every
+`Open questions` section, every explicit *"<name> to confirm"*, and any declared contradiction.
+Measured on 2026-09-15 that was **102 questions across 39 pages, and 24 waits on 14 pages**.
+
+Use it when the owner asks what is worth looking at, or when a session has room and no brief. An
+inquiry started from a question the corpus already posed is better than one started from a blank
+page, and it closes something rather than adding to the pile.
+
+Add `--shareable` before putting any of it in front of somebody who should not see `private`
+material. The default includes everything, because the owner reading their own wiki should.
+
 ## Method
 
 1. **State the problem back, as a question.** One sentence. If the owner has given you a task
