@@ -1,0 +1,75 @@
+name: What's waiting for you
+
+# Keeps ONE GitHub Issue up to date with everything that needs a person. The issue is the
+# point: it is a web page with a title and some links, and it can be read by someone who
+# does not know what a branch is. The terminal report exists for whoever wants it; this is
+# the surface the system is actually for.
+#
+# Why it was built, 2026-09-15: one wiki in this federation had 61 branches, of which 37 had
+# never had a pull request opened for them at all, the oldest from 4 July, carrying 66 wiki
+# pages that existed there and nowhere else. Nothing was broken and no check had failed. The review
+# queue was empty, which is exactly why nobody looked: the work was in the one place the
+# system never shows anyone.
+#
+# It never opens a proposal, never merges, never deletes a branch. Sixty-six pages nobody
+# has read since July are not obviously all wanted, and deciding that is a person's job.
+# The workflow's only power is to write one issue body.
+
+on:
+  schedule:
+    - cron: "0 8 * * 1"     # Mondays, 08:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+  # Required to ask which work already has a proposal. Without it the first real run
+  # reported 55 pieces of unproposed work against a true 37, because the query came back
+  # empty and empty looked like "none have ever been proposed". The tool now refuses to
+  # produce that list at all when it cannot ask — but the permission is the actual fix.
+  pull-requests: read
+
+concurrency:
+  group: waiting
+  cancel-in-progress: false
+
+jobs:
+  waiting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # the report diffs every branch against main
+
+      - name: Work out what is waiting
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 tools/waiting.py --markdown > /tmp/body.md
+          {
+            echo "### What's waiting"
+            echo ""
+            cat /tmp/body.md
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Kept as one issue, updated in place, rather than a new issue each week: a weekly
+      # issue is a notification stream, and the last thing this needs is to become another
+      # feed nobody reads. One page, one URL, always current.
+      - name: Put it in the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TITLE: "What's waiting for you"
+        run: |
+          set -euo pipefail
+          num=$(gh issue list -R "$REPO" --state open --limit 50 \
+                  --json number,title \
+                  --jq "[.[] | select(.title == env.TITLE)] | .[0].number // empty")
+          if [ -n "$num" ]; then
+            gh issue edit "$num" -R "$REPO" --body-file /tmp/body.md
+            echo "updated issue #$num"
+          else
+            url=$(gh issue create -R "$REPO" --title "$TITLE" --body-file /tmp/body.md)
+            echo "opened $url"
+          fi

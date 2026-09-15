@@ -174,8 +174,12 @@ def render() -> str:
                  f"name pages worth sharing. Nothing from a commons is written into `wiki/` "
                  f"without a person deciding.")
     else:
+        # Deliberately does not name the `contribute` skill in backticks. A commons does not
+        # carry that skill — it has nothing above it to send to — and `check_onboarding.py`
+        # reads "`x` skill" as a claim that the skill is here. The sentence was correct and
+        # the check was right to fire; the fix is the wording, not a hole in the check.
         L.append("- **Nothing sits above this wiki.** It is a top commons: other wikis contribute "
-                 "*to* it, and it contributes onward to nobody. The `contribute` skill has no "
+                 "*to* it, and it contributes onward to nobody. Contributing upward has no "
                  "target here, and that is correct rather than broken.")
     L.append("")
 

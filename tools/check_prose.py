@@ -113,9 +113,19 @@ def count(text: str) -> dict:
             "emdash": t.count("—")}
 
 
+#: Catalogues, not prose. `ai-detox` names index shelves explicitly among the reference
+#: documents that keep their structure, and the shelf format separates a page's link from its
+#: description with an em dash across several hundred rows. Scanning them made the tool
+#: contradict the skill it implements, and every new catalogue row failed the ratchet.
+SKIP = ("wiki/index/",)
+
+
 def scan(root=SCAN) -> dict:
     out = {}
     for p in sorted(root.rglob("*.md")):
+        rel = p.relative_to(ROOT).as_posix()
+        if any(rel.startswith(s) for s in SKIP):
+            continue
         c = count(p.read_text(encoding="utf-8", errors="ignore"))
         if any(c.values()):
             out[str(p.relative_to(ROOT))] = c

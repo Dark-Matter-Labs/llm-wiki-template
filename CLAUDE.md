@@ -188,6 +188,27 @@ The signal is `tools/staleness.py`, which reports when a page's **body** last ch
 frontmatter-only commits. Git mtime cannot be used: one schema backfill rewrites every page's
 frontmatter and resets every clock at once. A signal a migration can reset measures migrations.
 
+### Recording a decision about unmerged work — `decides:`
+
+A page that settles what happens to work sitting on branches lists those branches in its
+frontmatter, so a tool can tell a closed question from an open one:
+
+```yaml
+decides:
+  - claude/some-branch-name
+```
+
+`tools/waiting.py` reads it and moves those branches out of the waiting list. **The page's own
+`validation` decides how they are reported.** A ruling at `machine` is shown as decided *and*
+flagged — "nobody has stood behind that decision" — because a model closing a question is a
+proposal that has been treated as settled, not a decision. A ruling carrying `validation: self`
+or above with a `validated_by` is reported without the flag.
+
+This exists because a ruling in another wiki closed a question in September 2026, said in terms
+that it existed so nobody would re-derive it, and was re-derived twelve days later by a tool that
+could not see decisions. An inbox that keeps re-raising settled matters trains people to stop
+opening it.
+
 ### Contradictions must resolve, never sit silent
 
 When two pages genuinely disagree, declare it on the newer page:
@@ -293,6 +314,7 @@ In plain-English terms, here is when each fires:
 | "run a delta", "measure this against the wiki", "where does this sit / move us" | `delta` |
 | "share this with the team", "contribute this", "propose this to the commons" | `contribute` |
 | "add a contact", "log that meeting", "who do we know at…", "prep me for my meeting with…" | `crm` |
+| "what's waiting for me", "what needs me", "anything outstanding" | `waiting` |
 
 Published web pages live in `docs/` and are served by GitHub Pages.
 
