@@ -26,10 +26,12 @@ properly, and sent to people rather than left in a folder to be found.
 
 ## The split — and keep it
 
-`python3 tools/newsletter.py --json` does the arithmetic: what entered, what moved, what is stuck,
-per wiki and per commons. It is deterministic, costs nothing, and calls no model. **Start there,
-every time.** Do not recompute what it already knows and do not contradict it — if a number here
-disagrees with the tool, the tool is right and the draft is wrong.
+`python3 tools/newsletter.py --json` does the arithmetic: the patterns the corpus has formed and
+which have no name, the terms rising and falling in its centre, what is committed against which
+goal, how much of the month was repair rather than advance, and what is still unanswered. It is
+deterministic, costs nothing, and calls no model. **Start there, every time.** Do not recompute
+what it already knows and do not contradict it — if a number here disagrees with the tool, the
+tool is right and the draft is wrong.
 
 Your job is the half a script cannot do: deciding what is worth saying, and saying it well.
 
@@ -65,17 +67,52 @@ brochure, and people stop believing it by the third issue.
 **Quote the corpus.** A page's own one-line description, or a line somebody actually said in a
 session, beats any summary you would write of it.
 
-## What earns a place
+## What the issue is about
 
-In rough order of interest:
+**Not the movements of the wiki.** How many pages arrived, and of which type, is a changelog.
+Nobody has ever wanted to read one. The counts are in the material because they set the scale of
+a month, and they belong in one sentence at most.
 
-1. **A position that changed** — somebody now thinks something different, and why.
-2. **A decision taken**, especially one that closed an argument.
-3. **A thing that broke and what it taught.** The repair log is the most trusted section you have,
-   because nobody else publishes theirs.
-4. **A question nobody has answered yet**, stated plainly enough that a reader could answer it.
-5. **What came in** — sources, concepts, options. Last, and briefly, because it is the least
-   surprising part.
+The issue is about what the corpus is **thinking**. Five things carry that, and `newsletter.py`
+gathers all five deterministically so the writing is judgement rather than arithmetic.
+
+**Patterns, and what has no name yet.** `signals.patterns` reports the clusters the corpus has
+formed and how many have no page saying what the idea is. An unnamed cluster is the most
+interesting object this system produces: seven pages from seven sources that hang together
+tightly, with nobody having said what holds them. Name two or three of them by their tags and
+members and let the reader see the shape. If a cluster spans more than one wiki, say so, because
+a pattern that travels is a different claim from one that does not.
+
+**Anti-patterns, which are mostly in the corrections.** `signals.corrections` splits the month
+into advances and repairs, and marks which repairs fixed the model's own earlier error. That
+split exists so the correction rate is visible without a metacognition pass. Report it plainly,
+including the share. The repeated shapes are the real content: a check that could not fire, a
+mechanism that announced its failure into a log nobody reads, a number that was green for the
+wrong reason. Name the shape, not only the incident. This is the section people trust most,
+because almost nobody publishes theirs.
+
+**The vectors on goals and commitments.** `signals.goals` gives, per commons, how many goals
+exist, how many have nothing committed against them, what states the commitments are in, how
+many goals a person has stood behind, and what moved this month. A goal with no commitment is a
+statement of intent; a goal with a held commitment is a position. Say which is which.
+**`declined` and `exited` are not failures.** Refusing, or leaving deliberately, is a valid
+outcome, and only `lapsed` counts against a goal. Rendering the other two as failure misreports
+somebody's decision.
+
+**The trajectory of ideas.** `signals.trajectory` gives the size of the shift in the corpus's
+centre across the window, and which terms rose and which fell. This is the only measurement that
+says where the thinking is going rather than what it accumulated. Rising terms are usually the
+month's real subject, and they often name it better than any page title does. Read the falling
+list too: a term leaving the centre is a position quietly being dropped, and that is worth a
+sentence.
+
+**What is still unsettled.** `signals.unsettled` counts the questions the corpus has written down
+and not answered, and which are waiting on a named person. Quote one or two verbatim. A question
+stated plainly enough that a reader could answer it is the most useful thing an issue can carry.
+
+Then, and only then, the ordinary movements, in rough order of interest: a position that changed;
+a decision that closed an argument; what came in. The last of those is least surprising and goes
+last, briefly.
 
 ## Hard rules
 
@@ -99,9 +136,12 @@ In rough order of interest:
 0. **Load `ai-detox` and `dm-style-guide`.** Before drafting, not after. Retro-fitting a voice
    onto a finished draft produces a draft with a voice fitted onto it.
 1. **Gather.** `python3 tools/newsletter.py --json` for the last complete month. Read it fully
-   before writing anything.
-2. **Pick the spine.** One thing this month was about. Everything else arranges around it. If
-   nothing stands out, say so in the lede — that is itself a reading of the month.
+   before writing anything, and read `signals` first. A signal whose tool is missing from this
+   wiki says so; report the blank as a blank and never fill it with a guess.
+2. **Pick the spine.** One thing this month was about. It is almost always in `signals`: a
+   pattern nobody has named, a term that rose, a goal that gained or lost its backing, a shape
+   the repairs kept repeating. Everything else arranges around it. If nothing stands out, say so
+   in the lede — that is itself a reading of the month.
 3. **Check the material against the corpus** for the three or four items you will actually use.
    The tool gives you counts and descriptions; read the pages behind them so the sentences are
    true rather than plausible.

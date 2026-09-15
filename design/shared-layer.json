@@ -99,6 +99,12 @@
     "tools/test_newsletter.py",
     ".claude/skills/newsletter/SKILL.md",
     ".github/workflows/monthly-newsletter.yml",
+    "tools/patterns.py",
+    "tools/test_patterns.py",
+    "tools/community.py",
+    "tools/test_community.py",
+    "tools/open_questions.py",
+    "tools/test_open_questions.py",
     "docs/assets/xco2.css",
     "docs/assets/xco.css",
     "docs/assets/xco-dusk.css"
