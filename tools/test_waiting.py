@@ -583,6 +583,72 @@ def main():
         check("mutant leaks the internal slug into the public cut",
               "internal-one" in leaked, leaked[:300])
 
+
+    # ---- a deliberate adaptation is not the same finding as a forgotten edit ----------
+    #
+    # The commons ONBOARDING.md is written for a contributor joining a shared corpus rather
+    # than an owner starting a personal one. It is SUPPOSED to differ, and the report called
+    # it "never accepted from the shared layer" — crying wolf about a file somebody maintains
+    # by hand, in a list whose whole value is that it is short.
+
+    def adapted_world(tmp, files, base, adapted, source="some-source", name="a-wiki"):
+        root = pathlib.Path(tmp) / name
+        (root / "design").mkdir(parents=True)
+        for rel, body in files.items():
+            f = root / rel
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text(body, encoding="utf-8")
+        (root / "design" / "shared-layer.json").write_text(
+            json.dumps({"source": source, "shared": sorted(files)}), encoding="utf-8")
+        (root / "design" / ".sync-state.json").write_text(
+            json.dumps({"written": base, "adapted": adapted}), encoding="utf-8")
+        return root
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = adapted_world(
+            tmp,
+            {"ONBOARDING.md": "adapted\n", "stray.md": "edited and forgotten\n"},
+            base={},                       # neither has a base
+            adapted={"ONBOARDING.md": {"reviewed_at": "2026-09-18", "why": "written for a commons"}})
+        old_root = W.ROOT_P
+        W.ROOT_P = root
+        try:
+            h = W.held_here()
+        finally:
+            W.ROOT_P = old_root
+        rows = {r["path"]: r for r in h["files"]}
+        check("the declared one is marked deliberate", rows["ONBOARDING.md"].get("deliberate") is True,
+              str(rows.get("ONBOARDING.md")))
+        check("...and carries the recorded reason",
+              "written for a commons" in rows["ONBOARDING.md"]["why"], str(rows["ONBOARDING.md"]))
+        check("the undeclared one is not marked deliberate",
+              not rows["stray.md"].get("deliberate"), str(rows["stray.md"]))
+        check("...and still says nobody accepted it",
+              "never accepted" in rows["stray.md"]["why"], str(rows["stray.md"]))
+
+        m = {"repo": "x", "proposals": [], "never_proposed": [], "decided": [], "held": h}
+        md = W.markdown(m)
+        check("the issue marks the deliberate row", "**on purpose**" in md, md[:300])
+        check("...and counts the ones that are not",
+              "1 not declared deliberate" in W.render(m), W.render(m)[:300])
+
+    # MUTATION: ignore the declaration, and the deliberate row becomes a warning again.
+    src_h = (pathlib.Path(__file__).resolve().parent / "waiting.py").read_text()
+    needle = "        if rel in adapted:"
+    if needle not in src_h:
+        check("mutation anchor present", False, "the declaration branch has moved")
+    else:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = adapted_world(tmp, {"ONBOARDING.md": "adapted\n"}, base={},
+                                 adapted={"ONBOARDING.md": {"reviewed_at": "x", "why": "y"}})
+            region = src_h[src_h.index("def held_here"):src_h.index("def gather(")]
+            region = region.replace(needle, "        if False:")
+            ns = {"ROOT_P": root, "json": json, "pathlib": pathlib, "hashlib": __import__("hashlib")}
+            exec(compile(region, "mutant", "exec"), ns)
+            rows = ns["held_here"]()["files"]
+            check("mutant reports the adaptation as an accident",
+                  rows and not rows[0].get("deliberate"), str(rows))
+
     print()
     if fails:
         print(f"{len(fails)} check(s) failed: {', '.join(fails)}")

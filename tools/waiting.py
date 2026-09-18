@@ -374,13 +374,27 @@ def held_here():
             (root / "design" / ".sync-state.json").read_text(encoding="utf-8")).get("written", {})
     except Exception:                                  # noqa: BLE001
         base = {}
+    try:
+        adapted = json.loads(
+            (root / "design" / ".sync-state.json").read_text(encoding="utf-8")).get("adapted") or {}
+    except Exception:                                  # noqa: BLE001
+        adapted = {}
     out = []
     for rel in sorted(shared):
         f = root / rel
         if not f.exists():
             continue
         recorded = base.get(rel)
-        if recorded is None:
+        # A file that differs ON PURPOSE is not the same finding as one somebody edited and
+        # forgot, and reporting them identically is how this list starts getting skipped. The
+        # commons ONBOARDING.md is written for a contributor joining a shared corpus rather
+        # than an owner starting a personal one, and calling that "never accepted" was crying
+        # wolf about a file somebody maintains by hand.
+        if rel in adapted:
+            out.append({"path": rel, "deliberate": True,
+                        "why": f"adapted here on purpose — {adapted[rel].get('why', 'no reason recorded')}",
+                        "reviewed_at": adapted[rel].get("reviewed_at")})
+        elif recorded is None:
             out.append({"path": rel, "why": "never accepted from the shared layer"})
         elif hashlib.sha256(f.read_bytes()).hexdigest() != recorded:
             out.append({"path": rel, "why": "changed here since it was last accepted"})
@@ -461,8 +475,9 @@ def render(m) -> str:
 
     h = m.get("held") or {}
     if h.get("files"):
+        accidental = [r for r in h["files"] if not r.get("deliberate")]
         out.append(f"  {len(h['files'])} shared file(s) this wiki will never be sent "
-                   f"corrections for")
+                   f"corrections for ({len(accidental)} not declared deliberate)")
         for r in h["files"][:5]:
             out.append(f"     {r['path']}  ({r['why']})")
         out.append("")
@@ -599,15 +614,17 @@ def markdown(m, public_safe: bool = False) -> str:
     if h.get("files"):
         out += [f"## {len(h['files'])} file(s) here will not receive shared corrections", "",
                 "These files are part of the shared layer that keeps every wiki's tooling and "
-                "guides the same, and this wiki's copies have been **changed locally or never "
-                "accepted**. That is allowed and often deliberate. The consequence is the part "
+                "guides the same, and this wiki's copies differ. The consequence is the part "
                 "worth knowing: a fix made elsewhere will not reach them, and a stale copy "
                 "looks exactly like a current one.", "",
-                "Nothing to do unless one of these looks out of date. If it does, ask Claude "
-                "to compare it with the shared version.", "",
+                "A row marked **on purpose** is a deliberate adaptation somebody reviewed and "
+                "recorded, and needs nothing from you. The others are files that differ for "
+                "reasons nobody wrote down, which is the only part of this list worth "
+                "reading twice.", "",
                 "| file | why |", "|---|---|"]
         for r in h["files"][:10]:
-            out.append(f"| `{r['path']}` | {r['why']} |")
+            mark = " **on purpose**" if r.get("deliberate") else ""
+            out.append(f"| `{r['path']}`{mark} | {r['why']} |")
         if len(h["files"]) > 10:
             out.append(f"| … and {len(h['files']) - 10} more | |")
         out.append("")
