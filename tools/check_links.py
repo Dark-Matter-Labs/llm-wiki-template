@@ -86,8 +86,21 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 WIKI = ROOT / "wiki"
 BASELINE = ROOT / "tools" / "links-baseline.json"
 
-SKIP_DIRS = {"index", "log"}
-SKIP_FILES = {"index.md", "log.md"}
+# The log is skipped and the catalogues are not, and the difference is the point.
+#
+# A log entry is appended and never rewritten, so a link in it to something since renamed
+# is an accurate record of what was true that day. Correcting it would falsify the record,
+# which is why `wiki/log/` and `wiki/log.md` stay out.
+#
+# The catalogues are the opposite: `wiki/index.md` and `wiki/index/` are maintained
+# projections of the corpus, rebuilt as pages arrive and retire, and they are the one place
+# that lists every page. Excluding them meant the most link-dense files in the wiki were the
+# only ones nobody checked — about half of every wiki-link here. Found 2026-09-18, when two
+# pages were removed from the commons, this reported zero unresolved, and two catalogue rows
+# were still pointing at the deleted titles. Including them surfaced one more: a router row
+# in a sibling wiki whose link differed from its target by a single quote character.
+SKIP_DIRS = {"log"}
+SKIP_FILES = {"log.md"}
 
 FENCE = re.compile(r"```.*?```", re.S)
 INLINE_CODE = re.compile(r"`[^`\n]*`")
