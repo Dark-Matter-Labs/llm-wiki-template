@@ -103,6 +103,8 @@
     "tools/check_frontmatter.py",
     "tools/test_check_frontmatter.py",
     "tools/test_waiting_fetch.sh",
+    "tools/check_same_as.py",
+    "tools/test_check_same_as.py",
     "tools/patterns.py",
     "tools/test_patterns.py",
     "tools/community.py",

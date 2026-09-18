@@ -70,6 +70,12 @@ jobs:
       - name: The Monday fetch step's own cases
         run: bash tools/test_waiting_fetch.sh
 
+      - name: same_as stays inside the boundary
+        run: python3 tools/check_same_as.py --check
+
+      - name: The same_as gate's own cases
+        run: python3 tools/test_check_same_as.py
+
       - name: Schema — frontmatter, types, commitment states
         # Renamed 2026-08-31. This step was called "Schema + link integrity" and did not check
         # link integrity: it catches a link wrapped across a newline and nothing else. A broken
