@@ -100,6 +100,8 @@
     ".claude/skills/newsletter/SKILL.md",
     ".github/workflows/monthly-newsletter.yml",
     "tools/test_newsletter_gates.sh",
+    "tools/check_frontmatter.py",
+    "tools/test_check_frontmatter.py",
     "tools/patterns.py",
     "tools/test_patterns.py",
     "tools/community.py",

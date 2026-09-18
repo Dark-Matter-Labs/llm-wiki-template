@@ -57,6 +57,16 @@ jobs:
       - name: No model is standing in for a person
         run: python3 tools/cross_check.py --check
 
+      - name: Frontmatter parses as YAML
+        # Every tool in this repo reads frontmatter with a forgiving regex, so a page only
+        # this federation can parse looks perfectly healthy from the inside. 28 such pages
+        # existed across four wikis on 2026-09-18 and nothing had ever complained —
+        # including the step below, which passed on all of them.
+        run: python3 tools/check_frontmatter.py --check
+
+      - name: Frontmatter gate's own cases
+        run: python3 tools/test_check_frontmatter.py
+
       - name: Schema — frontmatter, types, commitment states
         # Renamed 2026-08-31. This step was called "Schema + link integrity" and did not check
         # link integrity: it catches a link wrapped across a newline and nothing else. A broken
