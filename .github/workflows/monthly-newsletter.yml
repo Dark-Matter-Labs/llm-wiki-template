@@ -127,8 +127,27 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_args: |
-            --allowedTools Bash,Read,Edit,Write,Glob,Grep
+          # MODEL AND BUDGET ARE PINNED, because neither was, and the default is the
+          # most expensive configuration on offer. Left alone the action resolves to
+          # `claude-opus-5[1m]` — Opus with a one-million-token context — which is what
+          # the retired weekly reflection was quietly running on: $9.51 for one run on
+          # 2026-09-04, $5.94 for the one that failed a week later. Ten wikis on that
+          # footing is roughly $70 a month to write ten short pages.
+          #
+          # Sonnet, because the expensive part of Opus buys reasoning this job does not
+          # need. `tools/newsletter.py` has already done every piece of arithmetic before
+          # the model is invoked; what is left is judgement about what matters and prose
+          # that reads as though a person wrote it. The million-token window is the part
+          # that made no sense at all — the material arrives as one JSON file.
+          #
+          # The budget is a backstop, not a target: a run that hits it has gone wrong,
+          # and stopping is cheaper than discovering why on the invoice. Measured
+          # 2026-09-18 on the largest corpus in the federation (indy, 879 pages):
+          # $1.74 and 54 turns, against $9.51 for the same shape of job on the old
+          # default. Three dollars because $2 left fifteen per cent of headroom, and a
+          # run cut off mid-write is worse than a slightly dearer one. The other nine
+          # wikis are between 12 and 676 pages, so the cap will not bind on any of them.
+          claude_args: --model claude-sonnet-5 --max-budget-usd 3 --allowedTools Bash,Read,Edit,Write,Glob,Grep
           prompt: |
             Run the `newsletter` skill for ${{ steps.gather.outputs.month }}. The gathered
             material is at /tmp/material.json and `python3 tools/newsletter.py --json` will
@@ -139,6 +158,36 @@ jobs:
             log file. Do NOT git commit, push, or open a PR, and do NOT run gh — the next
             step does that. Do NOT send anything anywhere.
 
+      # The write step can report success having done nothing at all. Found 2026-09-18:
+      # the action refuses to run when the workflow file differs from the default
+      # branch — a sensible protection against a branch rewriting what the action does
+      # — and it announces that refusal as a WARNING, leaving the step green. The run
+      # below it then opened a pull request titled "Newsletter — 2026-08" whose only
+      # content was the workflow edit that had caused the skip.
+      #
+      # So the issue file is checked for directly. It is the artefact this job exists to
+      # produce, and its absence is the only honest test of whether the job did its work.
+      - name: Did the model actually write the issue?
+        if: steps.guard.outputs.enabled == 'true'
+        env:
+          MONTH: ${{ steps.gather.outputs.month }}
+        run: |
+          if [ ! -f "wiki/newsletter/${MONTH}.md" ]; then
+            {
+              echo "### The writing step produced nothing"
+              echo ""
+              echo "No issue at \`wiki/newsletter/${MONTH}.md\`. The step above reported"
+              echo "success, so read its log rather than trusting its colour — the"
+              echo "action skips with a warning when the workflow file differs from the"
+              echo "default branch, and a skip looks exactly like a pass."
+              echo ""
+              echo "The material was gathered and is in this run's summary regardless."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::no issue written at wiki/newsletter/${MONTH}.md"
+            exit 1
+          fi
+          echo "Issue present at wiki/newsletter/${MONTH}.md ($(wc -w < "wiki/newsletter/${MONTH}.md") words)."
+
       - name: Commit and open the PR
         if: steps.guard.outputs.enabled == 'true'
         env:
@@ -147,7 +196,11 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if [ -z "$(git status --porcelain)" ] && git diff --quiet origin/main..HEAD; then
+          # Only the working tree counts. The old test also compared HEAD against
+          # origin/main, which is true whenever the branch differs for ANY reason —
+          # including a change to this very file — and that is how a PR carrying no
+          # newsletter came to be labelled as one.
+          if [ -z "$(git status --porcelain)" ]; then
             echo "Nothing written this run — no PR."
             exit 0
           fi
