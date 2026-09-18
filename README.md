@@ -124,10 +124,13 @@ content.
 | `export.yml` | push to `main` touching the wiki | free — deterministic, no LLM |
 | `export-shared.yml` | same | free |
 | `deploy-pages.yml` | push touching `docs/` | free |
-| `weekly-reflect.yml` | Fridays 15:00 UTC + on demand | **Claude API credits, billed outside your plan** |
+| `monthly-newsletter.yml` | 09:00 UTC on the 2nd + on demand | **Claude API credits, billed outside your plan** — pinned to Sonnet, capped at $3 a run |
 
-The three export/deploy jobs are plain Python and never call a model. Only the weekly
-reflection does. Delete its `schedule:` block to make reflections manual-only.
+Only the newsletter calls a model; everything else here is plain Python. The weekly
+reflection that used to sit in this table was retired on 2026-09-15 and its workflow
+deleted on 2026-09-18 — eight ran, seven ordinary pages of 819 ever cited one, and it
+billed every Friday. The monthly issue replaced it, and `reflect` is still there to run
+by hand when somebody wants it.
 
 ---
 
