@@ -46,6 +46,10 @@ CASES = [
      f"sources: [raw/COF {w.capitalize()}ation Options Hedge/x.pdf]"),
     (f"Holds (raw/COF {w.capitalize()}ation Hedge/x.pdf).", False,
      f"Holds (raw/COF {w.capitalize()}ation Hedge/x.pdf)."),
+    # A bracketed filename closed the protection span early, so everything after the
+    # bracket was fair game — the 2026-08 defect one bracket further along the path.
+    (f"Holds (raw/PCI (2)/COF {w.capitalize()}ation Hedge/x.pdf).", False,
+     f"Holds (raw/PCI (2)/COF {w.capitalize()}ation Hedge/x.pdf)."),
     # ...but prose on the same line as a citation is still ours.
     (f"A {w}ation and (raw/{w.capitalize()}ation Notes.pdf) cited.", True,
      f"A civilization and (raw/{w.capitalize()}ation Notes.pdf) cited."),
