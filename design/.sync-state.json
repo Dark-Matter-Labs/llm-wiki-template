@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "7b94400cf495dbb67ea99a40c6e3cd2cbdcab0dc19925476b8cb8212bdaa53d8",
+    "design/shared-layer.json": "a097df65e8b187049527d524e9e9f7bfae13f9fdb8cf6c93080bdc98dba97583",
     "tools/drift-baseline.json": "78a466c191314c8d306c584a4f275528639152269b604056f2d13221edf92ac1",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -41,7 +41,7 @@
     "docs/assets/xco-dusk.css": "cf58ae57e334087500a6f677c10404affb9dc9e461455085d084701240e93b62",
     "tools/propose_upstream.py": "40e4a8fae0d52e68c72d7aaf534f223de9bcd839b3167e9e900fc34b2217d57e",
     "tools/test_propose_upstream.py": "be1c1631e4c0dc48044334a3e606728f01744dbd5d46486bde15fde57494ea42",
-    ".claude/skills/reflect/SKILL.md": "f333b2da927d999c977898d909869b77d76ebba1dda1e378e3ebaca98bdb0493",
+    ".claude/skills/reflect/SKILL.md": "490c9140691724e8172b86d4c1a1036a20fe36be832a2e404ab6b9470fbcc40e",
     "tools/test_export.py": "befe871b33d6088e98e38c866fc8d82203dedd67480237998174f74d22607076",
     "tools/audit_design.py": "5c3fb4bd267825521d987b7242ad96ad4798bbdc3c783ed013908396ce154c48",
     "tools/check_log_shape.py": "df667951749fe215c3a89d3a05de33e686e265193ba8c344705079d15b32d8fd",
@@ -89,12 +89,13 @@
     "tools/newsletter.py": "6411ad1d54f2c8d133f2c9e6a43b386d2acd7ac6b3cb93a204985a6d8394470e",
     "tools/test_newsletter.py": "e4305353a8ffc445d66331cf9f0d5b458cb309435b4004efad91062ea7060009",
     ".claude/skills/newsletter/SKILL.md": "d7c4d088740e84adee0f600175b95eee46a70bc466deb8c17900123c1eb61f19",
-    ".github/workflows/monthly-newsletter.yml": "ab446040632d3f22f02314d2fe30119191622e0bed8113bca39d116339ae095a",
+    ".github/workflows/monthly-newsletter.yml": "4bb704bbabae5c4cb30cfd92a2f4679125ee5c9c2b492cbe006511ba28ced0ad",
     "tools/patterns.py": "fc2eb16ffadf49b742dcf56ec7fe8f3a720b2bda369e361ceedb6c54acb0a32c",
     "tools/test_patterns.py": "5b61d3a27c968a10a0a153a5e588538457f09c3f1f0f55c66245bf2a385ae6bc",
     "tools/community.py": "b21c9ff37493ff9b2f120eaa82dad809a6cb6e96540852f5af70c6adfebd9441",
     "tools/test_community.py": "dd45de07a873ce2192106050c050d3080a4c02094fd67d8e9b660d2c372722f7",
     "tools/open_questions.py": "c6252799356ed49d289b929b29dfbd23f424f000ccb6108c7c731523f9090e2c",
-    "tools/test_open_questions.py": "e7a32c51a5df9e418f009ee322f2be25daa0e1879c0349d1b7d474c4dac90843"
+    "tools/test_open_questions.py": "e7a32c51a5df9e418f009ee322f2be25daa0e1879c0349d1b7d474c4dac90843",
+    "tools/test_newsletter_gates.sh": "f941088dc1860b401c7c9af0231585bb13d47cb11622a7ca8c972490392e39c0"
   }
 }
