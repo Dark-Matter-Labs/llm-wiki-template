@@ -420,6 +420,105 @@ def main():
                        capture_output=True, text=True)
     check("an unusable repo argument exits non-zero", r.returncode != 0)
 
+
+    # ---- contributed_but_gone: the path home, after a rename -------------------------
+    #
+    # Found 2026-09-18. Contribution keeps the source's slug, so the commons copy and its
+    # origin are joined by path and nothing else. Two pages here were renamed by a lint
+    # pass and the join broke in silence; the commons copies were still correct, and only
+    # the pointer home was wrong. Four such cases existed in 638 contributed pages.
+
+    def gone_world(tmp, here, commons_nodes, name="a-wiki", commons="the-commons"):
+        root = pathlib.Path(tmp) / name
+        (root / "wiki").mkdir(parents=True)
+        for slug in here:
+            f = root / "wiki" / (slug + ".md")
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text("---\ntitle: x\n---\n", encoding="utf-8")
+        cut = root / ".commons" / commons / "export"
+        cut.mkdir(parents=True)
+        (cut / "wiki.shared.json").write_text(
+            json.dumps({"nodes": commons_nodes}), encoding="utf-8")
+        return root
+
+    def gone_of(root):
+        src = (pathlib.Path(__file__).resolve().parent / "waiting.py").read_text()
+        region = src[src.index("def contributed_but_gone"):src.index("def nothing_stands_behind")]
+        ns = {"ROOT_P": root, "json": json, "pathlib": pathlib}
+        exec(compile(region, "waiting.py", "exec"), ns)
+        return ns["contributed_but_gone"]()
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = gone_world(tmp, ["kept", "deltas/nested"], [
+            {"origin": "a-wiki", "slug": "kept", "title": "Kept"},
+            {"origin": "a-wiki", "slug": "renamed-away", "title": "Renamed Away"},
+            {"origin": "a-wiki", "slug": "deltas/nested", "title": "Nested"},
+            {"origin": "another-wiki", "slug": "not-mine", "title": "Someone Else's"},
+            {"slug": "written-in-the-commons", "title": "No Origin"},
+        ])
+        g = gone_of(root)
+        rows = g["rows"]
+        check("the renamed page is reported", [r["slug"] for r in rows] == ["renamed-away"],
+              str(rows))
+        check("a page still present is not reported", all(r["slug"] != "kept" for r in rows))
+        check("a nested slug still present is not reported",
+              all(r["slug"] != "deltas/nested" for r in rows))
+        check("another wiki's page is not reported",
+              all(r["slug"] != "not-mine" for r in rows))
+        check("a page written in the commons is not reported",
+              all(r["slug"] != "written-in-the-commons" for r in rows))
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = gone_world(tmp, [], [])
+        # gone_world always writes a cut, so remove it to get the real absent case.
+        for f in (root / ".commons").rglob("wiki.shared.json"):
+            f.unlink()
+        g = gone_of(root)
+        check("no commons cut means unavailable, not empty", g["available"] is False, str(g))
+
+    # A section that renders nothing when it could not look is the failure this whole
+    # session kept finding. Caught on 2026-09-18: waiting.yml never fetched the commons
+    # cut, so this check ran every week and could not once have fired.
+    blank = {"repo": "x", "proposals": [], "never_proposed": [], "decided": [],
+             "gone": {"available": False, "rows": []}}
+    check("an unavailable check says so in the issue",
+          "looked at nothing" in W.markdown(blank), W.markdown(blank)[:200])
+    check("...and in the terminal",
+          "could not be checked" in W.render(blank), W.render(blank)[:200])
+    check("the weekly workflow fetches the cut it needs",
+          "COMMONS_READ_TOKEN" in (pathlib.Path(__file__).resolve().parent.parent
+                                   / ".github/workflows/waiting.yml").read_text(),
+          "waiting.yml does not fetch the commons, so the check cannot fire")
+
+    # The boundary: a wiki's own page names are not public. Same hole that was closed in
+    # the validation ask on 2026-09-16.
+    with tempfile.TemporaryDirectory() as tmp:
+        root = gone_world(tmp, [], [{"origin": "a-wiki", "slug": "a-private-thing",
+                                     "title": "Secret", "visibility": "internal"}])
+        m = {"repo": "x", "proposals": [], "never_proposed": [], "decided": [],
+             "gone": gone_of(root)}
+        pub = W.markdown(m, public_safe=True)
+        unpub = W.markdown(m, public_safe=False)
+        check("a non-public path is withheld under --public-safe",
+              "a-private-thing" not in pub, pub[:200])
+        check("and shown without it", "a-private-thing" in unpub, unpub[:200])
+
+    # MUTATION: stop comparing against what is here, and the rename stops being reported.
+    src_g = (pathlib.Path(__file__).resolve().parent / "waiting.py").read_text()
+    needle = "            if slug and slug not in mine:"
+    if needle not in src_g:
+        check("mutation anchor present", False, "the comparison this tests is not there")
+    else:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = gone_world(tmp, ["kept"], [
+                {"origin": "a-wiki", "slug": "renamed-away", "title": "Renamed Away"}])
+            region = src_g[src_g.index("def contributed_but_gone"):src_g.index("def nothing_stands_behind")]
+            region = region.replace(needle, "            if False:")
+            ns = {"ROOT_P": root, "json": json, "pathlib": pathlib}
+            exec(compile(region, "mutant", "exec"), ns)
+            check("mutant reports nothing where the real one reports a rename",
+                  ns["contributed_but_gone"]()["rows"] == [])
+
     print()
     if fails:
         print(f"{len(fails)} check(s) failed: {', '.join(fails)}")

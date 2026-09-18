@@ -205,6 +205,51 @@ def never_proposed(slug):
 STAND_BEHIND_SAMPLE = 3
 
 
+def contributed_but_gone():
+    """Pages a commons says came from here, whose source this wiki no longer has.
+
+    Contribution stamps `origin` and `origin_rev` on the copy that goes up. Neither names
+    the page: the commons keeps the source's slug, so the two are joined by path, and a
+    rename here silently breaks the join. Nothing notices. The commons copy stays correct
+    and readable, and only its pointer home is wrong.
+
+    Measured 2026-09-18 across the federation: 634 of 638 contributed pages still resolve,
+    and the four that do not are two renames (`lint: action all five health-check items`
+    moved both) and two pages deleted from the wiki they came from after contributing.
+
+    Computed from this checkout alone — the cached commons cut under `.commons/` already
+    carries `origin`, so no spoke needs any other repository present. It is a report and
+    not a gate, deliberately: a rename is ordinary good work, and a check that fails CI for
+    doing it is a check somebody turns off.
+    """
+    root = ROOT_P
+    me = root.name
+    wiki = root / "wiki"
+    if not wiki.exists():
+        return {"available": False, "rows": []}
+    mine = {str(f.relative_to(wiki))[:-3] for f in wiki.rglob("*.md")}
+    cuts = sorted((root / ".commons").rglob("wiki.shared.json")) if (root / ".commons").exists() else []
+    if not cuts:
+        return {"available": False, "rows": []}
+    rows = []
+    for cut in cuts:
+        commons = cut.relative_to(root / ".commons").parts[0]
+        try:
+            nodes = json.loads(cut.read_text(encoding="utf-8")).get("nodes") or []
+        except Exception:                              # noqa: BLE001
+            continue
+        for n in nodes:
+            if n.get("origin") != me:
+                continue
+            slug = n.get("slug") or n.get("id")
+            if slug and slug not in mine:
+                rows.append({"commons": commons, "slug": slug,
+                             "title": n.get("title") or slug,
+                             "visibility": n.get("visibility") or "internal"})
+    rows.sort(key=lambda r: (r["commons"], r["slug"]))
+    return {"available": True, "rows": rows}
+
+
 def nothing_stands_behind(limit=STAND_BEHIND_SAMPLE):
     """The load-bearing pages in this wiki nobody has confirmed, as a short sample.
 
@@ -296,7 +341,8 @@ def held_here():
 def gather(slug):
     m = {"repo": slug, "proposals": open_proposals(slug), "never_proposed": [],
          "decided": [], "unavailable": None, "stand_behind": nothing_stands_behind(),
-         "held": held_here()}
+         "held": held_here(),
+         "gone": contributed_but_gone()}
     try:
         found = never_proposed(slug)
     except Unavailable as exc:
@@ -368,6 +414,19 @@ def render(m) -> str:
                    f"corrections for")
         for r in h["files"][:5]:
             out.append(f"     {r['path']}  ({r['why']})")
+        out.append("")
+
+    g = m.get("gone") or {}
+    if g.get("available") is False:
+        out.append("  Contributed pages could not be checked: no commons cut in this checkout.")
+        out.append("     Run tools/sync_commons.py, or set COMMONS_READ_TOKEN in CI.")
+        out.append("")
+    if g.get("rows"):
+        out.append(f"  {len(g['rows'])} page(s) the commons says came from here no longer exist here")
+        for r in g["rows"][:5]:
+            out.append(f"     {r['commons']}: wiki/{r['slug']}.md")
+        out.append("     Renamed or removed since contributing. The copy up there is fine;")
+        out.append("     what is broken is its pointer home.")
         out.append("")
 
     if m.get("unavailable"):
@@ -483,6 +542,34 @@ def markdown(m, public_safe: bool = False) -> str:
             out.append(f"| `{r['path']}` | {r['why']} |")
         if len(h["files"]) > 10:
             out.append(f"| … and {len(h['files']) - 10} more | |")
+        out.append("")
+
+    g = m.get("gone") or {}
+    if g.get("available") is False:
+        out += ["## Contributed pages could not be checked", "",
+                "This section reports pages a commons holds and says came from here, whose "
+                "source has since been renamed or removed. It needs the commons cut, and "
+                "there is none in this checkout, so **it found nothing because it looked at "
+                "nothing** — which is not the same as finding nothing wrong.", "",
+                "Run `python3 tools/sync_commons.py` locally, or set `COMMONS_READ_TOKEN` so "
+                "the weekly run can fetch it.", ""]
+    if g.get("rows"):
+        out += [f"## {len(g['rows'])} contributed page(s) have lost the path home", "",
+                "A commons holds these pages and records that they came from this wiki. It "
+                "keeps the source's own slug, so the two are joined by path rather than by "
+                "any identifier — and that path no longer exists here, because the page was "
+                "renamed or removed after it was contributed.", "",
+                "Nothing is broken up there: the copy is correct and readable, and "
+                "`origin_rev` still pins the commit it came from, so the original is "
+                "recoverable. What is lost is the way back. Worth a look only if you want "
+                "the commons to point at where the thinking lives now.", "",
+                "| commons | path it expects here |", "|---|---|"]
+        for r in g["rows"][:10]:
+            named = (f"`wiki/{r['slug']}.md`" if (r.get("visibility") == "public" or not public_safe)
+                     else "a page contributed from this wiki")
+            out.append(f"| {r['commons']} | {named} |")
+        if len(g["rows"]) > 10:
+            out.append(f"| … and {len(g['rows']) - 10} more | |")
         out.append("")
 
     if m.get("unavailable"):
