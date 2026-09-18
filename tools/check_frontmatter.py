@@ -21,15 +21,30 @@ This is a hard gate rather than a ratchet. Unlike prose, there is no defensible 
 of unparseable frontmatter to hold the line at, and the fix is always the same: quote
 the value.
 
+STANDARD LIBRARY ONLY, and the irony is the point. The first version of this file
+imported `yaml` and turned CI red in all eleven repos — the same failure `tools/
+community.py` records for `networkx`, in a codebase with no requirements.txt, no pip
+step and ~90 tools that run on a bare Python. A dependency added here is a dependency
+eleven wikis must install before anything runs.
+
+So it detects the failure class directly rather than by parsing: a top-level plain
+scalar containing a colon-space, or ending in a colon, is invalid YAML with no
+exceptions — `key: A Title: With a Colon` is a mapping whose key is `A Title`. Quoted,
+flow and block scalars are left alone. This cannot be over-eager, because there is no
+document in which an unquoted plain scalar may contain ": ".
+
+It is checked against the real parser in `tools/test_check_frontmatter.py`, which
+compares this verdict with `yaml.safe_load` over every page wherever PyYAML happens to
+be installed, and skips only that comparison when it is not.
+
     python3 tools/check_frontmatter.py            # report
     python3 tools/check_frontmatter.py --check    # exit 1 if any page fails
 """
 from __future__ import annotations
 
 import pathlib
+import re
 import sys
-
-import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 WIKI = ROOT / "wiki"
@@ -56,25 +71,59 @@ def frontmatter(raw: str):
     return raw[4:end]
 
 
+TOP_LEVEL = re.compile(r"^([A-Za-z_][\w-]*):[ \t]+(.*)$")
+
+
+def _plain_value(rest: str) -> str | None:
+    """The plain scalar on this line, or None when YAML will not read it as one.
+
+    Quoted, flow (`[`, `{`) and block (`|`, `>`) values are somebody else's problem and
+    are legal with colons inside. A plain value ends at " #", which starts a comment.
+    """
+    v = rest.strip()
+    if not v or v[0] in "\"'[{|>&*!":
+        return None
+    i = v.find(" #")
+    if i >= 0:
+        v = v[:i].rstrip()
+    return v or None
+
+
+def faults(block: str):
+    """Every line YAML would refuse, as (line-number-within-block, text, why)."""
+    out = []
+    for i, line in enumerate(block.split("\n")):
+        if line.startswith("- "):
+            # A sequence where the schema wants a mapping. Legal YAML, useless here, and
+            # every reader downstream expects `fm["title"]`.
+            out.append((i, line, "frontmatter is a sequence, not a mapping"))
+            return out
+        if not line or line[0] in " \t#":
+            continue                                    # nested, blank or comment
+        m = TOP_LEVEL.match(line)
+        if not m:
+            continue
+        value = _plain_value(m.group(2))
+        if value is None:
+            continue
+        if ": " in value or "\t" in value:
+            out.append((i, line, "a plain value cannot contain a colon followed by a space"))
+        elif value.endswith(":"):
+            out.append((i, line, "a plain value cannot end with a colon"))
+    return out
+
+
 def failures():
     out = []
     for p in pages():
         block = frontmatter(p.read_text(encoding="utf-8", errors="ignore"))
         if block is None:
             continue
-        try:
-            parsed = yaml.safe_load(block)
-        except yaml.YAMLError as exc:
-            mark = getattr(exc, "problem_mark", None)
-            lines = block.split("\n")
-            line = lines[mark.line] if mark and mark.line < len(lines) else ""
-            # +2, not +1: the block handed to YAML starts after the opening `---`, so its
-            # line 0 is the file's line 2. Reported as +1 at first, which sent the reader
-            # one line up from the fault; caught by the test rather than by rereading it.
-            out.append((p, str(exc).split("\n")[0], (mark.line + 2) if mark else None, line.strip()))
-            continue
-        if parsed is not None and not isinstance(parsed, dict):
-            out.append((p, f"frontmatter is {type(parsed).__name__}, not a mapping", None, ""))
+        for idx, line, why in faults(block):
+            # +2, not +1: the block starts after the opening `---`, so its line 0 is the
+            # file's line 2. Reported as +1 at first, which sent the reader one line up
+            # from the fault; caught by the test rather than by rereading it.
+            out.append((p, why, idx + 2, line.strip()))
     return out
 
 
@@ -87,7 +136,8 @@ def main(argv) -> int:
         print(f"frontmatter OK — {total} page(s) parse as YAML.")
         return 0
 
-    print(f"frontmatter — {len(bad)} of {total} page(s) a standard YAML parser cannot read\n")
+    pages_bad = len({p for p, *_ in bad})
+    print(f"frontmatter — {pages_bad} of {total} page(s) a standard YAML parser cannot read\n")
     for p, why, line, text in bad:
         where = f" (line {line})" if line else ""
         print(f"  {p.relative_to(ROOT)}{where}")

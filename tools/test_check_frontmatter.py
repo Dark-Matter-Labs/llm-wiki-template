@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
-"""Does check_frontmatter actually fire?
+"""Does check_frontmatter actually fire, and does it agree with a real parser?
 
 The gate is trivial enough to look obviously correct, which is how the last three
 unfireable checks in this federation got written. Case 6 mutates the failure exit away
 and asserts case 2 stops failing, so a gate that quietly stops working fails this file
 rather than passing it.
+
+Case 7 is the one that matters most. The gate detects invalid YAML by hand rather than
+by parsing, because importing `yaml` turned CI red in eleven repos — no requirements.txt,
+no pip step, ~90 tools on a bare Python. So wherever PyYAML *happens* to be installed,
+this compares the gate's verdict against `yaml.safe_load` over every page in the wiki and
+fails on any disagreement. Where it is not installed, that one case is skipped and every
+other case still runs, the same arrangement `tools/test_community.py` uses for networkx.
 
     python3 tools/test_check_frontmatter.py
 """
@@ -87,6 +94,38 @@ else:
     mutant.write_text(src.replace(needle, "    return 0"))
     code, out = run({"a.md": CLEAN, "bad.md": BROKEN}, ("--check",), script=mutant)
     check("mutant passes a corpus it should refuse", code == 0, f"code={code} out={out[:200]}")
+
+print("7. the gate agrees with PyYAML, wherever PyYAML exists")
+try:
+    import yaml  # noqa: F401
+except ModuleNotFoundError:
+    print("  SKIP  PyYAML not installed — the gate's own cases above still ran")
+else:
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("cf", TOOL)
+    cf = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cf)
+    wiki = TOOL.parent.parent / "wiki"
+    n = agree = 0
+    disagreed = []
+    for page in sorted(wiki.rglob("*.md")) if wiki.exists() else []:
+        block = cf.frontmatter(page.read_text(encoding="utf-8", errors="ignore"))
+        if block is None:
+            continue
+        n += 1
+        mine = bool(cf.faults(block))
+        try:
+            parsed = yaml.safe_load(block)
+            theirs = not isinstance(parsed, dict) and parsed is not None
+        except yaml.YAMLError:
+            theirs = True
+        if mine == theirs:
+            agree += 1
+        else:
+            disagreed.append((page.name, mine, theirs))
+    check(f"agrees with PyYAML on all {n} page(s)", not disagreed,
+          "; ".join(f"{f}: gate={m} pyyaml={t}" for f, m, t in disagreed[:5]))
 
 print()
 print(f"FAILED: {', '.join(failures)}" if failures else "all passed")

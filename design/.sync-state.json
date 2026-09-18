@@ -97,7 +97,7 @@
     "tools/open_questions.py": "c6252799356ed49d289b929b29dfbd23f424f000ccb6108c7c731523f9090e2c",
     "tools/test_open_questions.py": "e7a32c51a5df9e418f009ee322f2be25daa0e1879c0349d1b7d474c4dac90843",
     "tools/test_newsletter_gates.sh": "f941088dc1860b401c7c9af0231585bb13d47cb11622a7ca8c972490392e39c0",
-    "tools/check_frontmatter.py": "123e7a60e201a897106334db39eda0f4ffd08cc4d0ad7106668012f5df1c9c7b",
-    "tools/test_check_frontmatter.py": "86a3ce6c0911295d3480f8ef2bcaa315b50ed060025f47de6720fff2cbac88c5"
+    "tools/check_frontmatter.py": "a087b14396e70a7f15deaf918e970d6dd69f3adcf5f213c953435e95742cd344",
+    "tools/test_check_frontmatter.py": "2ed195b3a206508b677d21082c409f8ab8dd36a1fd573a549c4917b4d1bdf000"
   }
 }
