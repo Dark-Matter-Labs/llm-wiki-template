@@ -205,6 +205,56 @@ def never_proposed(slug):
 STAND_BEHIND_SAMPLE = 3
 
 
+def could_go_up(limit=3):
+    """Pages here that are eligible for a commons and that it does not already hold.
+
+    `contribution_prompt.py` has computed this since 19 August and nothing has ever run it
+    on a cadence. Its own docstring names the asymmetry: the down-flow got a daily cron and
+    the up-flow got three consent gates and no rhythm at all, and "a decision nobody is ever
+    asked to make is not consent, it is just silence". This is the asking.
+
+    It names and stops. No staging, no bundle, no pull request; `contribute.py` remains the
+    only path up, with every refusal intact. Private pages are never candidates, because
+    `contribute.eligible` refuses them before this sees them.
+
+    Imported late and defensively: contribution_prompt pulls in `export` and `contribute`,
+    and a wiki where those cannot load should lose this section, not the whole report.
+    """
+    try:
+        import contribution_prompt as cp
+        import contribute
+    except Exception:                                  # noqa: BLE001
+        return {"available": False, "why": "the contribution tools could not be loaded"}
+    try:
+        tgts = cp.targets(contribute.topology())
+        if not tgts:
+            return {"available": True, "targets": []}   # a top commons owes nobody
+        pages = cp.read_wiki(cp.WIKI)
+    except Exception as exc:                           # noqa: BLE001
+        return {"available": False, "why": f"the wiki could not be read ({exc.__class__.__name__})"}
+    out = []
+    for name in tgts:
+        try:
+            already = contribute.commons_titles(name)
+        except Exception:                              # noqa: BLE001
+            already = None
+        allc = cp.candidates(pages, already)
+        out.append({"commons": name,
+                    "eligible": len(allc),
+                    # The denominator matters. "638 could go to power-project" reads as a
+                    # backlog; "638 of 824" reads as what it is, which is that almost
+                    # nothing has ever been contributed to that commons. Without it the
+                    # section is a list of hundreds, and a list of hundreds is one nobody
+                    # starts.
+                    "pages_here": len(pages),
+                    # None means no cached cut, so the overlap could not be checked at all.
+                    # Reported as unknown rather than guessed: how wrong a guess would be
+                    # depends entirely on how much of the spoke came from the commons.
+                    "overlap_unknown": already is None,
+                    "top": allc[:limit]})
+    return {"available": True, "targets": out}
+
+
 def contributed_but_gone():
     """Pages a commons says came from here, whose source this wiki no longer has.
 
@@ -342,7 +392,8 @@ def gather(slug):
     m = {"repo": slug, "proposals": open_proposals(slug), "never_proposed": [],
          "decided": [], "unavailable": None, "stand_behind": nothing_stands_behind(),
          "held": held_here(),
-         "gone": contributed_but_gone()}
+         "gone": contributed_but_gone(),
+         "up": could_go_up()}
     try:
         found = never_proposed(slug)
     except Unavailable as exc:
@@ -415,6 +466,23 @@ def render(m) -> str:
         for r in h["files"][:5]:
             out.append(f"     {r['path']}  ({r['why']})")
         out.append("")
+
+    u = m.get("up") or {}
+    if u.get("available") is False:
+        out.append(f"  What could go to the commons was not worked out: {u.get('why')}")
+        out.append("")
+    for t in (u.get("targets") or []):
+        if t["overlap_unknown"]:
+            out.append(f"  {t['commons']}: {t['eligible']} page(s) eligible here; whether it "
+                       f"already holds them could not be checked")
+            out.append("")
+        elif t["eligible"]:
+            out.append(f"  {t['eligible']} of {t['pages_here']} page(s) here could go to "
+                       f"{t['commons']} and have not")
+            for c in t["top"]:
+                out.append(f"     {c['inbound']:3d} inbound  {c['slug']}  [{c['visibility']}]")
+            out.append("     Naming them is all this does. Sharing one is a person's decision.")
+            out.append("")
 
     g = m.get("gone") or {}
     if g.get("available") is False:
@@ -543,6 +611,39 @@ def markdown(m, public_safe: bool = False) -> str:
         if len(h["files"]) > 10:
             out.append(f"| … and {len(h['files']) - 10} more | |")
         out.append("")
+
+    u = m.get("up") or {}
+    if u.get("available") is False:
+        out += ["## What could go to the commons was not worked out", "",
+                f"**{u.get('why')}** — so this section found nothing because it looked at "
+                "nothing, which is not the same as finding nothing to share.", ""]
+    for t in (u.get("targets") or []):
+        if t["overlap_unknown"]:
+            out += [f"## {t['eligible']} page(s) here are eligible for {t['commons']}", "",
+                    "Whether it already holds them could not be checked: there is no cached "
+                    "export of that commons here. The count is of what is eligible, not of "
+                    "what is new, and the difference between those can be almost everything "
+                    "or almost nothing depending on how much of this wiki came from there.",
+                    ""]
+        elif t["eligible"]:
+            share = (f"Nearly everything here, which usually means little has ever gone to "
+                     f"that commons rather than that there are {t['eligible']} decisions "
+                     f"waiting. " if t["pages_here"] and t["eligible"] > t["pages_here"] // 2
+                     else "")
+            out += [f"## {t['eligible']} of {t['pages_here']} page(s) here could go to "
+                    f"{t['commons']}", "",
+                    share + "Eligible, and not already held there. The down-flow from a commons runs "
+                    "daily; the up-flow has three consent gates and no cadence, so this is "
+                    "the only thing that asks. **Naming them is all it does** — sharing one "
+                    "is a decision, and `contribute` is still the only path up.", "",
+                    "| page | inbound links |", "|---|---|"]
+            for c in t["top"]:
+                named = (f"`{c['slug']}`" if (c["visibility"] == "public" or not public_safe)
+                         else "a page in this wiki")
+                out.append(f"| {named} | {c['inbound']} |")
+            if t["eligible"] > len(t["top"]):
+                out.append(f"| … and {t['eligible'] - len(t['top'])} more | |")
+            out.append("")
 
     g = m.get("gone") or {}
     if g.get("available") is False:
