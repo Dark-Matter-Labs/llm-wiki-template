@@ -80,7 +80,10 @@ URL = re.compile(r"https?://\S+")
 #
 # Two spans are protected: a whole `sources:` line, and any `(raw/…)` inline citation.
 SOURCES_LINE = re.compile(r"^\s*sources:", re.I)
-RAW_CITATION = re.compile(r"\(raw/[^)\n]*\)?")
+# One level of nesting, because the filenames carry parentheses. Without it the span ends at
+# the first ")" INSIDE the name and everything after it is left unprotected — which is the
+# 2026-08 defect above waiting to happen again, one bracket further along the path.
+RAW_CITATION = re.compile(r"\(raw/(?:[^()\n]|\([^()\n]*\))*\)?")
 
 
 def fix_civil(m):
