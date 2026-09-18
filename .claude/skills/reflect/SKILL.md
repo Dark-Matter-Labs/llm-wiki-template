@@ -1,6 +1,6 @@
 ---
 name: reflect
-description: Weekly reflection on how the thinking deviated. Use when the owner says "run the weekly reflection" or "what deviated this week". Also runs automatically on the Friday schedule. Reads the log and git history since the last reflection and files a structured reflection to wiki/reflections/.
+description: Weekly reflection on how the thinking deviated. Use when the owner says "run the weekly reflection" or "what deviated this week". Reads the log and git history since the last reflection and files a structured reflection to wiki/reflections/.
 ---
 
 # Reflect — weekly deviations of thought

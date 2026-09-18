@@ -307,7 +307,7 @@ In plain-English terms, here is when each fires:
 | "is this ready to publish / share externally"      | `publish-check` |
 | "publish this as a web page", "make a shareable link", "put this on the site" | `publish-web` |
 | "challenge this", "run the joker", "what's the counterposition", "steelman the opposite" | `joker` |
-| "run the weekly reflection", "what deviated this week" (also runs Fridays automatically) | `reflect` |
+| "run the weekly reflection", "what deviated this week" (by hand — the Friday job was deleted 2026-09-18) | `reflect` |
 | "how am I using this", "metacognition", "usage patterns" | `metacognition` |
 | "what's the gravity / trajectory of the repo", "where does this sit relative to the repo" | `gravity` |
 | "make that a skill", "learn this pattern" (asks you to verify before creating) | `learn` |
