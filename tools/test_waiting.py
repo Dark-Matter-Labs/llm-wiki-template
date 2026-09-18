@@ -519,6 +519,70 @@ def main():
             check("mutant reports nothing where the real one reports a rename",
                   ns["contributed_but_gone"]()["rows"] == [])
 
+
+    # ---- could_go_up: the asking the up-flow never had ------------------------------
+    #
+    # contribution_prompt has computed this since 19 August and nothing ran it on a
+    # cadence. The renderings are tested rather than the tool it wraps, which has its own
+    # tests: what can go wrong here is a section that says nothing when it could not look,
+    # or one that names a page the reader is not entitled to see.
+
+    up_rows = {"available": True, "targets": [
+        {"commons": "a-commons", "eligible": 2, "pages_here": 10, "overlap_unknown": False,
+         "top": [{"slug": "public-one", "title": "P", "visibility": "public", "inbound": 9},
+                 {"slug": "internal-one", "title": "I", "visibility": "internal", "inbound": 4}]}]}
+    base = {"repo": "x", "proposals": [], "never_proposed": [], "decided": []}
+
+    md = W.markdown({**base, "up": up_rows}, public_safe=False)
+    check("the count carries its denominator", "2 of 10 page(s)" in md, md[:200])
+    check("an internal slug is named without --public-safe", "internal-one" in md, md[:300])
+
+    md_safe = W.markdown({**base, "up": up_rows}, public_safe=True)
+    check("a public slug is still named under --public-safe", "public-one" in md_safe,
+          md_safe[:300])
+    check("an internal slug is withheld under --public-safe", "internal-one" not in md_safe,
+          md_safe[:300])
+
+    big = {"available": True, "targets": [
+        {"commons": "a-commons", "eligible": 638, "pages_here": 824, "overlap_unknown": False,
+         "top": []}]}
+    md_big = W.markdown({**base, "up": big})
+    check("a large share reads as a relationship, not a backlog",
+          "Nearly everything here" in md_big, md_big[:300])
+
+    unknown = {"available": True, "targets": [
+        {"commons": "a-commons", "eligible": 5, "pages_here": 10, "overlap_unknown": True,
+         "top": []}]}
+    md_unk = W.markdown({**base, "up": unknown})
+    check("an unchecked overlap says the count is of eligible, not of new",
+          "could not be checked" in md_unk and "not of\nwhat is new" in md_unk.replace("  ", " ")
+          or "not of what is new" in md_unk, md_unk[:300])
+
+    md_off = W.markdown({**base, "up": {"available": False, "why": "the tools would not load"}})
+    check("a section that could not look says so",
+          "looked at\nnothing" in md_off or "looked at nothing" in md_off, md_off[:300])
+
+    # A top commons contributes nowhere and is not behind on anything.
+    md_none = W.markdown({**base, "up": {"available": True, "targets": []}})
+    check("a wiki that contributes nowhere gets no section",
+          "could go to" not in md_none, md_none[:200])
+
+    # MUTATION: stop filtering by visibility, and the internal slug must leak into the
+    # public cut. Without this the four cases above pass on a filter that does nothing.
+    src_u = (pathlib.Path(__file__).resolve().parent / "waiting.py").read_text()
+    needle = 'if (c["visibility"] == "public" or not public_safe)'
+    if needle not in src_u:
+        check("mutation anchor present", False, "the visibility filter has moved")
+    else:
+        import types
+        mutant = types.ModuleType("waiting_mutant")
+        mutant.__file__ = str(pathlib.Path(__file__).resolve().parent / "waiting.py")
+        exec(compile(src_u.replace(needle, "if True"), "waiting_mutant", "exec"),
+             mutant.__dict__)
+        leaked = mutant.markdown({**base, "up": up_rows}, public_safe=True)
+        check("mutant leaks the internal slug into the public cut",
+              "internal-one" in leaked, leaked[:300])
+
     print()
     if fails:
         print(f"{len(fails)} check(s) failed: {', '.join(fails)}")
