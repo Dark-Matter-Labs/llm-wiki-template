@@ -47,6 +47,32 @@ jobs:
       # GitHub at run time rather than read off the event payload, so it is the same answer
       # whether the run was scheduled or dispatched, and it fails closed: if the question
       # cannot be answered, the safe flag is passed.
+      # Without this the commons cut is absent and `contributed_but_gone` reports
+      # "unavailable" every week — a section that renders nothing, in a report nobody
+      # would know was incomplete. Built on 2026-09-18 and caught the same hour: the
+      # check existed, ran, and could never once have fired.
+      #
+      # The orphan `export` branch is already boundary-filtered, so a private page in
+      # the commons cannot reach this runner.
+      - name: Fetch the commons export
+        env:
+          TOKEN: ${{ secrets.COMMONS_READ_TOKEN }}
+          COMMONS: ${{ vars.COMMONS_REPO }}
+        run: |
+          COMMONS="${COMMONS:-Dark-Matter-Labs/xco-team-wiki}"
+          if [ -z "${TOKEN}" ]; then
+            echo "::notice::COMMONS_READ_TOKEN not set - contributed pages cannot be checked."
+            exit 0
+          fi
+          mkdir -p ".commons/${COMMONS##*/}"
+          if git clone --depth 1 --branch export \
+               "https://x-access-token:${TOKEN}@github.com/${COMMONS}.git" \
+               ".commons/${COMMONS##*/}/export" 2>/dev/null; then
+            echo "Fetched the commons export from ${COMMONS}."
+          else
+            echo "::warning::No export branch on ${COMMONS} - contributed pages cannot be checked."
+          fi
+
       - name: Work out what is waiting
         env:
           GH_TOKEN: ${{ github.token }}
