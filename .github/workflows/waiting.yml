@@ -54,24 +54,49 @@ jobs:
       #
       # The orphan `export` branch is already boundary-filtered, so a private page in
       # the commons cannot reach this runner.
-      - name: Fetch the commons export
+      - name: Fetch the commons exports
         env:
           TOKEN: ${{ secrets.COMMONS_READ_TOKEN }}
           COMMONS: ${{ vars.COMMONS_REPO }}
         run: |
-          COMMONS="${COMMONS:-Dark-Matter-Labs/xco-team-wiki}"
+          set -u
           if [ -z "${TOKEN}" ]; then
-            echo "::notice::COMMONS_READ_TOKEN not set - contributed pages cannot be checked."
+            echo "::notice::COMMONS_READ_TOKEN not set - the commons checks cannot run."
             exit 0
           fi
-          mkdir -p ".commons/${COMMONS##*/}"
-          if git clone --depth 1 --branch export \
-               "https://x-access-token:${TOKEN}@github.com/${COMMONS}.git" \
-               ".commons/${COMMONS##*/}/export" 2>/dev/null; then
-            echo "Fetched the commons export from ${COMMONS}."
+          # WHICH commons is the wiki's own declaration, not a repo variable.
+          #
+          # This fetched a single `COMMONS_REPO` until 2026-09-18, and indy contributes to
+          # two. So the second one reported "whether it already holds them could not be
+          # checked" every week, permanently — an honest unknown, but a permanently
+          # unknowable one is halfway back to a section that cannot fire. `contributes_to`
+          # in design/federation.json is the same list sync_commons.py reads locally, so
+          # the weekly run and the local tool now answer from the same source.
+          #
+          # Still the orphan `export` branch, one shallow clone each. That branch is already
+          # boundary-filtered, so a private page in a commons cannot reach this runner —
+          # which is why this does not simply call sync_commons.py, since that clones whole
+          # repositories and is written for a laptop that already has access.
+          OWNER="${GITHUB_REPOSITORY%%/*}"
+          if [ -n "${COMMONS:-}" ]; then
+            TARGETS="${COMMONS}"
           else
-            echo "::warning::No export branch on ${COMMONS} - contributed pages cannot be checked."
+            TARGETS=$(OWNER="$OWNER" python3 -c 'import json,os,pathlib; p=pathlib.Path("design/federation.json"); ns=(json.loads(p.read_text()).get("contributes_to") or []) if p.exists() else []; o=os.environ["OWNER"]; print(" ".join(n if "/" in n else o+"/"+n for n in ns))')
           fi
+          if [ -z "${TARGETS}" ]; then
+            echo "::notice::this wiki declares no commons in design/federation.json - nothing to fetch."
+            exit 0
+          fi
+          for C in ${TARGETS}; do
+            mkdir -p ".commons/${C##*/}"
+            if git clone --depth 1 --branch export \
+                 "https://x-access-token:${TOKEN}@github.com/${C}.git" \
+                 ".commons/${C##*/}/export" 2>/dev/null; then
+              echo "Fetched the commons export from ${C}."
+            else
+              echo "::warning::No export branch on ${C} - its checks cannot run."
+            fi
+          done
 
       - name: Work out what is waiting
         env:
