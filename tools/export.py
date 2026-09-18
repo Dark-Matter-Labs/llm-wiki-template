@@ -251,6 +251,11 @@ def build_nodes(wiki_dir):
             # the answer. A field the reading interfaces cannot see will never become anything
             # else.
             "derivation": fm.get("derivation"),
+            # Emitted for the same reason as `derivation`, and safe by construction rather
+            # than by care: check_same_as refuses any edge whose target is less visible
+            # than the page carrying it, so a node that survives a cut can only name
+            # pages at least as open as itself.
+            "same_as": fm.get("same_as") or [],
             "timestamp": fm.get("timestamp"),
             "description": fm.get("description"),
             "sources": fm.get("sources", []),
