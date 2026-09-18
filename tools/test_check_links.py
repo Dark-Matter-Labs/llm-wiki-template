@@ -52,12 +52,20 @@ def page(d, name, title, body):
         f"sources: []\n---\n\n{body}\n", encoding="utf-8")
 
 
-def build(tmp, body):
+def build(tmp, body, shelf=None, router=None, logentry=None):
     root = pathlib.Path(tmp)
     wiki = root / "wiki"
     wiki.mkdir()
     page(wiki, "target.md", "A Real Target", "I exist.")
     page(wiki, "subject.md", "Subject", body)
+    if shelf is not None:
+        (wiki / "index").mkdir(exist_ok=True)
+        (wiki / "index" / "summaries.md").write_text(shelf, encoding="utf-8")
+    if router is not None:
+        (wiki / "index.md").write_text(router, encoding="utf-8")
+    if logentry is not None:
+        (wiki / "log").mkdir(exist_ok=True)
+        (wiki / "log" / "2026-09-18.md").write_text(logentry, encoding="utf-8")
     cl.ROOT, cl.WIKI, cl.BASELINE = root, wiki, root / "links-baseline.json"
     return root
 
@@ -118,10 +126,55 @@ def main():
             check("the baseline does not suppress a new one",
                   [b["target"] for b in new] == ["Another Dead One"],
                   f"{[b['target'] for b in new]}")
+        # ---- the catalogues are checked; the log is not -------------------------------
+        #
+        # Until 2026-09-18 `SKIP_DIRS` held "index" as well as "log", so the shelves and the
+        # router — the most link-dense files in any of these wikis, about half of every
+        # wiki-link — were the only ones nobody checked. Two pages were removed from the
+        # commons that day, this reported zero unresolved, and two catalogue rows were still
+        # pointing at the deleted titles.
+        with tempfile.TemporaryDirectory() as t:
+            build(t, "nothing here.", shelf="- [[A Dead Shelf Row]] — gone.\n")
+            broken, _ = cl.audit()
+            check("a dead link in a catalogue shelf is reported",
+                  [b["target"] for b in broken] == ["A Dead Shelf Row"], str(broken))
+
+        with tempfile.TemporaryDirectory() as t:
+            build(t, "nothing here.", router="# Index\n\n- [[A Dead Router Row]] — gone.\n")
+            broken, _ = cl.audit()
+            check("a dead link in the router is reported",
+                  [b["target"] for b in broken] == ["A Dead Router Row"], str(broken))
+
+        # The log is appended and never rewritten. A link in it to something since renamed
+        # records what was true that day, and correcting it would falsify the record.
+        with tempfile.TemporaryDirectory() as t:
+            build(t, "nothing here.", logentry="## [2026-09-18] note\n\n[[A Page Since Renamed]]\n")
+            broken, _ = cl.audit()
+            check("a dead link in a log entry is left alone", broken == [], str(broken))
+
+        with tempfile.TemporaryDirectory() as t:
+            build(t, "nothing here.", shelf="- [[A Real Target]] — fine.\n",
+                  router="# Index\n\n- [[A Real Target]] — fine.\n")
+            broken, total = cl.audit()
+            check("live catalogue links resolve and are counted",
+                  broken == [] and total >= 2, f"broken={broken} total={total}")
+
+        # MUTATION: put "index" back in SKIP_DIRS and the shelf case must stop reporting.
+        with tempfile.TemporaryDirectory() as t:
+            build(t, "nothing here.", shelf="- [[A Dead Shelf Row]] — gone.\n")
+            saved_skip = cl.SKIP_DIRS
+            try:
+                cl.SKIP_DIRS = {"index", "log"}
+                broken, _ = cl.audit()
+            finally:
+                cl.SKIP_DIRS = saved_skip
+            check("mutant misses the dead shelf row", broken == [], str(broken))
+
     finally:
         cl.ROOT, cl.WIKI, cl.BASELINE = saved
 
     print()
+
     if FAILED:
         print(f"{len(FAILED)} failed: {', '.join(FAILED)}")
         return 1
