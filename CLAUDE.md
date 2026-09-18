@@ -209,6 +209,41 @@ that it existed so nobody would re-derive it, and was re-derived twelve days lat
 could not see decisions. An inbox that keeps re-raising settled matters trains people to stop
 opening it.
 
+### The same subject, in more than one wiki — `same_as:`
+
+Measured across the federation on 18 September 2026: of 172 entity and concept titles held by
+more than one wiki, 165 already carry `origin` — they are copies contributed up to a commons,
+and the edge exists. Seven do not. They are pages different people wrote independently about
+the same thing, with nothing joining them.
+
+```yaml
+same_as: [michelle-llm-wiki/muga-valley, power-project-wiki/dark-matter-labs]
+```
+
+It records that two pages are about one subject, and nothing else. It does not merge, supersede
+or rank, and it is **a person's judgement** — a model may propose one, the way it may declare a
+`contradicts:`, and may not decide that two bodies of thinking are the same thing.
+
+**Identity is symmetric; recording it is not.** A `private` page's title never leaves its repo,
+so a more visible page naming one would publish that it exists. A page may therefore only point
+at a target at least as open as itself:
+
+| carrier | may name |
+|---|---|
+| `private` | anything — it never exports, so it can leak nothing |
+| `internal` | `internal`, `public`, and the target must be visible in a commons cut read here |
+| `unlisted` | `unlisted`, `public` — unlisted is reachable on the web by direct link |
+| `public` | `public` |
+
+Of the 22 possible edges among those seven subjects, 17 are legal and five are refused; every
+refusal is an internal or unlisted page reaching for a private one. A non-private page must also
+be able to *see* its target, because asserting that a page exists in a repository you cannot read
+is not a claim this wiki can stand behind.
+
+Gated by `python3 tools/check_same_as.py --check`, and carried into the export so the reading
+interfaces can traverse it — safe by construction, since a node that survives a cut can only name
+pages at least as open as itself.
+
 ### Contradictions must resolve, never sit silent
 
 When two pages genuinely disagree, declare it on the newer page:
