@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "e78d76758ce778638a1b95d29a404e438fa8c85a91630454d31a09c6b08a42ee",
+    "design/shared-layer.json": "66fdb38d2810df782512773c262b157f9b65ff22ee4ca9fd5028a6c45f9c9f3d",
     "tools/drift-baseline.json": "78a466c191314c8d306c584a4f275528639152269b604056f2d13221edf92ac1",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -84,7 +84,7 @@
     "tools/test_check_prose.py": "73ba388b1528c6e8c861831337eb5b08a2e133f409073fe76c6ab2399ea86f30",
     "tools/waiting.py": "4970e49c8030e74409192878e1a5810b2eec81bba3b9504809af533b77a44ee9",
     "tools/test_waiting.py": "624019a82740d7f68317b38df2f804bdbb5bcce0a69047d7aa38820df6ec9f40",
-    ".github/workflows/waiting.yml": "7ffbbe9b5984ec13adb2145398f731ee20ed63e1778e42c4b26b5d56a69d6e18",
+    ".github/workflows/waiting.yml": "7c04b8b9da7c89fc05d16e3872e81847c57fedc5c71275a3a350bee63134f701",
     ".claude/skills/waiting/SKILL.md": "b11e3ce8331f338bae7e1f0b5b591b473d91786bb23972bcc0dff5dfa2894997",
     "tools/newsletter.py": "6411ad1d54f2c8d133f2c9e6a43b386d2acd7ac6b3cb93a204985a6d8394470e",
     "tools/test_newsletter.py": "e4305353a8ffc445d66331cf9f0d5b458cb309435b4004efad91062ea7060009",
@@ -98,6 +98,7 @@
     "tools/test_open_questions.py": "e7a32c51a5df9e418f009ee322f2be25daa0e1879c0349d1b7d474c4dac90843",
     "tools/test_newsletter_gates.sh": "f941088dc1860b401c7c9af0231585bb13d47cb11622a7ca8c972490392e39c0",
     "tools/check_frontmatter.py": "a087b14396e70a7f15deaf918e970d6dd69f3adcf5f213c953435e95742cd344",
-    "tools/test_check_frontmatter.py": "2ed195b3a206508b677d21082c409f8ab8dd36a1fd573a549c4917b4d1bdf000"
+    "tools/test_check_frontmatter.py": "2ed195b3a206508b677d21082c409f8ab8dd36a1fd573a549c4917b4d1bdf000",
+    "tools/test_waiting_fetch.sh": "1fb0ec87471a7f355da3c1a2d2380290ce06dcf5ee760efe3ba34b857b670cf3"
   }
 }
