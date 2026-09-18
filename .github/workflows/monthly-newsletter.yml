@@ -188,11 +188,58 @@ jobs:
           fi
           echo "Issue present at wiki/newsletter/${MONTH}.md ($(wc -w < "wiki/newsletter/${MONTH}.md") words)."
 
+      # The house gates, run against what the model just wrote.
+      #
+      # These already run on the pull request. What they did not do is colour the job
+      # that produced the prose: on 2026-09-18 a newsletter run wrote a log entry with
+      # eight em dashes, which `ai-detox` bans and `check_prose` refuses, and the run
+      # reported success. The PR carried the failure instead, and main went red when
+      # somebody merged it without reading the checks. That somebody had every reason
+      # to look and did not, which is the argument for the job owning its own output
+      # rather than passing the problem downstream. On the 2nd this runs unattended in
+      # ten repositories at once and nobody reads ten sets of checks.
+      #
+      # The issue is committed and the PR opened either way. A run costs about a
+      # dollar, the prose is nearly always worth keeping, and throwing the work away
+      # over a punctuation mark would be its own kind of waste. The job simply stops
+      # claiming to have succeeded: the PR says what failed, and the last step exits
+      # non-zero after the work is safely pushed.
+      - name: Check the issue against the house gates
+        id: gates
+        if: steps.guard.outputs.enabled == 'true'
+        run: |
+          rc=0
+          fails=""
+          for c in "check_prose.py --check" "house_rules.py --check" "check_log_shape.py" "sync_log_index.py --check"; do
+            # shellcheck disable=SC2086
+            if out=$(python3 tools/$c 2>&1); then
+              echo "ok    $c"
+            else
+              echo "FAIL  $c"
+              printf '%s\n' "$out" | tail -12 | sed 's/^/        /'
+              fails="${fails}- \`$c\`"$'\n'
+              rc=1
+            fi
+          done
+          if [ "$rc" != "0" ]; then
+            {
+              echo "### The issue does not pass this wiki's own checks"
+              echo ""
+              printf '%s' "$fails"
+              echo ""
+              echo "The issue is still committed and the pull request still opened, so"
+              echo "nothing is lost. Read the failures above, fix them on the branch, and"
+              echo "the PR's own checks will confirm it."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "failed=$rc" >> "$GITHUB_OUTPUT"
+
       - name: Commit and open the PR
         if: steps.guard.outputs.enabled == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           MONTH: ${{ steps.gather.outputs.month }}
+          GATES_FAILED: ${{ steps.gates.outputs.failed }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -215,6 +262,17 @@ jobs:
           # The Claude action reconfigures git auth during its run, so push with an
           # explicit token URL rather than the checkout's credentials.
           git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${BRANCH}"
+          NOTE=""
+          if [ "${GATES_FAILED}" = "1" ]; then
+            NOTE=$'\n\n**This issue does not pass the wiki\'s own checks.** See the run summary for which ones. It is here rather than discarded because the prose is usually worth keeping; fix it on this branch.'
+          fi
           gh pr create --base main --head "$BRANCH" \
             --title "Newsletter — ${MONTH}" \
-            --body "Automated monthly issue. **Nothing has been sent.** Read it, edit it, then decide where it goes — the skill deliberately has no delivery path, because a newsletter a model can mail to the team without a person reading it first is a mailing list nobody consented to."
+            --body "Automated monthly issue. **Nothing has been sent.** Read it, edit it, then decide where it goes — the skill deliberately has no delivery path, because a newsletter a model can mail to the team without a person reading it first is a mailing list nobody consented to.${NOTE}"
+
+      # Last, so the work is pushed before the job admits it went wrong.
+      - name: Fail if the issue did not pass the gates
+        if: steps.guard.outputs.enabled == 'true' && steps.gates.outputs.failed == '1'
+        run: |
+          echo "::error::the issue was written and the PR opened, but it does not pass this wiki's own checks - see the run summary"
+          exit 1

@@ -99,6 +99,7 @@
     "tools/test_newsletter.py",
     ".claude/skills/newsletter/SKILL.md",
     ".github/workflows/monthly-newsletter.yml",
+    "tools/test_newsletter_gates.sh",
     "tools/patterns.py",
     "tools/test_patterns.py",
     "tools/community.py",
