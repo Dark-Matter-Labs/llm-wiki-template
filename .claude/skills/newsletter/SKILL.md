@@ -37,6 +37,34 @@ tool is right and the draft is wrong.
 
 Your job is the half a script cannot do: deciding what is worth saying, and saying it well.
 
+### The corpus is at HEAD. The month is not.
+
+`newsletter.py` computes the window. The wiki you are standing in is today's, and for a month
+that closed weeks ago the two are different objects. **Every count, state and total comes from
+the material, and never from reading the pages.**
+
+The August 2026 issue was written on 18 September and said Goal 3 "carries all eleven
+commitments in the ledger, ten of them held", and that one person had stood behind a goal. The
+material for August said two commitments — one proposed, one held — and nobody standing behind
+anything. Eleven and the endorsement were true on the day it was written and false for the month
+it described: nine of those commitment pages were filed on 15 and 16 September, and the
+endorsement is dated the 16th. Nothing was invented. The corpus was simply asked a question
+about the present in a report about the past.
+
+So, concretely:
+
+- **Counts, states, dates, totals, who validated what — the material, always.** If it is not in
+  `signals`, it does not go in the issue. Not from `goals.py`, not from the frontmatter, not from
+  a page you happened to read.
+- **Read pages for prose, never for arithmetic.** A page's own one-line description, or a
+  sentence somebody actually wrote, is why you open it. Three or four pages, the ones behind the
+  items you are actually using.
+- **A page may have changed since the month ended.** When you quote one, you are quoting today's
+  wording of it, which is fine for a line of prose and wrong for a number.
+
+This is also most of what the issue costs. The August run took 54 turns and $1.74, and the
+reading is where that went — the writing is a few hundred words.
+
 ## The voice
 
 **Run two skills before you write a word, and again over the draft.**
@@ -144,9 +172,11 @@ last, briefly.
    pattern nobody has named, a term that rose, a goal that gained or lost its backing, a shape
    the repairs kept repeating. Everything else arranges around it. If nothing stands out, say so
    in the lede — that is itself a reading of the month.
-3. **Check the material against the corpus** for the three or four items you will actually use.
-   The tool gives you counts and descriptions; read the pages behind them so the sentences are
-   true rather than plausible.
+3. **Open the three or four pages behind the items you will actually use** — for their words,
+   not their numbers. The tool has given you every figure already; what a page adds is a line
+   worth quoting and the texture that makes a sentence true rather than plausible. See "The
+   corpus is at HEAD" above: reading further costs money and imports the present into a report
+   about the past.
 4. **Write it.** Markdown, in `wiki/newsletter/YYYY-MM.md`, `visibility: internal` unless the
    owner says otherwise, `type: synthesis`.
 5. **Produce the sending formats** with `python3 tools/learning_outcomes.py --format slack` and
