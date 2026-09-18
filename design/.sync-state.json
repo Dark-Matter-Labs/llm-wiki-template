@@ -99,6 +99,6 @@
     "tools/test_newsletter_gates.sh": "f941088dc1860b401c7c9af0231585bb13d47cb11622a7ca8c972490392e39c0",
     "tools/check_frontmatter.py": "a087b14396e70a7f15deaf918e970d6dd69f3adcf5f213c953435e95742cd344",
     "tools/test_check_frontmatter.py": "2ed195b3a206508b677d21082c409f8ab8dd36a1fd573a549c4917b4d1bdf000",
-    "tools/test_waiting_fetch.sh": "85d57193a43c6808b189a83bdf31522e3bf3803a23d84b5cedadab5fdab335d4"
+    "tools/test_waiting_fetch.sh": "1fb0ec87471a7f355da3c1a2d2380290ce06dcf5ee760efe3ba34b857b670cf3"
   }
 }

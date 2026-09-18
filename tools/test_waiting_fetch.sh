@@ -18,15 +18,35 @@ set -u
 # source wiki's path, so every sibling passed by testing a file in another repository —
 # ten green runs proving one thing once.
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BLOCK=$(WF="$HERE/.github/workflows/waiting.yml" python3 - <<'PY'
-import os, yaml
-d = yaml.safe_load(open(os.environ["WF"]))
-for j in d['jobs'].values():
-    for s in j['steps']:
-        if s.get('name','').startswith('Fetch the commons'):
-            print(s['run'])
-PY
-)
+# Standard library only. This imported PyYAML at first and turned CI red, which is the
+# same failure tools/community.py records for networkx and check_frontmatter.py records
+# for yaml itself — twice in one day, in a codebase with no requirements.txt and no pip
+# step. The block is found by name and read by indentation, which is all a YAML literal
+# block needs.
+BLOCK=$(WF="$HERE/.github/workflows/waiting.yml" python3 -c '
+import os, sys
+lines = open(os.environ["WF"], encoding="utf-8").read().split("\n")
+out, indent = [], None
+for i, ln in enumerate(lines):
+    if indent is None:
+        if ln.lstrip().startswith("- name:") and "Fetch the commons" in ln:
+            for j in range(i + 1, len(lines)):
+                t = lines[j].strip()
+                if t.startswith("- name:"):
+                    break
+                if t in ("run: |", "run: |-"):
+                    indent = len(lines[j]) - len(lines[j].lstrip()) + 2
+                    start = j + 1
+                    break
+        continue
+for j in range(start, len(lines)):
+    ln = lines[j]
+    if ln.strip() and (len(ln) - len(ln.lstrip())) < indent:
+        break
+    out.append(ln[indent:] if len(ln) >= indent else ln)
+sys.stdout.write("\n".join(out))
+' 2>/dev/null)
+
 if [ -z "${BLOCK}" ]; then
   echo "  FAIL  no Fetch-the-commons step in $HERE/.github/workflows/waiting.yml"
   exit 1

@@ -67,6 +67,9 @@ jobs:
       - name: Frontmatter gate's own cases
         run: python3 tools/test_check_frontmatter.py
 
+      - name: The Monday fetch step's own cases
+        run: bash tools/test_waiting_fetch.sh
+
       - name: Schema — frontmatter, types, commitment states
         # Renamed 2026-08-31. This step was called "Schema + link integrity" and did not check
         # link integrity: it catches a link wrapped across a newline and nothing else. A broken
