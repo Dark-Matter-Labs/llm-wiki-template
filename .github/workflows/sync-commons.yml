@@ -26,7 +26,12 @@ name: Sync the commons
 #     gh variable set COMMONS_SYNC_OPTIONAL --body true
 on:
   schedule:
-    - cron: "0 6 * * *"   # daily, before the working day
+    # Monday 06:00, not daily. The cache this fills is reference material a person reads
+    # against, not something the wiki depends on being current to the hour, and daily across
+    # ten spokes was about 300 minutes a month of the 3,000 the plan includes. GitHub rounds
+    # every job up to a whole minute, so a sync that finds nothing new still bills one.
+    # Anyone who needs it fresher can run it by hand; that is what workflow_dispatch is for.
+    - cron: "0 6 * * 1"
   workflow_dispatch:
 
 permissions:
