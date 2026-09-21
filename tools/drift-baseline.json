@@ -100,7 +100,7 @@
       "path": "tools/export.py",
       "repos": 10,
       "versions": 2,
-      "reason": "BY ROLE \u2014 a commons emits wiki.shared.json and provenance; a spoke does not. Documented in the file's own header."
+      "reason": "BY PUBLISHING DECISION, not by role \u2014 one variant emits wiki.shared.json and the provenance fields, the other does not. The three commons take the first; so does fang-llm-wiki, a spoke, deliberately (fang-llm-wiki 5af7ceb, 1 Sept 2026): `internal` is the default tier, so publishing only the public cut shows a colleague less than half the canon, silently. This reason said \"a spoke does not\" and was wrong from that day. NOTE, unresolved: init_wiki.py --check says a spoke \"correctly publishes only wiki.public.json\". Both cannot be right, and which is a decision for the group."
     },
     {
       "path": "tools/sync_index_counts.py",
