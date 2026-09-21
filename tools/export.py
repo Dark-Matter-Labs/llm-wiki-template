@@ -251,10 +251,12 @@ def build_nodes(wiki_dir):
             # the answer. A field the reading interfaces cannot see will never become anything
             # else.
             "derivation": fm.get("derivation"),
-            # Emitted for the same reason as `derivation`, and safe by construction rather
-            # than by care: check_same_as refuses any edge whose target is less visible
-            # than the page carrying it, so a node that survives a cut can only name
-            # pages at least as open as itself.
+            # Emitted for the same reason, and safe by construction rather than by
+            # care: check_same_as refuses any edge whose target is less visible than
+            # the page carrying it, so a node that survives a cut can only name pages
+            # at least as open as itself. Without this the field is inert — recorded,
+            # checked, and invisible to every reading interface, which is what
+            # `derivation` was for two weeks.
             "same_as": fm.get("same_as") or [],
             "timestamp": fm.get("timestamp"),
             "description": fm.get("description"),

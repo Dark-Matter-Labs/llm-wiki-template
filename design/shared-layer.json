@@ -101,6 +101,7 @@
     ".github/workflows/monthly-newsletter.yml",
     "tools/gates.py",
     "tools/test_gates.py",
+    "tools/check_ingest_conformance.py",
     "tools/test_newsletter_gates.sh",
     "tools/check_frontmatter.py",
     "tools/test_check_frontmatter.py",
