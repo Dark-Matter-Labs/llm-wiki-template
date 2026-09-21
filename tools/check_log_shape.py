@@ -18,6 +18,10 @@ Checks:
      2026-08-12.md is how chronology quietly rots, which is what the split found in the
      old monthly file (five out-of-order points).
   3. Every day file is listed in its month index, and every listed day file exists.
+  4. Every day file opens with a level-1 heading carrying its own date. A union merge
+     keeps every entry and can still drop the heading, and every other check passes on
+     the result. Three heading wordings are in use and all are accepted; what is checked
+     is that there is one.
 
 Exit 0 clean, 1 with findings. No untrusted input; reads only files in this repo.
 """
@@ -88,6 +92,26 @@ def main() -> int:
                 )
             if not dates:
                 findings.append(f"{path.relative_to(LOG.parent.parent)}: day file with no entries")
+
+            # A day file opens with `# Log, YYYY-MM-DD`. Trivial, and it went missing on
+            # 2026-09-21 when two branches both appended to the same day file and git's
+            # union merge kept every entry and dropped the heading. Nothing caught it: the
+            # entries were all present and correctly dated, the month index regenerated
+            # cleanly, and all sixteen gates passed. The file was simply no longer a
+            # document. A convention nobody enforces is a preference, which is the whole
+            # argument of this file applied to its own first line.
+            # Three headings are in use across the federation and all three are fine:
+            # `# Log — DATE`, `# Log, DATE` and `# Wiki Log — DATE`. The check is that the
+            # file opens with a level-1 heading carrying its own date, not which dash or
+            # comma somebody chose. A gate that enforces a punctuation preference across
+            # three legitimate variants gets switched off; one that catches a missing
+            # heading catches the thing that actually happened.
+            first = next((l.strip() for l in text.splitlines() if l.strip()), "")
+            if not (first.startswith("# ") and day in first):
+                findings.append(
+                    f"{path.relative_to(LOG.parent.parent)}: opens with {first[:44]!r} — a day "
+                    f"file starts with a level-1 heading carrying its own date"
+                )
 
             # Day files are union-merged (see .gitattributes), so a bad merge lands
             # without conflict markers and without anyone reading it. Duplication is
