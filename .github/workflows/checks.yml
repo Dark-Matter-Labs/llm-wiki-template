@@ -12,6 +12,18 @@ on:
 permissions:
   contents: read
 
+# Pushing three commits to a branch used to pay for three full runs of every gate, because
+# nothing cancelled the runs nobody would look at. `checks.yml` is the longest workflow here
+# and 62% of the federation's Actions usage, so this is where the waste was.
+#
+# cancel-in-progress is deliberately conditional. On a pull request a superseded run is dead
+# weight and gets cancelled. On main it is NOT: two merges landing close together would
+# otherwise cancel the first one's gates, and a commit whose gates never finished is exactly
+# the thing this file exists to prevent.
+concurrency:
+  group: checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   checks:
     runs-on: ubuntu-latest
