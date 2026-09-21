@@ -62,6 +62,8 @@
     "tools/audit_design.py",
     "tools/check_log_shape.py",
     "tools/test_check_log_shape.py",
+    "tools/check_noindex.py",
+    "tools/test_check_noindex.py",
     "tools/sync_log_index.py",
     ".claude/skills/gravity/compute_gravity.py",
     "tools/make_social_card.py",
