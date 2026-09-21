@@ -61,6 +61,7 @@
     "tools/test_export.py",
     "tools/audit_design.py",
     "tools/check_log_shape.py",
+    "tools/test_check_log_shape.py",
     "tools/sync_log_index.py",
     ".claude/skills/gravity/compute_gravity.py",
     "tools/make_social_card.py",

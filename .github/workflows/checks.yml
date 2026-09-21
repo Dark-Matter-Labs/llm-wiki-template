@@ -102,6 +102,33 @@ jobs:
       # The boundary suites this replaced carried their own note, kept here because the
       # intent outlives the step: they prove the tier invariants hold — private leaks
       # into nothing; internal reaches the colleague cut but never the web.
+      # ── Added 2026-09-21. Four gates existed as tools here and were never wired into
+      # this workflow, so `gates.py` reported green while they were failing. That gap was
+      # found in xco-team-wiki, where `check_prose --check` was failing and only the
+      # discovered tool-test step caught it. Audited across all eleven wikis: ten were
+      # missing the same four. Each was run in each repo before being wired, so none of
+      # them arrives red.
+      - name: Prose ratchet
+        # The mechanical half of ai-detox. Counts may fall and never rise, and a new file
+        # must be clean. Not a style opinion: a ratchet over the corpus.
+        run: python3 tools/check_prose.py --check
+
+      - name: Onboarding guide names what exists
+        # ONBOARDING.md tells a new contributor what to run. A guide naming a tool or a
+        # workflow this repo no longer has is worse than no guide.
+        run: python3 tools/check_onboarding.py --check
+
+      - name: Skill links resolve
+        # A skill that points at a missing page or a tool that was renamed fails silently
+        # at the moment somebody is relying on it.
+        run: python3 tools/check_skill_links.py --check
+
+      - name: Contradictions are declared, not dangling
+        # A `contradicts:` naming a page that does not exist is a disagreement pointing at
+        # nothing. Declaring is a model's job; resolving is a person's; neither is served
+        # by a broken pointer.
+        run: python3 tools/contradictions.py --check
+
       - name: Tool tests
         run: |
           set -o pipefail

@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "9902c09245c55f02775b64ddec56a171c75d1fd98728c4fddc0b5c44f9b79c8f",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "5cf8fe582c1477ee27e067c2b96d5f1bf19ad4fbd54926de81ee8b0b026486e6",
+    "design/shared-layer.json": "4635d55cb6e0490188e5212afae52a5b7788c03a91c15b4e5fabad4a608b048e",
     "tools/drift-baseline.json": "f55451e1dad2fac761add700c2bdd9b41dd960a1373ea8e71b5b3254bc8d061f",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -44,7 +44,7 @@
     ".claude/skills/reflect/SKILL.md": "490c9140691724e8172b86d4c1a1036a20fe36be832a2e404ab6b9470fbcc40e",
     "tools/test_export.py": "befe871b33d6088e98e38c866fc8d82203dedd67480237998174f74d22607076",
     "tools/audit_design.py": "5c3fb4bd267825521d987b7242ad96ad4798bbdc3c783ed013908396ce154c48",
-    "tools/check_log_shape.py": "df667951749fe215c3a89d3a05de33e686e265193ba8c344705079d15b32d8fd",
+    "tools/check_log_shape.py": "876415fb8b56e3cf3fb0e1a6f60e39ccda8eb5e670ebca5bef01cec69a2df6c7",
     "tools/sync_log_index.py": "0dc2a98e918078a9b344e589da99ce304fc247a5e6e7d7b2d74832376dd53637",
     ".claude/skills/gravity/compute_gravity.py": "7180939228b4acf17a0f307bd55f25afe00e0b59389095e094319e0431513fdb",
     "tools/scan_public_leaks.py": "6bbc04cb5c458a3fc8c3698193c2c8a8de424bdb98a00e501ad03b38c6d6a7f0",
@@ -104,7 +104,8 @@
     "tools/test_check_same_as.py": "2961536c738b5a61d09da8783211e20afbbd941f793fc552e5d75b0cab9f2de1",
     "tools/gates.py": "4150be7731445b6add969e960174caefc29d5d0d6704511d6493b77b7c6f382d",
     "tools/test_gates.py": "b63e22c685406b5ce04dc92bc4196d6bd07b8548028ba0d6f7738971b92e0ce4",
-    "tools/check_ingest_conformance.py": "0c7dae87c4605af918e6b25a63ed78e695f5de299bef6ae3e90d8e7abbe9e297"
+    "tools/check_ingest_conformance.py": "0c7dae87c4605af918e6b25a63ed78e695f5de299bef6ae3e90d8e7abbe9e297",
+    "tools/test_check_log_shape.py": "5de597e71125b7474adeb78ef10deb95bbc444993dc38f2af5322d453ad87d84"
   },
   "adapted": {}
 }
