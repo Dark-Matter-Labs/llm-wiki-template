@@ -129,6 +129,14 @@ jobs:
         # by a broken pointer.
         run: python3 tools/contradictions.py --check
 
+      - name: Unlisted pages say so to a crawler
+        # `unlisted` means rendered, reachable by direct link, NOT indexed. The third
+        # property is a robots meta in the file and nothing checked it: three pages the
+        # corpus describes in writing as unlisted were served without one. Checks the
+        # written claim, not the record page's tier — a private source can legitimately
+        # produce a public page, and several here do.
+        run: python3 tools/check_noindex.py --check
+
       - name: Tool tests
         run: |
           set -o pipefail
