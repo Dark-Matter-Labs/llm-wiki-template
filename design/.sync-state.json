@@ -63,7 +63,7 @@
     "tools/test_wiki_context.py": "8803fd328c5779b29d229071c2c2821a56bebe14b38deed7b7a538b6dc237696",
     "tools/init_wiki.py": "1449f5ff96e9a0207ab47ccc4e9c0c5ed35d8a419c9acf41f55ddef44ab11e98",
     "tools/test_init_wiki.py": "6644af0434b1d814f985c8a33051fc2744cd8c2b49b6c89722881940d665fc14",
-    ".github/workflows/sync-commons.yml": "84745fc7d430135678af55db840d52e040d1d16e00f787b45829fcc997f51ff7",
+    ".github/workflows/sync-commons.yml": "278771cf76ab5c0d0458988805ee3fa186077d057b1bdfff03c31e564b1e2ba3",
     ".claude/skills/onboard/SKILL.md": "6b4b464d3b2b92b13c379c78b1715fde78a65739eeb4eb5e11cc7c065fa009fd",
     ".claude/skills/notion-sync/SKILL.md": "954056cb6924fe637293d3966126ebbde10ba4054b38fdd0e1ebc7a886c15f98",
     "tools/check_skill_links.py": "96025c8e3a96bafc7280fd326606166aba49d2b9a1a118686afd659580eddce0",

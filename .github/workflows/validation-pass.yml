@@ -1,15 +1,24 @@
 name: Validation pass
 
-# The validation layer's cadence, from the 7 Aug session: not weekly (too slow — "a week
-# is too long, I just don't remember it") and not unconditionally daily (burns credits on
-# days nothing happened). So this runs DAILY but the deciding step is free.
+# The validation layer's cadence. On 7 August this was set to DAILY and weekly was
+# explicitly rejected — "a week is too long, I just don't remember it" — on the reasoning
+# that the deciding step calls no model, so a quiet day costs nothing.
 #
-# tools/validation_due.py counts words added to wiki/ since the last recorded pass and
-# calls no model. Only when it says "due" does the paid step run. Cost therefore tracks
-# use rather than the calendar — on a quiet week this workflow costs nothing at all.
+# THAT REASONING WAS WRONG, and it is why this is now weekly. GitHub rounds every job up to
+# a whole minute, so a run that decides "not due" in five seconds still bills one minute.
+# Daily across eleven repos was about 330 minutes a month of the 3,000 the plan includes,
+# spent almost entirely on deciding there was nothing to do. The org ran out of minutes on
+# 21 September and this was part of why.
+#
+# tools/validation_due.py still gates the paid step, so a week with no new words still costs
+# only the one minute. What changed is how often that minute is spent.
+#
+# If a week turns out to be too long in practice, the honest fix is not daily again: it is
+# to trigger on the thing that matters, a push that adds words to wiki/, rather than on the
+# calendar. Change the cron here and the reason above stops being true, so change both.
 on:
   schedule:
-    - cron: "0 16 * * *"   # 16:00 UTC daily — the decision is free; the work rarely runs
+    - cron: "0 16 * * 4"   # Thursday 16:00 UTC — see the note above on why not daily
   workflow_dispatch:
     inputs:
       force:
