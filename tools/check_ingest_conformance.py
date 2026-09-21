@@ -70,7 +70,18 @@ def check(page_path, wiki_dir="wiki", since=None):
 
     # 3. citations exist AND point at real files. Inventing a source is worse than
     #    omitting one, so both are checked.
-    cites = re.findall(r"\(raw/([^)]+?)\)", body)
+    # Bracketed filenames: `[^)]+?` stopped at the first ")" inside one. See CITE in
+    # tools/verification.py for the same pattern and the count behind it.
+    # A citation may name several sources in one bracket. This split was never here, so a
+    # multi-source group was tested as if it were one impossible filename and reported as
+    # invented — five of them on wiki/indy-johar.md alone, every one of which exists.
+    groups = re.findall(r"\(raw/((?:[^()]+|\([^()]*\))*)\)", body)
+    cites = []
+    for g in groups:
+        for s in re.split(r"[;,]", "raw/" + g):
+            s = " ".join(s.split())
+            if s.startswith("raw/"):
+                cites.append(s[4:])
     missing = [c for c in set(cites) if not os.path.exists(os.path.join("raw", c))]
     out.append(("cites its sources", len(cites) >= MIN_CITATIONS,
                 f"{len(cites)} inline citations (need {MIN_CITATIONS})"))
