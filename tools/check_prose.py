@@ -94,7 +94,30 @@ CATEGORIES = ("words", "phrases", "xnoty", "emdash")
 
 #: `- [[Page Title]] — one line about it`, the house catalogue row. A separator, not a
 #: sentence. Anchored at the start so a bulleted sentence in ordinary prose still counts.
-CATALOGUE_ROW = re.compile(r"\s*[-*]\s*\[\[")
+#:
+#: THE SECOND ALTERNATIVE, added 2026-09-22. Some indexes write the same row as a markdown
+#: link rather than a wiki-link: `- **[Question-Native Organising](question-native-organising.md)**
+#: — the organising philosophy…`. That is the identical object, and it was not matched, so
+#: filing a page into one of those indexes raised the ratchet on the act of filing. It moved
+#: three times in one day in `learning-system-wiki` before this was fixed, each time recorded
+#: as debt nobody had incurred. Measured across the federation: 6,288 rows in the wiki-link
+#: form, 193 in this one.
+#:
+#: THE DISCRIMINATOR IS THE TARGET, NOT THE SYNTAX, and the distinction was already in the
+#: tests. `- [a thing](https://x.test) — robust and comprehensive` is prose: it cites something
+#: outside the wiki and the sentence after the dash is a sentence. A row pointing at a page in
+#: this wiki is naming a page, which is a name rather than prose, exactly as `[[...]]` is. So
+#: the alternative requires a target with no URL scheme. All 193 rows found were local; none
+#: was external, so nothing that was counted before stops being counted.
+#:
+#: The em dash is also required, which keeps the 46 bulleted sentences that merely begin with
+#: a link in scope. Both additions are strictly additive: a line matched before is still
+#: matched, so a file's count can only fall.
+CATALOGUE_ROW = re.compile(
+    r"\s*[-*]\s*(?:"
+    r"\[\["                                                   # - [[Page Title]] — one line
+    r"|\*{0,2}\[[^\]\n]+\]\((?!\w+:)[^)\s]+\)\*{0,2}\s*\u2014"  # - **[Title](page.md)** — one line
+    r")")
 
 
 def prose(text: str) -> str:

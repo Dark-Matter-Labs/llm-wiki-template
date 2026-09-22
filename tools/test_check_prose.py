@@ -12,6 +12,7 @@ import json
 import os
 import pathlib
 import subprocess
+import re
 import sys
 import tempfile
 
@@ -83,6 +84,41 @@ def main():
           C.count("- This is a robust sentence.\n")["words"] == 1)
     check("a link row that is not a page title is still prose",
           C.count("- [a thing](https://x.test) — robust and comprehensive\n")["emdash"] == 1)
+
+    # Added 2026-09-22. The same row written as a markdown link rather than a wiki-link was not
+    # matched, so filing a page into an index that uses that form raised the ratchet on the act
+    # of filing. It moved three times in one day in learning-system-wiki before this was fixed.
+    check("a catalogue row written as a markdown link is not prose",
+          C.count("- **[A Title](a-title.md)** — one line about it\n")["emdash"] == 0)
+    check("...bold or not",
+          C.count("- [A Title](a-title.md) — one line about it\n")["emdash"] == 0)
+    check("...and indented",
+          C.count("  - **[A Title](a-title.md)** — one line about it\n")["emdash"] == 0)
+    # The two guards. The target decides, not the syntax: a row naming a page in this wiki is a
+    # name, a row citing something outside it is a sentence. And the separator has to be there,
+    # or every bulleted sentence that happens to start with a link escapes the gate.
+    check("a row pointing outside the wiki is still prose",
+          C.count("- [a thing](https://x.test) — robust and comprehensive\n")["emdash"] == 1)
+    check("...including a bold one",
+          C.count("- **[a thing](https://x.test)** — robust and comprehensive\n")["emdash"] == 1)
+    check("a bulleted sentence that merely begins with a link is still prose",
+          C.count("- **[A Title](a-title.md)** is a robust thing — really\n")["emdash"] == 1)
+    check("...and its banned words still count",
+          C.count("- [A Title](a-title.md) is robust and comprehensive.\n")["words"] == 2)
+
+    # MUTATION. Put the old pattern back and the markdown-link row must be counted again. If it
+    # still passes, the three checks above are decorative.
+    _saved = C.CATALOGUE_ROW
+    try:
+        C.CATALOGUE_ROW = re.compile(r"\s*[-*]\s*\[\[")
+        check("mutant (wiki-link form only) counts the markdown row again",
+              C.count("- **[A Title](a-title.md)** — one line about it\n")["emdash"] == 1)
+        check("...while the wiki-link row is unaffected by the mutation",
+              C.count("- [[Some Page]] — one line about it\n")["emdash"] == 0)
+    finally:
+        C.CATALOGUE_ROW = _saved
+    check("the real pattern is restored after the mutation",
+          C.count("- **[A Title](a-title.md)** — one line about it\n")["emdash"] == 0)
 
     # A heading is a label, not a sentence. The house log header is `# Log — 2026-09-16`, so
     # under the old counting EVERY new day file failed the ratchet on its own template, one
