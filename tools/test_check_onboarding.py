@@ -43,8 +43,8 @@ def main():
     got = run("Pages are `public`, `unlisted` or `private`.")
     check("an incomplete tier list is caught", says(got, "internal"))
 
-    # Deliberately NOT under raw/: source documents are gitignored by design, so a
-    # reference into raw/ cannot be verified from a checkout and is accepted unchecked.
+    # raw/ has its own cases below, against a tree whose .gitignore is known: whether a
+    # raw/ path is ignored depends on the wiki, and a travelling test may not assume it.
     got = run("Run `tools/NOPE-not-a-tool.py` for that.")
     check("a file that does not exist is caught", says(got, "NOPE-not-a-tool.py"))
 
@@ -126,7 +126,7 @@ def main():
         (root / ".claude" / "skills" / "crm" / "SKILL.md").write_text(
             "The catalogue is `wiki/crm/roster.md`.\n", encoding="utf-8")
         old_root = K.ROOT
-        K.ROOT, K._WRITTEN, K._TREE = root, None, None
+        K.ROOT, K._WRITTEN, K._TREE, K._IGNORED = root, None, None, {}
         try:
             check("a path a skill in this repo creates is not flagged",
                   not run("`wiki/crm/roster.md` is its catalogue."))
@@ -134,7 +134,54 @@ def main():
                   says(run("The roster is `wiki/crm/nobody-writes-this.md`."),
                        "nobody-writes-this"))
         finally:
-            K.ROOT, K._WRITTEN, K._TREE = old_root, None, None
+            K.ROOT, K._WRITTEN, K._TREE, K._IGNORED = old_root, None, None, {}
+
+    # REGRESSION, 2026-09-22. Four wikis ignore `raw/*.md` and un-ignore their real sources
+    # one by one, so `git check-ignore` succeeded for ANY `raw/<name>.md` — and their READMEs
+    # named `raw/EXAMPLE-sample-source.md`, deleted months earlier, with the gate green. Newer
+    # wikis, which un-ignore that one file, failed correctly on the same sentence. Source
+    # documents are curated by a person and built by nothing, so "git ignores it" is no
+    # evidence that anything will produce it. Built in a throwaway repo with no tools/, so
+    # nothing but the rule under test can make a path resolve.
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+        (root / ".gitignore").write_text("raw/*.md\n!raw/README.md\nraw/scratch/\nexport/\n",
+                                         encoding="utf-8")
+        (root / "raw").mkdir()
+        (root / "raw" / "README.md").write_text("What goes here.\n", encoding="utf-8")
+        (root / "raw" / "assets").mkdir()
+        (root / "raw" / "assets" / ".gitkeep").write_text("", encoding="utf-8")
+        # Present on this machine, ignored, so absent from every clean checkout.
+        (root / "raw" / "local-only-source.md").write_text("Never committed.\n", encoding="utf-8")
+        old_root = K.ROOT
+        K.ROOT, K._WRITTEN, K._TREE, K._IGNORED = root, None, None, {}
+        try:
+            check("an invented raw/ file is caught even though .gitignore ignores raw/*.md",
+                  says(run("Drop it next to `raw/foo.md`."), "raw/foo.md"))
+            check("...including the deleted example four READMEs still named",
+                  says(run("A worked example ships in `raw/EXAMPLE-sample-source.md`."),
+                       "EXAMPLE-sample-source"))
+            check("an invented raw/ folder is caught even though .gitignore ignores it",
+                  says(run("Drafts wait in `raw/scratch/`."), "raw/scratch/"))
+            # The narrowing must not reach the case the leniency exists for. There is no
+            # tools/ here, so only the ignore rule can vouch for `export/wiki.json`.
+            check("a gitignored, CI-generated file is still not flagged when raw/ is narrowed",
+                  not run("The graph is written to `export/wiki.json`."))
+            check("a raw/ file the wiki commits (un-ignored with !raw/...) still resolves",
+                  not run("Start with `raw/README.md`."))
+            # On disk here, absent in CI. Passing it locally would be green for the wrong
+            # reason, the failure this file has recorded twice already.
+            check("an ignored raw/ file present only on this machine is still flagged",
+                  says(run("See `raw/local-only-source.md`."), "local-only-source"))
+            check("the raw/ folder itself is not flagged",
+                  not run("Drop the PDF into `raw/`."))
+            # Folders are a place to put sources, not sources: every CLAUDE.md names
+            # `raw/assets/`, and the file rule must not be applied to it.
+            check("a folder under raw/ that exists is not held to the file rule",
+                  not run("Images live in `raw/assets/`."))
+        finally:
+            K.ROOT, K._WRITTEN, K._TREE, K._IGNORED = old_root, None, None, {}
 
     check("a schedule that really exists is not flagged",
           not run("The newsletter goes out monthly, automatically.", crons=1))
