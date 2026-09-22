@@ -82,10 +82,21 @@ def resolve_commons(requested, topo):
     and the fix afterwards is a deletion request rather than a revert.
     """
     targets = topo.get("contributes_to") or []
+    # A commons this wiki READS but may not push to. Naming it is not an oversight to be
+    # helpfully worked around; it is the whole point of the declaration, so say which it is.
+    readonly = [c for c in (topo.get("reads_from") or []) if c not in targets]
     if not targets:
+        hint = (f"\n       It reads {', '.join(readonly)} but may not contribute to "
+                f"{'it' if len(readonly) == 1 else 'them'}.") if readonly else ""
         return None, ("this wiki contributes to no commons "
-                      "(design/federation.json lists none)")
+                      "(design/federation.json lists none)" + hint)
     if requested:
+        if requested in readonly:
+            return None, (f"{requested!r} is a commons this wiki READS and may not write to.\n"
+                          f"       design/federation.json lists it under `reads_from`, not "
+                          f"`contributes_to`.\n"
+                          f"       That is a deliberate one-way link. If it should become "
+                          f"two-way, a person changes the declaration.")
         if requested not in targets:
             return None, (f"{requested!r} is not a commons this wiki contributes to.\n"
                           f"       Declared: {', '.join(targets)}")
