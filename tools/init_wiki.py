@@ -282,8 +282,9 @@ def check(root=None) -> Report:
                f"would clone the repo into itself")
 
     if role == "spoke" and not ups and not downs:
-        r.fail("a spoke that neither contributes nor reads has no place in the federation. "
-               "Either name a commons, or declare `role: commons`.")
+        r.fail("a spoke with nowhere to contribute and nothing to read has no place in the "
+               "federation. Name a commons in `contributes_to` or `reads_from`, or declare "
+               "`role: commons`.")
     elif role == "spoke" and not ups and downs:
         # The deliberate one-way case, and it must read as deliberate rather than broken.
         r.ok(f"one-way spoke: reads {', '.join(downs)} and contributes to nothing. "
