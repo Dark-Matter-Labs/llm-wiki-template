@@ -42,7 +42,7 @@ DECISION = {"decided": "2026-09-04", "by": "Indy",
 
 
 def wiki(tmp, dirname, *, name=None, role="spoke", display_name="Alex's LLM Wiki",
-         ups=("xco-team-wiki",), export=None, card_line="Something of our own.",
+         ups=("xco-team-wiki",), reads=None, export=None, card_line="Something of our own.",
          deploy_pages=False, manifest=True, federation=True, bad_json=False,
          publishes=None, demo=0, demo_sources=0):
     """A minimal wiki on disk. The directory name matters: `name` is checked against it."""
@@ -61,6 +61,8 @@ def wiki(tmp, dirname, *, name=None, role="spoke", display_name="Alex's LLM Wiki
                 "role": role,
                 "contributes_to": list(ups),
             }
+            if reads is not None:
+                fed["reads_from"] = list(reads)
             if publishes is not None:
                 fed["publishes_site"] = publishes
             p.write_text(json.dumps(fed), encoding="utf-8")
@@ -140,6 +142,31 @@ def main():
     with tempfile.TemporaryDirectory() as t:
         r = iw.check(wiki(t, "alex-llm-wiki", ups=()))
         check("a spoke with nowhere to contribute is caught", fails_with(r, "nowhere"))
+
+    # ---- reading and writing are separate directions -----------------------------------
+    # people-hosts-wiki reads its commons and contributes nothing, on purpose. Nothing tested
+    # that until a reworded message broke the case above in all twenty repos at once.
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "alex-llm-wiki", ups=(), reads=("xco-team-wiki",)))
+        check("a one-way spoke (reads, never contributes) passes", not r.failures,
+              "; ".join(r.failures)[:120])
+        check("and is reported as one-way, so it reads as deliberate rather than broken",
+              any("one-way" in m for m in r.passed))
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "alex-llm-wiki", ups=(), reads=()))
+        check("an explicit empty `reads_from` is still a spoke with nowhere to go",
+              fails_with(r, "nowhere"))
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "alex-llm-wiki", reads=("alex-llm-wiki",)))
+        check("a wiki reading from itself is caught", fails_with(r, "reads_from"))
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "alex-llm-wiki", reads=("somewhere-unknown",)))
+        check("a `reads_from` target the manifest does not know is caught",
+              fails_with(r, "somewhere-unknown"))
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "alex-llm-wiki"))
+        check("a wiki written before the split (no `reads_from`) still passes", not r.failures,
+              "; ".join(r.failures)[:120])
 
     with tempfile.TemporaryDirectory() as t:
         r = iw.check(wiki(t, "alex-llm-wiki", ups=("alex-llm-wiki",)))
@@ -350,6 +377,16 @@ def main():
         check("--init refuses a spoke with no targets", code == 1)
         check("and writes nothing when it refuses",
               not (root / "design" / "federation.json").exists())
+
+    with tempfile.TemporaryDirectory() as t:
+        root = pathlib.Path(t) / "w"
+        root.mkdir(parents=True)
+        code, _ = iw.init("w", "spoke", "W", [], downs=["xco-team-wiki"], root=root)
+        fed = json.loads((root / "design" / "federation.json").read_text()) if code == 0 else {}
+        check("--init accepts a one-way spoke (reads, contributes nothing)", code == 0)
+        check("and records the direction it reads, with nothing to contribute to",
+              fed.get("reads_from") == ["xco-team-wiki"] and fed.get("contributes_to") == [],
+              json.dumps(fed)[:120])
 
     check("a commons is told to copy the exporter, which the tool will not invent",
           any("export.py" in i for i in iw.human_remainder("commons")))
