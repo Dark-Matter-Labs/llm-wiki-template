@@ -28,15 +28,24 @@ JARGON = ("branch", "commit", "rebase", "remote", "upstream", "HEAD", "checkout"
           "merge conflict", "refspec")
 
 
-def fake(branches, proposed, main_contains=(), diffs=None):
-    """Stand in for GitHub and git. Returns the patches to apply to the module."""
+def fake(branches, proposed, main_contains=(), diffs=None, tips=None):
+    """Stand in for GitHub and git. Returns the patches to apply to the module.
+
+    `proposed` may be a plain iterable of branch names, meaning "proposed and merged at the
+    beginning of time", or a mapping of branch -> mergedAt, with None for a proposal that
+    never merged. `tips` maps branch -> last commit timestamp; the default is older than any
+    merge, so a branch with a merged proposal stays quiet unless a test says otherwise.
+    """
     diffs = diffs or {}
+    tips = tips or {}
+    merged = (proposed if isinstance(proposed, dict)
+              else {b: "2000-01-01T00:00:00Z" for b in proposed})
 
     def gh(args):
         if args[:1] == ["api"]:
             return list(branches)
         if args[:1] == ["pr"] and "--state" in args and "all" in args:
-            return [{"headRefName": b} for b in proposed]
+            return [{"headRefName": b, "mergedAt": at} for b, at in merged.items()]
         return []
 
     def ok(cmd, cwd=None):
@@ -52,13 +61,15 @@ def fake(branches, proposed, main_contains=(), diffs=None):
                 return "\n".join(files)
             return "\n".join(files)
         if cmd[:2] == ["git", "log"]:
+            if any("%cI" in c for c in cmd):   # membership, not substring, was the bug
+                return tips.get(cmd[-1].split("/", 1)[-1], "1999-01-01T00:00:00Z")
             return "2026-07-04"
         return ""
     return gh, ok, run
 
 
-def with_fake(branches, proposed, main_contains=(), diffs=None):
-    gh, ok, run = fake(branches, proposed, main_contains, diffs)
+def with_fake(branches, proposed, main_contains=(), diffs=None, tips=None):
+    gh, ok, run = fake(branches, proposed, main_contains, diffs, tips)
     old = (W._gh_json, W._ok, W._run)
     W._gh_json, W._ok, W._run = gh, ok, run
     try:
@@ -648,6 +659,50 @@ def main():
             rows = ns["held_here"]()["files"]
             check("mutant reports the adaptation as an accident",
                   rows and not rows[0].get("deliberate"), str(rows))
+
+    # ---- work pushed to a branch after its proposal merged --------------------------
+    #
+    # Measured in indy-llm-wiki on 2026-09-22: twelve branches carried commits added after
+    # their pull request merged, and every one was invisible here, because the old code
+    # skipped any branch whose name had ever appeared on a proposal. The inbox built to
+    # surface stranded work was reporting "Nothing is waiting" over a real backlog.
+    rows = with_fake(["kept-working"],
+                     {"kept-working": "2026-08-01T00:00:00Z"},
+                     diffs={"kept-working": ["wiki/a.md"]},
+                     tips={"kept-working": "2026-09-01T00:00:00Z"})
+    check("work added after a merge is waiting again",
+          [r["branch"] for r in rows] == ["kept-working"], str(rows))
+
+    rows = with_fake(["landed"],
+                     {"landed": "2026-09-01T00:00:00Z"},
+                     diffs={"landed": ["wiki/a.md"]},
+                     tips={"landed": "2026-08-01T00:00:00Z"})
+    check("a branch with nothing added since it merged stays quiet",
+          rows == [], str(rows))
+
+    # A proposal opened and closed without merging is a decision a person took. Raising it
+    # again would be the tool arguing with them.
+    rows = with_fake(["turned-down"], {"turned-down": None},
+                     diffs={"turned-down": ["wiki/a.md"]},
+                     tips={"turned-down": "2026-09-01T00:00:00Z"})
+    check("a proposal closed without merging is not raised again",
+          rows == [], str(rows))
+
+    # MUTATION. Put the old rule back, skipping on the mere existence of a proposal, and the
+    # first case must stop being reported. If it still passes, the check is decorative.
+    src = pathlib.Path(W.__file__).read_text(encoding="utf-8")
+    guard = src[src.index('        merged_at = proposed.get(b'):
+                src.index('# nothing added since it landed') + len('# nothing added since it landed')]
+    gh, ok, run = fake(["kept-working"], {"kept-working": "2026-08-01T00:00:00Z"},
+                       diffs={"kept-working": ["wiki/a.md"]},
+                       tips={"kept-working": "2026-09-01T00:00:00Z"})
+    mutant = src.replace(guard, "        if b in proposed:\n            continue")
+    check("the mutation actually changed the source", mutant != src, "guard text not found")
+    ns = {"__name__": "mutant", "__file__": W.__file__}
+    exec(compile(mutant, "mutant-waiting", "exec"), ns)
+    ns["_gh_json"], ns["_ok"], ns["_run"] = gh, ok, run
+    check("mutant (skip on any past proposal) misses the stranded work",
+          ns["never_proposed"]("owner/repo") == [], "mutant still reported it")
 
     print()
     if fails:

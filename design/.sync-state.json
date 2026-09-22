@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "1caa1a56d1c1d1a678e11d5f32ed3db26ceca59862e74c6651f6197a2cda9e1d",
     "tools/test_sync_commons.py": "3daabb31a3e9fc2baa6753757096757be8f7b524163ff8e68f361d532a9a42b1",
-    "design/shared-layer.json": "fbdcc6acb1989f3445249b7872245f84bcb44b7872cfd1e2430af7ec1ab9515c",
+    "design/shared-layer.json": "81f1961c1333cf3898b79d385dffb7b3ac1976522d35980221b70beb992247bd",
     "tools/drift-baseline.json": "f55451e1dad2fac761add700c2bdd9b41dd960a1373ea8e71b5b3254bc8d061f",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -82,8 +82,8 @@
     ".claude/skills/dm-style-guide/SKILL.md": "e39aa8d6aca9d1a837fe6469f978e24102723bb29fe3467075a4c51ec8ea16c3",
     "tools/check_prose.py": "0979becbe87238e47540af610a3ffa226892670df3bf3fff8998181f55c19d23",
     "tools/test_check_prose.py": "73ba388b1528c6e8c861831337eb5b08a2e133f409073fe76c6ab2399ea86f30",
-    "tools/waiting.py": "08d01ab9c02a493d77d3f919ebd813a3cf72a374b48b6137c23f8494009d9167",
-    "tools/test_waiting.py": "346b14c622a748ee8527525ba09e3ae2857e3dafc04dbff8779c7a5e64405161",
+    "tools/waiting.py": "99005d2cb0d6ae0df373ce4f912b51a3595be80f86c1a971f3e87390462e44a3",
+    "tools/test_waiting.py": "60fd8fc3280ca791c22437088f515901e3f728bb81dac6422547369640160b9f",
     ".github/workflows/waiting.yml": "7c04b8b9da7c89fc05d16e3872e81847c57fedc5c71275a3a350bee63134f701",
     ".claude/skills/waiting/SKILL.md": "b11e3ce8331f338bae7e1f0b5b591b473d91786bb23972bcc0dff5dfa2894997",
     "tools/newsletter.py": "6411ad1d54f2c8d133f2c9e6a43b386d2acd7ac6b3cb93a204985a6d8394470e",
@@ -107,7 +107,8 @@
     "tools/check_ingest_conformance.py": "0c7dae87c4605af918e6b25a63ed78e695f5de299bef6ae3e90d8e7abbe9e297",
     "tools/test_check_log_shape.py": "5de597e71125b7474adeb78ef10deb95bbc444993dc38f2af5322d453ad87d84",
     "tools/check_noindex.py": "f1dc65cbfc98b28a43eeaca3dda657894636dd39cd9d69ab84e938f234bbce1a",
-    "tools/test_check_noindex.py": "419427f90108f30c0736f7bc20d94e92d73626b1f1682882ea77a80d254c0149"
+    "tools/test_check_noindex.py": "419427f90108f30c0736f7bc20d94e92d73626b1f1682882ea77a80d254c0149",
+    ".claude/rules/finishing.md": "9085a9b42a62d60ad8149c66e2fd5efc68806f97e2234c5dd482861903fecdbd"
   },
   "adapted": {}
 }

@@ -11,6 +11,15 @@
     "michelle-llm-wiki",
     "prateek-llm-wiki",
     "oliver-llm-wiki",
+    "georgia-llm-wiki",
+    "leon-llm-wiki",
+    "rz-commons",
+    "gurden-llm-wiki",
+    "dm-llm-wiki",
+    "mission-pathways-wiki",
+    "people-hosts-wiki",
+    "eunsoo-llm-wiki",
+    "sophia-llm-wiki",
     "llm-wiki-template"
   ],
   "shared": [
@@ -98,6 +107,7 @@
     "tools/test_waiting.py",
     ".github/workflows/waiting.yml",
     ".claude/skills/waiting/SKILL.md",
+    ".claude/rules/finishing.md",
     "tools/newsletter.py",
     "tools/test_newsletter.py",
     ".claude/skills/newsletter/SKILL.md",
