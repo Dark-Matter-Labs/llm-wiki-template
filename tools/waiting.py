@@ -139,7 +139,10 @@ def open_proposals(slug):
 
 
 def never_proposed(slug):
-    """Work that exists only on a branch nobody ever opened a proposal for.
+    """Work on a branch that no open or merged proposal covers.
+
+    Including work added to a branch *after* its proposal merged, which is the common case
+    and the one this missed until 2026-09-22.
 
     The branch is deliberately not shown as the headline. What a person needs to know is
     *what is in it* — how many pages, written when — and where to click.
@@ -162,11 +165,28 @@ def never_proposed(slug):
     # A list that silently overstates is worse than no list — it teaches people to discount
     # it, and this whole tool exists because something went unread.
     asked = _gh_json(["pr", "list", "-R", slug, "--state", "all", "--limit", "1000",
-                      "--json", "headRefName"])
+                      "--json", "headRefName,mergedAt"])
     if asked is None:
         raise Unavailable("could not ask which work has already been proposed "
                           "(needs `pull-requests: read`)")
-    proposed = {p.get("headRefName") for p in asked}
+    # A PR HAVING EXISTED IS NOT THE SAME AS THE WORK HAVING LANDED, and reading it that way
+    # hid twelve branches in this repo on 2026-09-22. The pattern is ordinary: a branch is
+    # proposed, merged, and then somebody keeps working on the same branch. Its later commits
+    # are in no proposal, are not in main, and were invisible here by construction, because
+    # the branch's name was in this set forever after its first merge.
+    #
+    # So keep the LATEST merge time per branch rather than a bare set of names, and below,
+    # skip a branch only while nothing has been added since. A branch whose PR was closed
+    # without merging carries no merge time, stays skipped, and that is deliberate: work
+    # somebody looked at and turned down should not be raised again by a tool.
+    proposed = {}
+    for pr in asked:
+        b, at = pr.get("headRefName"), pr.get("mergedAt")
+        if not b or not at:
+            proposed.setdefault(b, None)
+            continue
+        if proposed.get(b) is None or at > proposed[b]:
+            proposed[b] = at
     _run(["git", "fetch", "--quiet", "origin"])
     out = []
     for b in branches:
@@ -181,8 +201,13 @@ def never_proposed(slug):
         # Ancestry alone is not enough — a squash merge rewrites history, so a branch that
         # WAS merged still fails the test above. Asking whether a proposal ever existed is
         # what separates "merged and left lying around" from "never surfaced to anyone".
-        if b in proposed:
-            continue
+        merged_at = proposed.get(b, "__none__")
+        if merged_at != "__none__":
+            if merged_at is None:
+                continue                  # proposed and never merged; closed or still open
+            tip = _run(["git", "log", "-1", "--format=%cI", ref])
+            if not tip or tip <= merged_at:
+                continue                  # nothing added since it landed
         added = [f for f in _run(["git", "diff", "--name-only", "--diff-filter=A",
                                   f"origin/main...{ref}"]).splitlines()
                  if f.startswith("wiki/") and f.endswith(".md")]

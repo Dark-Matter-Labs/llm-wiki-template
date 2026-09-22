@@ -69,13 +69,27 @@ def owner() -> "str | None":
 
 
 def declared() -> "list[str]":
-    """The commons this wiki reads. Same declaration contribute.py writes UP to."""
+    """The commons this wiki READS.
+
+    `reads_from` when it is present, `contributes_to` when it is not. The two used to be one
+    field, which meant declaring that a wiki may read a commons silently also declared that it
+    may push to it. That is wrong in one direction only, and it is the dangerous direction: a
+    wiki holding material that must never travel up still needs to read what the group knows.
+    Splitting them lets a wiki be a reader without being a contributor, and contribute.py
+    needs no change to enforce it — it only ever consults `contributes_to`.
+
+    Falling back keeps every wiki written before this honest: where a wiki genuinely does both,
+    one field still says so.
+    """
     if not FEDERATION.exists():
         return []
     try:
-        return list(json.loads(FEDERATION.read_text(encoding="utf-8")).get("contributes_to", []))
+        fed = json.loads(FEDERATION.read_text(encoding="utf-8"))
     except ValueError:
         return []
+    if "reads_from" in fed:
+        return list(fed.get("reads_from") or [])
+    return list(fed.get("contributes_to") or [])
 
 
 def cached(name: str) -> "int | None":
