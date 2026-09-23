@@ -116,6 +116,98 @@ class Unavailable(RuntimeError):
     """Raised when a question could not be asked, rather than answered with a guess."""
 
 
+# HOW MUCH OF A PIECE OF WORK IS NOT IN THE WIKI. Added 2026-09-23, when the inbox listed seven
+# unproposed branches under "0 page(s) exist there and nowhere else" and that line nearly
+# justified discarding them. It counted only pages that were NEW on a branch. One of the seven
+# was a 180-line rewrite of a page main already has, plus a published page: 289 of its 293
+# added lines were on no page in main. A rewrite is not a new page, so it counted as nothing.
+#
+# The measure is the one used by hand that day: the lines a branch adds since it left main,
+# ignoring the log and very short lines, that appear on NO file in main. "Anywhere", not "in
+# the same file", because work also lands another way — under a different name, or re-done
+# the same afternoon — and a branch whose words are all on main already has nothing to lose.
+
+#: Shorter lines are too common to mean anything — a heading, `---`, a closing tag — and would
+#: match main by accident. The threshold of the 2026-09-23 measurement.
+MIN_LINE = 20
+
+#: The log is bookkeeping about work, not the work, and every branch carries some.
+LOG_EXCLUDES = [":(exclude)wiki/log", ":(exclude)wiki/log.md"]
+
+
+def _is_log(path) -> bool:
+    return path == "wiki/log.md" or path.startswith("wiki/log/")
+
+
+def added_lines(ref):
+    """The substantive lines `ref` adds since it left main, grouped by the file they are in.
+
+    Keyed by the `diff --git` header only to tell files apart. No path is ever returned to a
+    renderer: a count can go into a public repository's issue, a private page's slug cannot.
+    """
+    patch = _run(["git", "diff", "--no-color", "--no-ext-diff", "--unified=0",
+                  f"origin/main...{ref}", "--", "."] + LOG_EXCLUDES)
+    files, cur, in_hunk = {}, None, False
+    for ln in patch.split("\n"):
+        if ln.startswith("diff --git "):
+            cur, in_hunk = ln, False
+        elif ln.startswith("@@"):
+            in_hunk = True
+        elif in_hunk and ln.startswith("+"):
+            t = ln[1:].strip()
+            if len(t) >= MIN_LINE:
+                files.setdefault(cur, []).append(t)
+    return files
+
+
+def _cat_blobs(shas, cwd=None):
+    """Every blob's bytes, concatenated, in one `git cat-file --batch`; None on failure."""
+    try:
+        r = subprocess.run(["git", "cat-file", "--batch"], input="\n".join(shas).encode(),
+                           cwd=cwd or ROOT, capture_output=True, timeout=300)
+        return r.stdout if r.returncode == 0 else None
+    except Exception:                                     # noqa: BLE001
+        return None
+
+
+def landed(candidates):
+    """Which of `candidates` already appear on some file in main, outside the log.
+
+    One read of main's tree per run, however many branches there are, and only the candidate
+    lines are held: about 110MB of blobs in the largest wiki, a few seconds, no network.
+    None when main could not be read — and then no figure is shown, because every added line
+    would look missing and a list that overstates is how this tool loses its readers.
+    """
+    if not candidates:
+        return set()
+    tree = _run(["git", "ls-tree", "-r", "-z", "origin/main"])
+    if not tree:
+        return None
+    shas = set()
+    for ent in tree.split("\0"):
+        meta, _, path = ent.partition("\t")
+        parts = meta.split()
+        if len(parts) == 3 and parts[1] == "blob" and not _is_log(path):
+            shas.add(parts[2])
+    data = _cat_blobs(sorted(shas))
+    # A partial clone answers "<id> missing" for a blob it lacks and still exits cleanly; read
+    # as an empty blob, its lines would all look absent. Not a figure, then.
+    if data is None or re.search(rb"(?m)^[0-9a-f]{40,64} missing$", data):
+        return None
+    return {t for t in (ln.strip() for ln in data.decode("utf-8", "ignore").splitlines())
+            if t in candidates}
+
+
+def unlanded(files, found):
+    """Count what `files` (from `added_lines`) adds that `found` says main does not have."""
+    added = sum(len(ls) for ls in files.values())
+    if found is None:
+        return {"added_lines": added, "unlanded_lines": None, "unlanded_files": None}
+    missing = [sum(1 for t in ls if t not in found) for ls in files.values()]
+    return {"added_lines": added, "unlanded_lines": sum(missing),
+            "unlanded_files": sum(1 for n in missing if n)}
+
+
 def open_proposals(slug):
     """Pull requests waiting for a person, with their checks in plain words."""
     rows = _gh_json(["pr", "list", "-R", slug, "--state", "open", "--limit", "50",
@@ -145,7 +237,8 @@ def never_proposed(slug):
     and the one this missed until 2026-09-22.
 
     The branch is deliberately not shown as the headline. What a person needs to know is
-    *what is in it* — how many pages, written when — and where to click.
+    *what is in it* — how much of it the wiki does not have, how many pages are new, written
+    when — and where to click.
     """
     # The branch list comes from GitHub, paginated, not from local refs. Two reasons, and
     # the second is the one that actually bit. `refs/remotes/origin` is a cache of whatever
@@ -188,7 +281,7 @@ def never_proposed(slug):
         if proposed.get(b) is None or at > proposed[b]:
             proposed[b] = at
     _run(["git", "fetch", "--quiet", "origin"])
-    out = []
+    out, lines_of = [], {}
     for b in branches:
         if b in ("main", "HEAD", "export"):
             continue
@@ -210,10 +303,11 @@ def never_proposed(slug):
                 continue                  # nothing added since it landed
         added = [f for f in _run(["git", "diff", "--name-only", "--diff-filter=A",
                                   f"origin/main...{ref}"]).splitlines()
-                 if f.startswith("wiki/") and f.endswith(".md")]
+                 if f.startswith("wiki/") and f.endswith(".md") and not _is_log(f)]
         changed = _run(["git", "diff", "--name-only", f"origin/main...{ref}"]).splitlines()
         if not changed:
             continue
+        lines_of[b] = added_lines(ref)
         out.append({
             "branch": b,
             "when": _run(["git", "log", "-1", "--format=%ad", "--date=short", ref]),
@@ -221,6 +315,8 @@ def never_proposed(slug):
             "files": len(changed),
             "url": f"https://github.com/{slug}/compare/main...{b}?expand=1",
         })
+    found = landed({t for fl in lines_of.values() for ls in fl.values() for t in ls})
+    out = [{**r, **unlanded(lines_of[r["branch"]], found)} for r in out]
     out.sort(key=lambda r: (r["when"], -r["new_pages"]))
     return out
 
@@ -448,6 +544,59 @@ def gather(slug):
     return m
 
 
+def _lines_total(rows):
+    """Lines not in the wiki across `rows`, or None if any row could not be measured."""
+    vals = [r.get("unlanded_lines") for r in rows]
+    return None if any(v is None for v in vals) else sum(vals)
+
+
+def _held_in(rows):
+    """What a set of pieces holds, as sentences both renderers share.
+
+    The page count stays, and is never again allowed to stand alone: on 2026-09-23 "0 page(s)
+    exist there and nowhere else" sat over 289 lines the wiki did not have, and read as nothing.
+    Counts only — no path, so nothing here needs the private-title guard.
+    """
+    pages = sum(r.get("new_pages", 0) for r in rows)
+    lines = _lines_total(rows)
+    if lines is None:
+        return ["How much of it is not in the wiki yet could not be measured.",
+                f"{pages} page(s) exist there and nowhere else."]
+    if lines == 0 and pages:
+        # A new page of nothing but short lines counts no lines and still exists nowhere else.
+        return ["No line long enough to count is missing from the wiki,",
+                f"but {pages} page(s) exist there and nowhere else. Look before setting them aside."]
+    if lines == 0:
+        return ["Every line in them is already in the wiki (log entries and very short "
+                "lines aside), so setting them aside loses nothing."]
+    files = sum(r.get("unlanded_files") or 0 for r in rows)
+    out = [f"{lines} line(s) in them are not in the wiki yet, across {files} file(s)."]
+    out.append(f"{pages} page(s) exist there and nowhere else." if pages else
+               "No new wiki page among them, which is why counting new pages alone read as nothing.")
+    return out
+
+
+def _what(p):
+    """One piece of work's contents, in words."""
+    pages = f"{p['new_pages']} new page(s)" if p.get("new_pages") else ""
+    n = p.get("unlanded_lines")
+    if n is None:
+        return ", ".join(s for s in (pages, "not measured") if s)
+    if n == 0:
+        return (pages + ", but " if pages else "") + "every line already in the wiki"
+    return ", ".join(s for s in (f"{n} line(s) not in the wiki, {p['unlanded_files']} file(s)",
+                                 pages) if s)
+
+
+def _summary(rows):
+    """A group's contents in one clause, for the already-decided lines."""
+    pages = sum(r.get("new_pages", 0) for r in rows)
+    lines = _lines_total(rows)
+    if lines is None:
+        return f"{pages} new page(s), not measured"
+    return f"{lines} line(s) not in the wiki, {pages} new page(s)"
+
+
 def render(m) -> str:
     out = [f"What's waiting for you — {m['repo']}", ""]
     props, never = m["proposals"], m["never_proposed"]
@@ -460,14 +609,12 @@ def render(m) -> str:
         out.append("")
 
     if never:
-        pages = sum(p["new_pages"] for p in never)
-        out.append(f"  {len(never)} piece(s) of work that were never proposed — "
-                   f"{pages} page(s) exist there and nowhere else")
+        out.append(f"  {len(never)} piece(s) of work that were never proposed")
+        out += [f"     {s}" for s in _held_in(never)]
         out.append("     Written, saved, and never put forward, so nothing has ever asked")
         out.append("     you about them. Open a link to see the change and propose it.")
         for p in never[:12]:
-            what = f"{p['new_pages']} new page(s)" if p["new_pages"] else f"{p['files']} file(s)"
-            out.append(f"     {p['when']}  {what:<18} {p['url']}")
+            out.append(f"     {p['when']}  {_what(p):<44} {p['url']}")
         if len(never) > 12:
             out.append(f"     … and {len(never) - 12} more")
         out.append("")
@@ -481,8 +628,7 @@ def render(m) -> str:
                                 d["decision"]["by_a_person"]), []).append(d)
         out.append(f"  {len(dec)} piece(s) already decided about — not listed above")
         for (page, when, person), items in by_page.items():
-            pages = sum(i["new_pages"] for i in items)
-            out.append(f"     {len(items)} of them, {pages} page(s), by \"{page[:48]}\" ({when})")
+            out.append(f"     {len(items)} of them ({_summary(items)}), by \"{page[:48]}\" ({when})")
             if not person:
                 out.append("       NOBODY HAS STOOD BEHIND THAT DECISION — it is recorded at")
                 out.append("       machine validation, so it is a proposal that has been")
@@ -574,18 +720,16 @@ def markdown(m, public_safe: bool = False) -> str:
         out.append("")
 
     if never:
-        pages = sum(p["new_pages"] for p in never)
+        held = _held_in(never)
         out += [f"## {len(never)} piece(s) of work nobody ever put forward", "",
-                f"**{pages} page(s) exist only here.** They were written and saved, and then "
-                "nothing ever asked you about them — so nothing has been wrong, and nothing "
-                "has been visible either.", "",
+                f"**{held[0]}** " + " ".join(held[1:] + [
+                    "They were written and saved, and then nothing ever asked you about them "
+                    "— so nothing has been wrong, and nothing has been visible either."]), "",
                 "Open one to see exactly what it would add. The green button on that page "
                 "proposes it; you can also just close the tab and nothing happens.", "",
                 "| written | what's in it | open it |", "|---|---|---|"]
         for p in never:
-            what = (f"{p['new_pages']} new page(s)" if p["new_pages"]
-                    else f"{p['files']} changed file(s)")
-            out.append(f"| {p['when']} | {what} | [look]({p['url']}) |")
+            out.append(f"| {p['when']} | {_what(p)} | [look]({p['url']}) |")
         out.append("")
 
 
@@ -600,9 +744,8 @@ def markdown(m, public_safe: bool = False) -> str:
                 "Listed here rather than above, so this page does not keep asking you the "
                 "same closed question every week.", ""]
         for (page, when, person, vis), items in by_page.items():
-            pages = sum(i["new_pages"] for i in items)
             named = page if (vis == "public" or not public_safe) else "a page in this wiki"
-            out.append(f"- **{len(items)} piece(s)**, {pages} page(s) — decided by "
+            out.append(f"- **{len(items)} piece(s)**, {_summary(items)} — decided by "
                        f"*{named}* ({when})")
             if not person:
                 out.append("  - **Nobody has stood behind that decision.** It is recorded at "

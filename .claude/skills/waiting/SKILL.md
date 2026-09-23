@@ -38,6 +38,9 @@ it was written, and what clicking will do.
    contradict it — if a number here disagrees with the tool, the tool is right.
 2. **Lead with the total, not the list.** "Sixty-six pages are sitting in work nobody ever put
    forward" is the sentence. The table is the detail behind it.
+   **Lead with the lines the wiki does not have, not with the new pages.** "0 new pages" is not
+   "nothing to lose": on 2026-09-23 it sat over a 180-line rewrite of an existing page, and
+   nearly got that work set aside unread. A rewrite is not a new page.
 3. **Offer to look, not to act.** For anything old, offer to read it and say what it contains
    and whether it still holds — that is genuinely useful and costs the owner nothing.
 4. **Never propose, merge, or delete anything on your own.** See below.

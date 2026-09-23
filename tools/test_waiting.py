@@ -55,7 +55,9 @@ def fake(branches, proposed, main_contains=(), diffs=None, tips=None):
 
     def run(cmd, cwd=None, timeout=60):
         if cmd[:2] == ["git", "diff"]:
-            ref = cmd[-1].split("...")[-1].split("/", 1)[-1]
+            ref = next(c for c in cmd if "..." in c).split("...")[-1].split("/", 1)[-1]
+            if "--unified=0" in cmd:
+                return ""                               # no content: nothing to measure
             files = diffs.get(ref, [])
             if "--diff-filter=A" in cmd:
                 return "\n".join(files)
@@ -703,6 +705,185 @@ def main():
     ns["_gh_json"], ns["_ok"], ns["_run"] = gh, ok, run
     check("mutant (skip on any past proposal) misses the stranded work",
           ns["never_proposed"]("owner/repo") == [], "mutant still reported it")
+
+    # ---- how much of it is not in the wiki, not just how many pages are new ----------
+    #
+    # Found 2026-09-23. The inbox listed seven unproposed branches with "0 page(s) exist
+    # there and nowhere else", and that nearly justified discarding them. One carried a
+    # 180-line rewrite of a page main already has, 289 of its 293 added lines on no page in
+    # main, because the count only ever looked at pages that were NEW. A rewrite is not new.
+    #
+    # These run against a real repository in a temporary directory, not a fake, because the
+    # thing under test is the reading of git's own output.
+    def real_git(repo):
+        env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
+               "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
+
+        def g(*a):
+            subprocess.run(["git", *a], cwd=repo, check=True, capture_output=True, env=env)
+
+        def put(rel, body):
+            f = pathlib.Path(repo) / rel
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text(body, encoding="utf-8")
+
+        def run(cmd, cwd=None, timeout=60):
+            r = subprocess.run(cmd, cwd=repo, capture_output=True, text=True, timeout=timeout)
+            return r.stdout.strip() if r.returncode == 0 else ""
+
+        def ok(cmd, cwd=None):
+            return subprocess.run(cmd, cwd=repo, capture_output=True).returncode == 0
+        return g, put, run, ok
+
+    LANDED = ["The same paragraph, which reached the wiki under another name.",
+              "And its second line, which also reached the wiki another way."]
+    REWRITE = ["A rewritten opening that says what the position is actually for.",
+               "A second paragraph the page on main has never carried at all.",
+               "A third, so the count is not an accident of one line matching."]
+
+    def build(tmp):
+        repo = pathlib.Path(tmp) / "repo"
+        repo.mkdir()
+        g, put, run, ok = real_git(repo)
+        g("init", "-q", "-b", "main")
+        put("wiki/a-private-slug.md", "---\ntitle: T\n---\nThe original opening line of this page.\n")
+        put("wiki/log.md", "# Log\n")
+        g("add", "-A"); g("commit", "-q", "-m", "base")
+        # A rewrite of a page main already has: no new page, and real work.
+        g("checkout", "-q", "-b", "rewrite")
+        put("wiki/a-private-slug.md", "---\ntitle: T\n---\n" + "\n".join(REWRITE) + "\nshort\n")
+        put("wiki/log.md", "# Log\n## [2026-07-11] ingest | A log line long enough to count\n")
+        put("wiki/log/2026-07-11.md", "## [2026-07-11] ingest | Another log line long enough\n")
+        g("add", "-A"); g("commit", "-q", "-m", "rewrite")
+        # A variant whose words reached main another way, under a different file.
+        g("checkout", "-q", "main"); g("checkout", "-q", "-b", "variant")
+        put("wiki/variant.md", "\n".join(LANDED) + "\n")
+        g("add", "-A"); g("commit", "-q", "-m", "variant")
+        g("checkout", "-q", "main")
+        put("wiki/landed.md", "\n".join(LANDED) + "\n")
+        # A line that reached main only as a log entry is written about, not in the wiki.
+        put("wiki/log/2026-07-12.md", REWRITE[0] + "\n")
+        g("add", "-A"); g("commit", "-q", "-m", "landed another way")
+        for b in ("main", "rewrite", "variant"):
+            g("update-ref", f"refs/remotes/origin/{b}", b)
+        return repo, run, ok
+
+    def gh_for(branches):
+        def gh(args):
+            if args[:1] == ["api"]:
+                return list(branches)
+            if args[:1] == ["pr"]:
+                return []
+            return None
+        return gh
+
+    def measure(ns, repo, run, ok):
+        keep = {k: ns[k] for k in ("_gh_json", "_ok", "_run", "ROOT")}
+        ns.update(_gh_json=gh_for(["main", "rewrite", "variant"]), _ok=ok, _run=run,
+                  ROOT=str(repo))
+        try:
+            return {r["branch"]: r for r in ns["never_proposed"]("owner/repo")}
+        finally:
+            ns.update(keep)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        repo, run, ok = build(tmp)
+        rows = measure(W.__dict__, repo, run, ok)
+        rw, va = rows.get("rewrite", {}), rows.get("variant", {})
+        check("a rewrite of an existing page counts no new pages", rw.get("new_pages") == 0, str(rw))
+        check("...but its unlanded lines are counted", rw.get("unlanded_lines") == 3, str(rw))
+        check("...in the one file that carries them", rw.get("unlanded_files") == 1, str(rw))
+        check("log lines and short lines are not counted as added work",
+              rw.get("added_lines") == 3, str(rw))
+        check("lines that reached main in another file are not counted as missing",
+              va.get("new_pages") == 1 and va.get("added_lines") == 2
+              and va.get("unlanded_lines") == 0, str(va))
+
+        # The headline. "0 pages exist nowhere else" beside 3 lines nowhere else must not read
+        # as "nothing would be lost".
+        m = {"repo": "o/r", "proposals": [], "never_proposed": [rw], "decided": []}
+        md, tx = W.markdown(m, public_safe=True), W.render(m)
+        check("the issue says how many lines are not in the wiki",
+              "3 line(s)" in md and "1 file(s)" in md, md[:600])
+        check("...on the piece's own row, not only in the total",
+              any(ln.startswith("| ") and "3 line(s) not in the wiki, 1 file(s)" in ln
+                  for ln in md.splitlines()), md[:600])
+        check("...and so does the terminal", "3 line(s)" in tx, tx[:600])
+        check("no new pages is explained, not left to read as nothing lost",
+              "counting new pages alone" in md and "counting new pages alone" in tx, md[:600])
+        check("the new figures name no file, so no private path reaches a public issue",
+              "a-private-slug" not in md and "a-private-slug" not in tx)
+        leaked = [w for w in JARGON if w.lower() in tx.lower()]
+        check("...and still use no git vocabulary", not leaked, f"leaked: {leaked}")
+
+        m = {"repo": "o/r", "proposals": [], "never_proposed": [{**va, "new_pages": 0}],
+             "decided": []}
+        check("work that is all in the wiki already says so, and that nothing would be lost",
+              "loses nothing" in W.markdown(m) and "loses nothing" in W.render(m),
+              W.markdown(m)[:600])
+
+        # A new page made only of short lines has no line long enough to count, and still exists
+        # nowhere else. "Loses nothing" over it is the original failure from the other side.
+        stub = {**va, "new_pages": 1, "unlanded_lines": 0, "unlanded_files": 0}
+        m = {"repo": "o/r", "proposals": [], "never_proposed": [stub], "decided": []}
+        md, tx = W.markdown(m), W.render(m)
+        check("a new page is never summed up as nothing to lose",
+              "loses nothing" not in md and "loses nothing" not in tx, md[:600])
+        check("...and is counted in the headline", "1 page(s) exist there and nowhere else" in md
+              and "1 page(s) exist there and nowhere else" in tx, md[:600])
+
+        # A partial clone answers "<id> missing" for a blob it lacks, with a clean exit. Read as
+        # an empty blob, every line in it would look absent: the understatement, silently.
+        keep = W._cat_blobs
+        W._cat_blobs = lambda shas, cwd=None: b"some text line long enough to count\n" + \
+            b"0" * 40 + b" missing\n"
+        try:
+            got = W.landed({"some text line long enough to count"})
+        finally:
+            W._cat_blobs = keep
+        check("a blob main does not have locally gives no figure, not a partial one",
+              got is None, str(got))
+
+        # Set aside is not deleted, so a decided piece still says what it holds.
+        m = {"repo": "o/r", "proposals": [], "never_proposed": [],
+             "decided": [{**rw, "decision": {"page": "A ruling", "when": "2026-09-23",
+                                             "by_a_person": True, "visibility": "private"}}]}
+        check("a decided piece still reports the lines it holds",
+              "3 line(s)" in W.markdown(m, public_safe=True) and "3 line(s)" in W.render(m),
+              W.markdown(m)[:600])
+
+        # FAILS HONESTLY. If main cannot be read, every added line would look missing; say it
+        # could not be measured instead of printing the overstatement.
+        keep = W._cat_blobs
+        W._cat_blobs = lambda shas, cwd=None: None
+        try:
+            rows_off = measure(W.__dict__, repo, run, ok)
+        finally:
+            W._cat_blobs = keep
+        check("an unreadable main gives no figure rather than a wrong one",
+              rows_off.get("rewrite", {}).get("unlanded_lines") is None, str(rows_off))
+        m = {"repo": "o/r", "proposals": [], "never_proposed": list(rows_off.values()),
+             "decided": []}
+        check("...and says it could not be measured",
+              "could not be measured" in W.markdown(m) and "could not be measured" in W.render(m),
+              W.markdown(m)[:600])
+
+        # MUTATIONS. Each must change a number above, or the check it answers is decorative.
+        src_m = pathlib.Path(W.__file__).read_text(encoding="utf-8")
+        for name, needle, repl, branch, key, want_not in [
+            ("stop subtracting what main already has", "if t not in found", "if True",
+             "variant", "unlanded_lines", 0),
+            ("stop excluding the log", "+ LOG_EXCLUDES", "", "rewrite", "added_lines", 3),
+            ("stop ignoring short lines", "MIN_LINE = 20", "MIN_LINE = 0", "rewrite",
+             "added_lines", 3),
+        ]:
+            if needle not in src_m:
+                check(f"mutation anchor present: {needle}", False, "the code this tests has moved")
+                continue
+            ns = {"__name__": "mutant", "__file__": W.__file__}
+            exec(compile(src_m.replace(needle, repl), "mutant-waiting", "exec"), ns)
+            got = measure(ns, repo, run, ok).get(branch, {}).get(key)
+            check(f"mutant ({name}) changes the count", got != want_not, f"still {got}")
 
     print()
     if fails:
