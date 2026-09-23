@@ -161,7 +161,10 @@ def known_federation(root=None) -> set[str]:
     data, _ = _read_json(MANIFEST, root)
     if not data:
         return set()
-    return set(data.get("siblings") or []) | ({data["source"]} if data.get("source") else set())
+    # external_members are known but never synced into (a wiki on its own system); they are
+    # still legal to read from and contribute to, which is what this set answers.
+    return (set(data.get("siblings") or []) | set(data.get("external_members") or [])
+            | ({data["source"]} if data.get("source") else set()))
 
 
 def _model_shaped(name: str):

@@ -23,6 +23,9 @@
     "sophia-llm-wiki",
     "llm-wiki-template"
   ],
+  "external_members": [
+    "pj-wiki"
+  ],
   "shared": [
     "design/xco.tokens.json",
     "tools/build_tokens.py",

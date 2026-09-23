@@ -200,6 +200,13 @@ def main():
         check("a `reads_from` target the manifest does not know is caught",
               fails_with(r, "somewhere-unknown"))
     with tempfile.TemporaryDirectory() as t:
+        root = wiki(t, "alex-llm-wiki", ups=(), reads=("pj-wiki",))
+        man = root / "design" / "shared-layer.json"
+        m = json.loads(man.read_text()); m["external_members"] = ["pj-wiki"]; man.write_text(json.dumps(m))
+        r = iw.check(root)
+        check("a wiki the manifest lists as an external member is a legal target",
+              not r.failures, "; ".join(r.failures)[:120])
+    with tempfile.TemporaryDirectory() as t:
         r = iw.check(wiki(t, "alex-llm-wiki"))
         check("a wiki written before the split (no `reads_from`) still passes", not r.failures,
               "; ".join(r.failures)[:120])
