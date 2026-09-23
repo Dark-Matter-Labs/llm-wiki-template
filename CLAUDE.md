@@ -54,9 +54,10 @@ The owner works in plain English from a web browser. They are **not** using a te
 - Never ask them to run commands, edit files by hand, or understand the folder layout.
 - They talk in intent ("add this report", "what does the wiki say about X", "check the wiki").
 - You translate that intent into the operations below.
-- When you finish work, you push changes to a branch and they review/merge a pull request
-  from the GitHub web interface. Summarise what changed in plain language so the review is
-  easy — lead with *what you learned*, not *which files moved*.
+- When you finish work, push it to a branch, open a pull request, and summarise what changed
+  in plain language. Lead with *what you learned*, not *which files moved*. Then **ask once, in
+  the session: "Shall I merge this?"**, and merge on a yes (see `.claude/rules/finishing.md`).
+  Never send anyone to github.com to merge: that is the step that left work stranded.
 
 Things worth recording here once you know them: the owner's field and vocabulary, what
 they want the wiki to eventually answer, how much pushback they want, and any standing

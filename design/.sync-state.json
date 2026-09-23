@@ -75,7 +75,7 @@
     ".claude/skills/inquiry/SKILL.md": "33a6bc4dd427a7b8940bb410336cf5ab46c81d94c4974e8e700eb4bd7af3f9ce",
     "tools/goals.py": "898c127e2232be956053affe3e6d981fb56e9c81dc07f02ad4c6eb2bbccb9cbc",
     "tools/test_goals.py": "dc4116c3676ef9cee91a508485a916bda0ce2c24f52a53b59059abe484cf0c48",
-    "ONBOARDING.md": "1e69087a68a5fe7af21a8e3e9ba539926fc5311c21059467c9ede5da3fd591a8",
+    "ONBOARDING.md": "7573551f826a7b7838ffc6de52c390ee8103438f441e580524dff5dea377554a",
     "tools/check_onboarding.py": "63c809fc725f84d4691c04e2d49f0e18f423756cf4764968b8fbaffbeba508e5",
     "tools/test_check_onboarding.py": "01156c210263d06db94b5e65124dc0d9b8558575e54c7dadb8273c409e6e72b3",
     ".claude/skills/ai-detox/SKILL.md": "fbc886f89e3ec751a476a64db1be8c4442d6e47440af186d8c9d23610207fd73",
