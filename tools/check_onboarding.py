@@ -21,11 +21,17 @@ WHAT IT DOES NOT CHECK. Whether the docs are any good, whether the tone is right
 order helps — none of that is mechanisable, and pretending otherwise would give a false all-
 clear on the part that actually matters. This checks the facts and says so.
 
-It also cannot check a reference into a gitignored tree. `raw/` holds source documents that
-deliberately never leave the machine that ingested them, and `export/` is built by CI, so
-neither is present in a clean checkout: a path under either is accepted unverified. Treating
-their absence as an error would fail every correct doc in the federation; treating it as
-proof of existence would be a lie. It is accepted, and recorded here as the blind spot.
+It also cannot check a reference into a generated tree. `export/` is built by CI and never
+committed, so it is absent from a clean checkout, and a path git is told to ignore there is
+accepted unverified. That is the blind spot, and it is recorded here.
+
+`raw/` is NOT in that blind spot, though this docstring said so until 2026-09-22. Source
+documents are curated by a person and built by nothing, so "git ignores it" is no evidence
+that anything will produce one. Four wikis ignore `raw/*.md` and un-ignore their real
+sources one by one, and the ignore rule was passing any `raw/<name>.md` in their docs at
+all, including an example file deleted months earlier. The claim that checking raw/ "would
+fail every correct doc in the federation" was never measured. Measured that day across 20
+wikis: the only raw/ files any doc named were committed ones, and the defect itself.
 
     python3 tools/check_onboarding.py            # report
     python3 tools/check_onboarding.py --check    # exit non-zero on any drift (CI)
@@ -54,20 +60,22 @@ SCHEDULE = re.compile(
 #: ...but only when the sentence also claims it happens on its own.
 AUTOMATIC = re.compile(r"automatic|on its own|by itself|runs? (?:on|itself)|scheduled", re.I)
 
+#: Paths under `raw/`: source documents, which a person curates and no tool ever builds.
+#: The generated-artefact leniency below must never reach them (see the module docstring).
+CURATED = re.compile(r"^(?:\./)?raw/[^/]")
+
 
 _TREE = None
 _IGNORED = {}
 
 
-def _generated(path: str) -> bool:
-    """True when git is told to ignore this path — i.e. it is built, not committed.
+def _curated(path: str) -> bool:
+    """True for a path under `raw/` — `raw/` itself is a folder every wiki has, not a source."""
+    return bool(CURATED.match(path))
 
-    `export/` is the case that matters: the docs describe it correctly ("built by CI, not
-    committed to main"), and it exists in any working copy where the export has been run.
-    So this check passed on my machine and failed in CI on a clean checkout — green for the
-    wrong reason, which is the failure it was written to catch, one level up. A documented
-    generated artefact is not a broken reference.
-    """
+
+def _git_ignores(path: str) -> bool:
+    """True when git is told to ignore this path. Cached; no git means no opinion."""
     if path in _IGNORED:
         return _IGNORED[path]
     hit = False
@@ -86,16 +94,32 @@ def _generated(path: str) -> bool:
                 break
     except Exception:                                    # noqa: BLE001 — no git, no opinion
         hit = False
-    if not hit:
-        # A bare basename — docs say `wiki.public.json`, not `export/wiki.public.json`.
-        # Accept it only when this repo's own tooling actually writes that name. The
-        # tempting shortcut is "it would be ignored inside an ignored directory", but
-        # `export/` ignores everything under it, so that rule accepts any invented name
-        # at all and the check quietly stops checking. Tried, caught by its own tests,
-        # replaced with this.
-        hit = _written_by_tooling(pathlib.PurePosixPath(path.rstrip("/")).name)
     _IGNORED[path] = hit
     return hit
+
+
+def _generated(path: str) -> bool:
+    """True when git is told to ignore this path — i.e. it is built, not committed.
+
+    `export/` is the case that matters: the docs describe it correctly ("built by CI, not
+    committed to main"), and it exists in any working copy where the export has been run.
+    So this check passed on my machine and failed in CI on a clean checkout — green for the
+    wrong reason, which is the failure it was written to catch, one level up. A documented
+    generated artefact is not a broken reference.
+
+    Never on the ignore rule alone for a path under `raw/`: nothing builds a source
+    document, so git ignoring one says only that it would not be committed.
+    """
+    if not _curated(path) and _git_ignores(path):
+        return True
+    # A bare basename — docs say `wiki.public.json`, not `export/wiki.public.json`.
+    # Accept it only when this repo's own tooling actually writes that name. The
+    # tempting shortcut is "it would be ignored inside an ignored directory", but
+    # `export/` ignores everything under it, so that rule accepts any invented name
+    # at all and the check quietly stops checking. Tried, caught by its own tests,
+    # replaced with this. The same shape came back on 2026-09-22 through `raw/*.md`,
+    # which is why the ignore rule above now stops at `raw/`.
+    return _written_by_tooling(pathlib.PurePosixPath(path.rstrip("/")).name)
 
 
 _NAMES = None
@@ -160,6 +184,11 @@ def _resolves(path: str, want_dir: bool = False) -> bool:
     and rightly so. Anchoring only at the root would report every one of those as missing.
     """
     global _TREE
+    if _curated(path) and not want_dir:
+        # A source document resolves as a clean checkout will see it: present, and not
+        # ignored. No tooling fallback either — a tool that names a source is talking
+        # about it, not producing it — and no suffix match, since raw/ is at the root.
+        return (ROOT / path).is_file() and not _git_ignores(path)
     if (ROOT / path).exists() or _generated(path):
         return True
     if _TREE is None:
