@@ -18,10 +18,12 @@ Built on the [LLM-Wiki pattern](https://gist.github.com/karpathy/442a6bf55591489
 
 The whole thing is one loop, and it works from a browser with no terminal:
 
-**say what you want → Claude works → you review and merge a pull request.**
+**say what you want → Claude works, then asks "Shall I merge this?" → you say yes.**
 
-Every change arrives as a PR with a plain-language summary. That's the oversight step:
-nothing enters the wiki, and nothing gets published, without a human merge.
+Every change still arrives as a pull request with a plain-language summary, and Claude merges it
+only when you say yes, in the same conversation, so you never have to find it on GitHub. That's
+the oversight step:
+nothing enters the wiki, and nothing gets published, without a person saying yes.
 
 ### Things you can say
 

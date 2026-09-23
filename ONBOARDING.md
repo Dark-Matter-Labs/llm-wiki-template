@@ -39,7 +39,9 @@ Three words you will meet, and then never have to think about again:
   nothing until someone clicks Merge. This is the undo button; it is why you cannot break
   anything.
 - **Merge** — accepting the proposal. This is the only irreversible-feeling button, and it
-  isn't: every merge can be reverted on its own.
+  isn't: every merge can be reverted on its own. **You won't usually press it yourself.** When
+  Claude finishes a piece of work in your own wiki, it tells you what changed and asks *"Shall I
+  merge this?"* Say yes and it merges. Say no, or say nothing, and the work waits safely.
 
 ---
 
@@ -83,7 +85,10 @@ tier applies** (see below — say `private` if you are unsure), write a summary 
 every existing page your document touches. A single source normally touches five to fifteen
 pages; that bookkeeping is the part that would rot if a person had to do it.
 
-Then it opens a pull request. **Read the summary, check the new page reads correctly, merge.**
+Then it opens a pull request and tells you, in plain words, what it learned. Read that, check
+the new page reads correctly, and when Claude asks *"Shall I merge this?"*, say yes. You don't
+need to find anything on github.com. (In a shared commons it stops at the pull request instead,
+because there a second person reviews it.)
 
 Now ask: *"What does the wiki now say about \<a topic your document covered\>?"* and watch your
 contribution come back in the answer. That is the compounding effect, live.
@@ -128,6 +133,7 @@ you just say what you want and the right one fires.
 | "Where does this document sit relative to us?" | measures agreement, extension, divergence, contradiction |
 | "What patterns are emerging?" | groups the wiki keeps forming that nobody has named |
 | "Share this with the team" | stages a sanitised contribution to the team wiki |
+| "What's waiting for me?" | lists work that was written and never merged, so nothing is forgotten |
 | "Is this ready to publish?" | checks sourcing and visibility before anything ships |
 
 There are more than these. Ask *"what can you do?"* and Claude will tell you.
