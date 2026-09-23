@@ -110,6 +110,9 @@ tier, and there are four:
 A page only reaches the team wiki if you ask Claude to **contribute** it, and even then it
 arrives there as a pull request someone else reviews. Nothing travels by accident.
 
+**The full picture, in plain words, is in `HOW-IT-WORKS.md`:** what the labels mean, what merging does
+and doesn't do, how sharing with the team works, and when to start a commons.
+
 **One honest caveat.** This repository sits in the Dark Matter Labs organisation, so org
 owners can technically read it — GitHub grants access per repository, not per page. `private`
 here means *not shared, not published, not exported*. It does not mean hidden from DM.
