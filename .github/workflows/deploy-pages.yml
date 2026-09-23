@@ -29,7 +29,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Block deploy if sensitive material is on a public surface
         # Tripwire: fails (and stops the deploy) if any never-public term from
@@ -58,7 +58,7 @@ jobs:
         # checks that actually matter — still run unconditionally.
         id: configure
         continue-on-error: true
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
         with:
           enablement: true
 
@@ -71,11 +71,11 @@ jobs:
 
       - name: Upload /docs as the Pages artifact
         if: steps.configure.outcome == 'success'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs
 
       - name: Deploy to GitHub Pages
         id: deployment
         if: steps.configure.outcome == 'success'
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
