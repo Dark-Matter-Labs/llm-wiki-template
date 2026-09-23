@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "1caa1a56d1c1d1a678e11d5f32ed3db26ceca59862e74c6651f6197a2cda9e1d",
     "tools/test_sync_commons.py": "39fb5e7f459132381c2ce0fda3087df443873cb98a55c2fd8253c466e8fd9a94",
-    "design/shared-layer.json": "c45ca1ae1bc1efcaa8573b0f2220e876371bf6adfadee23c4eba1e0a0f8360eb",
+    "design/shared-layer.json": "7063336799afba2991eb9caf0316aceded49063708ea3de1b386e0acf974b445",
     "tools/drift-baseline.json": "f55451e1dad2fac761add700c2bdd9b41dd960a1373ea8e71b5b3254bc8d061f",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -75,8 +75,8 @@
     ".claude/skills/inquiry/SKILL.md": "33a6bc4dd427a7b8940bb410336cf5ab46c81d94c4974e8e700eb4bd7af3f9ce",
     "tools/goals.py": "898c127e2232be956053affe3e6d981fb56e9c81dc07f02ad4c6eb2bbccb9cbc",
     "tools/test_goals.py": "dc4116c3676ef9cee91a508485a916bda0ce2c24f52a53b59059abe484cf0c48",
-    "ONBOARDING.md": "85f1ea4fb3ad410469563f79599edf2d14ab5f3e073271f0624f63656d49ff46",
-    "tools/check_onboarding.py": "f43dcbca95f0446d88100bad653c883600a80c4060f46adbc450dbe6ff04ac37",
+    "ONBOARDING.md": "6994a80a81df4803016530271cb86c79459e7ed7e235369c54ef071d02044f4a",
+    "tools/check_onboarding.py": "3e3297bc0a57a1bc7d2825d36b292f9b5a94ac6a4f62d64f4cd39281f25e957f",
     "tools/test_check_onboarding.py": "01156c210263d06db94b5e65124dc0d9b8558575e54c7dadb8273c409e6e72b3",
     ".claude/skills/ai-detox/SKILL.md": "fbc886f89e3ec751a476a64db1be8c4442d6e47440af186d8c9d23610207fd73",
     ".claude/skills/dm-style-guide/SKILL.md": "e39aa8d6aca9d1a837fe6469f978e24102723bb29fe3467075a4c51ec8ea16c3",
@@ -110,7 +110,8 @@
     "tools/test_check_noindex.py": "419427f90108f30c0736f7bc20d94e92d73626b1f1682882ea77a80d254c0149",
     ".claude/rules/finishing.md": "9085a9b42a62d60ad8149c66e2fd5efc68806f97e2234c5dd482861903fecdbd",
     "tools/test_search.py": "df60ca7bc206e2cc56e285bae67e1828c578833098f94da2fa4cd0997b312113",
-    "HOW-IT-WORKS.md": "8e9e6d1b03c50f5a178386d3d919d2a07aa487d9aba3c9b3918286f01132303a"
+    "HOW-IT-WORKS.md": "cd9d83247df5cac64c1f97736536056bd575d040e7d854b159b68765d7b242c4",
+    "TECHNICAL.md": "60c5ce3776ad512277bf01928edd8f7b1c8083c10146c59fddf1fe444740a31e"
   },
   "adapted": {}
 }

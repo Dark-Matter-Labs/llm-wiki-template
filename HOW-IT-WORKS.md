@@ -1,132 +1,127 @@
-# How your wiki works: labels, drafts, and the team commons
+# How your wiki works
 
-Three questions come up more than any others. What do the labels mean? What is a branch, and what
-does merging do? And how does anything get to the team? This page answers all three in plain words.
-You never need git or a terminal for any of it. You say what you want, and Claude does the rest.
+Three questions come up more than any others. Who can see my pages? What happens when Claude asks
+"Shall I merge this?" And how does anything get to my team? This page answers all three, in plain words.
 
-This page is the same in every wiki. If you are reading it in a commons, "your wiki" means your own
-personal wiki.
+You never need any technical knowledge for this. You say what you want, and Claude does the rest.
+
+*This page is the same in every wiki. If you're reading it in a team wiki, "your wiki" means your own
+personal one. The technical version is in `TECHNICAL.md`, and you don't need it.*
 
 ---
 
 ## Three places your writing can be
 
-| Place | What it is | Who can open it |
-| --- | --- | --- |
-| **Your wiki** | This repository. Every page you and Claude write lives here. | You, and the few people given access to this repository |
-| **A commons** | A shared wiki for a team or a topic, such as `xco-team-wiki`. | Its members |
-| **The open web** | A published page on the wiki's website, if it has one. | Anyone |
+- **Your wiki.** Your own space. Everything you and Claude write lives here first.
+- **A team wiki** (we call these *commons*). A shared space for a team or a topic, like the xCO team
+  wiki. Its members can all read it.
+- **The public internet.** Only if you choose to publish something.
+
+Nothing moves between these on its own. Every step happens because someone asked for it.
 
 ```mermaid
 flowchart LR
-  A["Your wiki<br/>(everything you write)"] -- "you say: share this with the team<br/>(internal pages only)" --> B["A commons<br/>(the team's wiki)"]
-  B -- "every Monday, a read-only copy<br/>of what the team shares" --> A
-  A -- "you say: publish this<br/>(public and unlisted pages only)" --> C["The open web"]
+  A["Your wiki"] -- "you ask: share this with the team" --> B["A team wiki"]
+  B -- "once a week, a copy of what the team shares" --> A
+  A -- "you ask: publish this" --> C["The public internet"]
 ```
 
-Nothing moves between these places on its own. Every arrow happens because someone asked for it.
-
 ---
 
-## The four labels
+## Who can see your pages
 
-Every page carries one label, called its **visibility**. The label decides **how far a page is allowed to
-travel**. It does not hide a page from people who can already open your wiki.
+Every page has a **label** that says how far it's allowed to travel.
 
-| Label | Can it go to a commons? | Can it go on the open web? | Use it for |
+| Label | Who it's for | Can it go to your team? | Can it go on the internet? |
 | --- | --- | --- | --- |
-| **`private`** | No, never | No, never | Anything personal or sensitive: relationships and contacts, money and deals, meeting transcripts, positions you haven't settled |
-| **`internal`** | Yes, when you ask | No, never | Ordinary working knowledge you'd happily show a colleague |
-| **`unlisted`** | Yes, when you ask | Only by direct link, never listed or searchable | Work in progress you want to show someone outside |
-| **`public`** | Yes, when you ask | Yes | Finished work you'd put your name to in public |
+| **`private`** | Just you | No | No |
+| **`internal`** | You and your colleagues | Yes, if you ask | No |
+| **`unlisted`** | Anyone with the link | Yes, if you ask | Yes, but hidden from search |
+| **`public`** | Anyone | Yes, if you ask | Yes |
 
-**New pages start as `private`.** That is the safe default. Moving a page up is one sentence, and moving a
-page down after it has been shared is impossible.
+**Every new page starts as `private`.** That's the safe choice. You can always open a page up later, but
+you can't take back something once it's been shared.
 
-**To change a label, just say so:** *"make this page internal"*. Claude will not raise a label on its own.
+**To change a label, just say so:** *"make this page internal."* Claude never changes a label on its own.
 
-**The one thing labels cannot do.** Anyone who can open your wiki can read every page in it, `private`
-included. GitHub gives access to a whole repository, not to single pages, and people who run the
-organisation can open any repository in it. So `private` means *never shared, never exported, never
-published*. It does not mean *hidden from everyone*. If something must be hidden from the people who can
-open this wiki, it should not be in the wiki.
+**What to use when:**
+
+- **`private`** for anything personal or sensitive: people and contacts, money and deals, meeting
+  transcripts, and ideas you haven't settled yet.
+- **`internal`** for everyday working knowledge you'd happily show a colleague. Most pages end up here.
+- **`unlisted`** for work in progress you want to show someone outside, by sending them the link.
+- **`public`** for finished work you'd put your name to in public.
+
+**The one thing labels can't do.** A label controls where a page can *travel*. It doesn't lock your wiki.
+Anyone who can open your wiki can read every page in it, private ones included. That's usually just you
+and a couple of Dark Matter Labs' GitHub admins. So *private* means "never shared, never published". It
+doesn't mean "hidden from everyone". If something must stay hidden even from admins, keep it out of the
+wiki.
 
 ---
 
-## Drafts, merging, and `main`
+## When Claude asks "Shall I merge this?"
 
-Three words, and what they mean here:
+While Claude works, it writes its changes into a **draft** first, so your wiki is never left half-changed.
+When it's done, it tells you what changed and asks ***"Shall I merge this?"*** Merging just means
+*saving the draft into your wiki*.
 
-- **`main`** is your wiki: the version everyone reads, and the one every tool works from.
-- **A branch** is a draft copy Claude makes while it works, so nothing is half-changed while you watch.
-- **A pull request** is the proposal to put that draft into `main`. **Merging** accepts it.
-
-**In your own wiki, you won't usually do any of this yourself.** When Claude finishes a piece of work, it
-tells you in plain words what changed and asks *"Shall I merge this?"*
-
-- **Say yes**, and the change goes into `main`. It is now part of your wiki.
+- **Say yes**, and it's saved. It's now part of your wiki.
 - **Say no, or say nothing**, and the draft waits safely. Nothing is lost.
-- **To find drafts you forgot about**, say *"what's waiting for me?"*
+- **To find drafts you forgot about**, ask *"what's waiting for me?"*
 
-**Merging does not share anything.** It only changes your own wiki. Nothing reaches the team until you
-ask for it, as the next section explains.
+**Saving never shares anything.** It only changes your own wiki. Nothing reaches your team until you ask,
+as the next section explains.
 
-Every merge can be undone on its own, and automatic checks run before anything lands, so you cannot
-break the wiki by saying yes.
-
----
-
-## Sharing with the team
-
-Say *"share this with the team"*, and name the page. Claude then:
-
-1. **Checks the label.** A `private` page is refused outright. If you want it shared, first say *"make
-   it internal"*. Claude will never do that step for you, because deciding a page is fit to share is
-   yours to decide.
-2. **Makes a clean copy for the commons.** It carries a note of where it came from and who contributed
-   it. Anything linking to your private pages is removed, and nothing about money, deals or contacts
-   can go.
-3. **Opens a pull request in the commons.** **Another member of the commons reviews it and merges it.**
-   Nobody merges their own contribution into a commons. That second person is the check.
-
-Your own page stays in your wiki, unchanged. The commons gets a copy.
-
-**Sharing cannot be taken back.** Once a copy has been sent to the commons, closing the pull request does
-not remove it. That is why Claude reads the copy with you before it goes.
+And you can't break anything by saying yes. Every change is checked automatically, and any change can be
+undone.
 
 ---
 
-## Reading what the team knows
+## Sharing something with your team
 
-Every Monday your wiki fetches a **read-only copy** of what each commons it reads has shared: its
-`internal`, `unlisted` and `public` pages, never its private ones. The copy is kept apart from your pages
-and is never mixed into them.
+Say *"share this with the team"*, and say which page. Then Claude:
 
-It is there so Claude can **compare** your thinking with the team's. For example:
+1. **Checks the label.** A `private` page can't be shared. If you want to share it, first say *"make it
+   internal"*. Claude will never do that for you, because deciding a page is ready to share is your call.
+2. **Makes a careful copy for the team wiki.** The copy notes where it came from and who shared it.
+   Anything that points to your private pages is taken out. Nothing about money, deals or contacts can go.
+3. **Sends it to the team wiki for someone else to check.** Another member of that team reviews it and
+   adds it. Nobody adds their own contribution to a team wiki; that second pair of eyes is the check.
 
-- *"Where does this document sit against what the team already knows?"* measures agreement and
-  disagreement.
-- *"Is anything here worth sharing with the team?"* finds pages the commons doesn't have yet.
+Your own page stays exactly as it was. The team wiki gets a copy.
 
-Your wiki's settings say which commons it reads from, and which it may contribute to. They can be
-different: a wiki can read a commons without ever sending anything to it.
+**Sharing can't be taken back.** Once a copy has gone to the team, it can't be fully recalled. That's why
+Claude goes through the copy with you before sending it.
 
 ---
 
-## Starting a commons
+## Seeing what your team knows
 
-A commons is worth creating when **more than one person** is building knowledge about the same thing, such
-as a team, a programme, or an xCO position. Creating the repository needs an organisation admin, so ask one
-first. Then say *"set up a commons for …"*, and Claude runs a short first session with you. It covers four
-things:
+Once a week, your wiki quietly fetches a **copy of what each of your team wikis has shared**. You only get
+the pages they've marked for colleagues or the public, never their private ones. The copy is kept separate
+from your own pages, and never mixed into them.
 
-1. **What it is for**, and how you would know in six months that it worked.
-2. **Who may open it.** Access is given to named people. Everyone who can open it can read all of it.
-3. **Where it sits:** which larger commons it contributes to, if any.
-4. **Its first three sources**, so it holds something real from day one.
+It lets Claude compare your thinking with your team's. For example, you could ask:
 
-Pages in a commons start as `internal`, not `private`, because a commons exists to be shared with its
-members.
+- *"How does this document compare with what the team already knows?"*
+- *"Is there anything in my wiki worth sharing with the team?"*
+
+---
+
+## Starting a team wiki
+
+A team wiki is worth creating when **more than one person** keeps adding knowledge about the same thing,
+such as a team, a programme or an xCO position. One of Dark Matter Labs' GitHub admins needs to create it
+first, so ask one. Then say *"set up a team wiki for …"*, and Claude will run a short first conversation
+with you about four things:
+
+1. **What it's for**, and how you'd know in six months that it's working.
+2. **Who can open it.** People are added by name, and everyone who can open it can read all of it.
+3. **Where it fits:** whether it feeds into a bigger team wiki.
+4. **Its first three documents**, so it has something real in it from day one.
+
+Pages in a team wiki start as `internal`, not `private`, because a team wiki exists to be shared.
 
 ---
 
@@ -134,13 +129,13 @@ members.
 
 | Question | Answer |
 | --- | --- |
-| Can my colleagues see my `private` pages? | Only the ones who can open your wiki. Everyone else sees nothing, not even the title. |
-| If I say yes to "Shall I merge this?", does it go to the team? | No. It only goes into your own wiki. |
-| Why was my page refused when I asked to share it? | It is `private`. Say "make it internal" first, if you're sure. |
-| Who merges what I share with the team? | Another member of the commons. Never you, and never Claude on your behalf. |
-| I said no to a merge. Is the work gone? | No. It waits. Say "what's waiting for me?" |
-| Can I undo something I shared? | Not fully. That is why Claude checks with you before it goes. |
-| Does the team's copy change my pages? | Never. It is read-only and kept apart. |
-| Should this be a new commons or a page in an existing one? | A commons, if several people will keep adding to it. A page, if it is one topic within existing work. |
+| Can my colleagues see my `private` pages? | Only the few who can open your wiki. Everyone else sees nothing, not even the page's name. |
+| If I say yes to "Shall I merge this?", does it go to the team? | No. It's only saved in your own wiki. |
+| Why won't Claude share my page? | It's `private`. Say "make it internal" first, if you're sure. |
+| Who adds what I share to the team wiki? | Another member of that team. Never you, and never Claude for you. |
+| I said no to saving. Is my work gone? | No. It waits. Ask "what's waiting for me?" |
+| Can I take back something I shared? | Not fully. That's why Claude checks it with you first. |
+| Will my team's copy change my pages? | Never. It's kept separate. |
+| New team wiki, or a page in an existing one? | A team wiki if several people will keep adding to it. A page if it's one topic in existing work. |
 
-For the technical detail behind the labels, and how access is set up, see `SHARING-AND-ACCESS.md`.
+For admins, and for how access is set up, see `SHARING-AND-ACCESS.md`.

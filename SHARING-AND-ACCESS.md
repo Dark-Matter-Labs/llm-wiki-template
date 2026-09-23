@@ -1,5 +1,46 @@
 # Sharing & access — who can read what
 
+## In plain words
+
+*This first part is for everyone. You don't need anything below the line to use the wiki.*
+
+Every page has a label that says how far it's allowed to travel:
+
+- **`private`**: just for you. It never leaves this wiki.
+- **`internal`**: for colleagues. It can go to your team, but never onto the public internet.
+- **`unlisted`**: anyone with the link. It can go on a website, but it's hidden from search.
+- **`public`**: anyone. It can go on the public internet.
+
+### Rules of thumb
+
+- **Start private.** Nothing is shared until you say so. In your own wiki every new page starts
+  `private`. In a team wiki pages start `internal`, because a team wiki exists to be shared.
+- **`internal` is the everyday choice.** Working knowledge a colleague would find useful, and never
+  on the public internet. Most pages end up here.
+- **`unlisted` is still on the internet.** It's hidden, not locked. Anyone with the link can read it,
+  and links get forwarded. If it mustn't be on the internet, use `internal`.
+- **Your original documents stay put.** The reports, drafts and transcripts you add are never shared
+  or published, whatever the labels on the pages say.
+- **People and contacts are always `private`.** No exceptions.
+
+### The one thing to know
+
+Labels decide where a page can *travel*. They don't lock the wiki. Everyone who can open this wiki can
+read every page in it, private ones included. In your own wiki that's usually just you and a couple of
+Dark Matter Labs' GitHub admins; in a team wiki it's all of its members. If something must stay hidden
+even from them, keep it out of the wiki.
+
+### If something went out by mistake
+
+Tell Claude or a GitHub admin straight away, and it can be taken down quickly. But anything that
+was on the internet may already have been copied, so it's worth a moment's thought before you share,
+rather than after.
+
+---
+
+*Everything below is for admins and technical readers: how the labels are enforced, how access is set
+up, and what to do in an emergency. The technical version of the whole system is in `TECHNICAL.md`.*
+
 This wiki has **two different kinds of "private," and they are easy to confuse.** Getting
 this right is what keeps sensitive material safe while still letting colleagues benefit
 from the shareable parts.
