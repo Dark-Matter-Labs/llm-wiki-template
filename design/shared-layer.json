@@ -34,6 +34,7 @@
     "tools/contribution_prompt.py",
     "tools/test_contribution_prompt.py",
     "tools/search.py",
+    "tools/test_search.py",
     "tools/staleness.py",
     "tools/test_staleness.py",
     "tools/dependency_staleness.py",

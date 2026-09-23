@@ -10,6 +10,11 @@ Usage (Claude shells out to this; Indy never runs it directly):
     python tools/search.py "climate finance outcomes"
     python tools/search.py "permissioning" --top 5
 
+Ask it questions, not keywords. "what does Dm think about property" and "property" route
+to the same page, because the interrogatives and filler are stopped before ranking and a
+term that sits on nearly every page in this particular wiki is weighted down rather than
+counted as content. See the note above STOP for the measurement that forced both.
+
 Output: ranked list of matching pages with their one-line description and score.
 No external packages required — runs in a fresh cloud environment as-is.
 """
@@ -23,11 +28,76 @@ from collections import Counter, defaultdict
 
 WIKI_DIR = Path(__file__).resolve().parent.parent / "wiki"
 TOKEN_RE = re.compile(r"[a-z0-9]+")
-STOP = set("the a an and or of to in for on is are was were be with as at by from this that it its".split())
+
+# Two different problems, kept apart on purpose.
+#
+# STOP is about LANGUAGE: words that carry no topic in any corpus. The damping below is
+# about THIS corpus: words that are perfectly good topics but happen to sit on nearly
+# every page here. Conflating them is how a search stops working when it is copied to
+# another wiki — "dm" is background noise in dm-llm-wiki and a real query term everywhere
+# else, so it must never be stopped, only weighted down where it is in fact ubiquitous.
+#
+# Measured in dm-llm-wiki on 2026-09-22: of six conversationally-phrased questions, three
+# returned the wrong page. "what does Dm think about property" ranked
+# wiki/what-this-wiki-holds.md above the philosophies page, because "what", "does",
+# "think" and "about" were scored as content and outvoted the single term ("property")
+# that carried the question. The whole system is built for people who type plain English,
+# and CLAUDE.md puts this tool first in the retrieval order, so a diluted first hop costs
+# the entire query.
+#
+# The list below is deliberately in two tiers. Closed-class function words are safe
+# anywhere. Open-class filler is not, so each one is here because it appeared in a
+# measured failure, and words that look like filler but are load-bearing in this
+# federation are excluded by name: care, value, values, beyond, option, options,
+# optionality, work, state, power, right, rights, need, needs, want, wants, thinking,
+# thought, making, means, meaning.
+STOP = set("""
+    a an the this that these those it its
+    and or but nor if then than because while though although
+    of to in for on at by with as into onto upon over under between through
+    about across after before during against within without
+    is are was were be been being am
+    do does did doing done
+    has have had having
+    can could will would shall should may might must
+    i me my mine we us our ours you your yours
+    he him his she hers they them their theirs
+    what when where which who whom whose why how
+    no not all any some each every both other another same
+    more most less least few many much several
+    there here now so such very just also really actually quite simply
+
+    think thinks say says said tell tells told
+    make makes made get gets got know knows
+""".split())
 
 
-def tokenize(text):
-    return [t for t in TOKEN_RE.findall(text.lower()) if t not in STOP and len(t) > 1]
+def tokenize(text, stop=None):
+    # `stop=None` rather than `stop=STOP`: a default argument binds once, at definition
+    # time, so the latter would quietly ignore any later reassignment of STOP — including
+    # the one test_search.py makes to prove the old stop list reproduces the old bug. A
+    # mutation test that cannot mutate is a test that always passes.
+    stop = STOP if stop is None else stop
+    return [t for t in TOKEN_RE.findall(text.lower()) if t not in stop and len(t) > 1]
+
+
+# A term on more than half the pages is describing the corpus, not the question. Rather
+# than stopping it — which would break the same query in a wiki where the term is rare —
+# taper its weight from full at the threshold down to UBIQUITY_MIN when it is on every
+# page. The floor is not zero: a one-word query for a ubiquitous term must still rank
+# something, and since every page is damped identically it ranks them in the same order.
+UBIQUITY_THRESHOLD = 0.5
+UBIQUITY_MIN = 0.15
+
+
+def ubiquity_damp(df, n):
+    """Weight multiplier for a term appearing in `df` of `n` pages."""
+    if n <= 0:
+        return 1.0
+    frac = df / n
+    if frac <= UBIQUITY_THRESHOLD:
+        return 1.0
+    return max(UBIQUITY_MIN, (1.0 - frac) / (1.0 - UBIQUITY_THRESHOLD))
 
 
 def read_pages():
@@ -61,7 +131,9 @@ def score(pages, query):
     for pg in pages:
         for t in set(pg["tokens"]):
             df[t] += 1
-    idf = {t: math.log((N + 1) / (df.get(t, 0) + 1)) + 1 for t in q_tokens}
+    idf = {t: (math.log((N + 1) / (df.get(t, 0) + 1)) + 1)
+              * ubiquity_damp(df.get(t, 0), N)
+           for t in q_tokens}
 
     # Field weights. Body TF-IDF alone ranked long essays above the concept page a
     # question was actually about — which is why nothing used this tool and every
@@ -105,6 +177,14 @@ def main():
     pages = read_pages()
     if not pages:
         print("Wiki is empty — nothing to search. Ingest a source first.")
+        return
+
+    # A question made entirely of function words ("what is this about?") has nothing to
+    # rank on. Say that, rather than "no matches", which reads as a claim about the wiki
+    # instead of a claim about the question.
+    if not tokenize(args.query) and tokenize(args.query, stop=frozenset()):
+        print(f"Every term in {args.query!r} is a stop word — there is nothing to search "
+              f"for. Add the subject of the question.")
         return
 
     ranked = score(pages, args.query)
