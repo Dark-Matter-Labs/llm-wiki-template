@@ -24,8 +24,21 @@ import init_wiki as iw      # noqa: E402
 
 FAILED = []
 
-SPOKE_EXPORT = "writes export/wiki.public.json and nothing else\n"
-COMMONS_EXPORT = "writes export/wiki.public.json and export/wiki.shared.json\n"
+# The spoke exporter is modelled on the real one, which is the point: its docstring and its
+# comments both say that a commons "also emits wiki.shared.json". A text search read that as
+# the commons exporter and passed four commons that were running the spoke one (2026-09-22).
+SPOKE_EXPORT = ('"""export.py\n\nA commons also emits wiki.shared.json; a spoke does not.\n"""\n'
+                '# a commons writes wiki.shared.json too\n'
+                'PUBLIC = "export/wiki.public.json"\n')
+COMMONS_EXPORT = ('"""export.py — the commons exporter."""\n'
+                  'PUBLIC = "export/wiki.public.json"\n'
+                  'SHARED = "export/wiki.shared.json"\n')
+# The workflow that puts the cuts on the export branch. The spoke one names the shared cut only
+# in a comment, which must not count as publishing it.
+COMMONS_WORKFLOW = ("      - run: |\n          cp export/wiki.public.json _publish/\n"
+                    "          cp export/wiki.shared.json _publish/\n")
+SPOKE_WORKFLOW = ("      - run: |\n          # a commons would also copy wiki.shared.json\n"
+                  "          cp export/wiki.public.json _publish/\n")
 
 FEDERATION_MEMBERS = ["xco-team-wiki", "power-project-wiki", "alex-llm-wiki",
                       "llm-wiki-template"]
@@ -42,7 +55,8 @@ DECISION = {"decided": "2026-09-04", "by": "Indy",
 
 
 def wiki(tmp, dirname, *, name=None, role="spoke", display_name="Alex's LLM Wiki",
-         ups=("xco-team-wiki",), reads=None, export=None, card_line="Something of our own.",
+         ups=("xco-team-wiki",), reads=None, export=None, export_workflow="auto",
+         card_line="Something of our own.",
          deploy_pages=False, manifest=True, federation=True, bad_json=False,
          publishes=None, demo=0, demo_sources=0):
     """A minimal wiki on disk. The directory name matters: `name` is checked against it."""
@@ -78,6 +92,11 @@ def wiki(tmp, dirname, *, name=None, role="spoke", display_name="Alex's LLM Wiki
 
     if export is not None:
         (root / "tools" / "export.py").write_text(export, encoding="utf-8")
+    if export_workflow == "auto":       # the workflow that normally travels with that exporter
+        export_workflow = {COMMONS_EXPORT: COMMONS_WORKFLOW, SPOKE_EXPORT: SPOKE_WORKFLOW}.get(export)
+    if export_workflow is not None:
+        (root / ".github" / "workflows").mkdir(parents=True, exist_ok=True)
+        (root / ".github" / "workflows" / "export.yml").write_text(export_workflow, encoding="utf-8")
 
     if demo:
         (root / "wiki" / "examples").mkdir(parents=True, exist_ok=True)
@@ -89,7 +108,7 @@ def wiki(tmp, dirname, *, name=None, role="spoke", display_name="Alex's LLM Wiki
             (root / "raw" / f"EXAMPLE-src{i}.md").write_text("x", encoding="utf-8")
 
     if deploy_pages:
-        (root / ".github" / "workflows").mkdir(parents=True)
+        (root / ".github" / "workflows").mkdir(parents=True, exist_ok=True)
         (root / ".github" / "workflows" / "deploy-pages.yml").write_text("on: push\n",
                                                                          encoding="utf-8")
     return root
@@ -111,11 +130,28 @@ def main():
 
     with tempfile.TemporaryDirectory() as t:
         r = iw.check(wiki(t, "some-commons", role="commons", ups=(), export=SPOKE_EXPORT))
-        check("a commons running the SPOKE exporter is caught",
-              fails_with(r, "wiki.shared.json"),
+        check("a commons running the SPOKE exporter is caught, though its comments name the cut",
+              fails_with(r, "never writes wiki.shared.json"),
               "SETUP.md's not-optional step; its absence leaves a green repo")
         check("and the failure names the file to copy and from where",
               any("cp ../xco-team-wiki/tools/export.py" in f for f in r.failures))
+
+    # The exporter can be right and the export still empty: four commons built the shared cut
+    # and their workflow copied only the public one onto the export branch.
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "some-commons", role="commons", ups=(), export=COMMONS_EXPORT,
+                          export_workflow=SPOKE_WORKFLOW))
+        check("a commons whose workflow publishes only the public cut is caught",
+              fails_with(r, "publishes only the public cut"),
+              "the shared cut is built and left behind; a comment naming it is not publishing it")
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "some-commons", role="commons", ups=(), export=COMMONS_EXPORT,
+                          export_workflow=None))
+        check("a commons with no export workflow is caught", fails_with(r, "does not exist"))
+    with tempfile.TemporaryDirectory() as t:
+        r = iw.check(wiki(t, "some-commons", role="commons", ups=(), export="def (:\n"))
+        check("an exporter that does not parse is not taken as writing anything",
+              fails_with(r, "never writes"))
 
     with tempfile.TemporaryDirectory() as t:
         r = iw.check(wiki(t, "alex-llm-wiki", display_name="this LLM Wiki"))

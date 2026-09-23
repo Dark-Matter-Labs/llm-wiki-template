@@ -89,6 +89,17 @@ def main():
     finally:
         sc.ROOT, sc.FEDERATION, sc.CACHE = saved
 
+    # The scheduled job decides which commons to clone. It must ask declared(), or the rule
+    # lives twice: until 2026-09-23 the workflow read `contributes_to` itself, and
+    # people-hosts-wiki, which only reads, was told "nothing to sync" and passed.
+    wf = pathlib.Path(__file__).resolve().parent.parent / ".github" / "workflows" / "sync-commons.yml"
+    if wf.exists():
+        targets = [l for l in wf.read_text(encoding="utf-8").splitlines()
+                   if l.strip().startswith("TARGETS=")]
+        check("the scheduled sync asks sync_commons.declared() which commons to read",
+              len(targets) == 1 and "sync_commons.declared()" in targets[0]
+              and "contributes_to" not in targets[0], (targets or ["no TARGETS= line"])[0].strip()[:100])
+
     print()
     if FAILED:
         print(f"{len(FAILED)} failed: {', '.join(FAILED)}")

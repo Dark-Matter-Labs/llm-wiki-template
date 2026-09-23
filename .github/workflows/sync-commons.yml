@@ -94,11 +94,14 @@ jobs:
         run: |
           set -euo pipefail
           OWNER="${GITHUB_REPOSITORY%%/*}"
-          # The same declaration contribute.py reads for the UP flow — one source of
-          # truth for this wiki's place in the graph, in both directions.
-          TARGETS=$(python3 -c "import sys; sys.path.insert(0,'tools'); import contribute; print('\n'.join(contribute.topology().get('contributes_to') or []))")
+          # What this wiki READS, asked of sync_commons.declared(): `reads_from` when it is
+          # set, `contributes_to` when it is not. Until 2026-09-23 this line read
+          # `contributes_to` directly, so the rule lived in two places and only the script
+          # learned about `reads_from`. people-hosts-wiki reads dm-llm-wiki and contributes
+          # to nothing; this job told it "nothing to sync" and passed. One rule, one place.
+          TARGETS=$(python3 -c "import sys; sys.path.insert(0,'tools'); import sync_commons; print('\n'.join(sync_commons.declared()))")
           if [ -z "$TARGETS" ]; then
-            echo "### Contributes to no commons" >> "$GITHUB_STEP_SUMMARY"
+            echo "### Reads from no commons" >> "$GITHUB_STEP_SUMMARY"
             echo "::notice::design/federation.json lists no commons - nothing to sync."
             exit 0
           fi

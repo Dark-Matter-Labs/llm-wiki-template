@@ -46,6 +46,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import os
 import pathlib
@@ -82,6 +83,32 @@ TEMPLATE_NAME = "llm-wiki-template"
 # (wiki.public.json); a commons publishes that plus wiki.shared.json -- public + unlisted +
 # internal -- which is the entire reason the `internal` tier exists.
 SHARED_CUT_MARKER = "wiki.shared.json"
+EXPORT_WORKFLOW = ".github/workflows/export.yml"
+
+
+def _code_names(py_text: str, marker: str) -> bool:
+    """True when `marker` is in a string the program USES, not in what it says about itself.
+
+    A substring search passed four commons on 2026-09-22 that were running the spoke exporter,
+    because that exporter's docstring explains that a commons "also emits wiki.shared.json".
+    So: parse, and count only string constants that are not bare expression statements --
+    which excludes every docstring, and comments never reach the tree at all.
+    """
+    try:
+        tree = ast.parse(py_text)
+    except SyntaxError:
+        return False
+    said = {id(n.value) for n in ast.walk(tree)
+            if isinstance(n, ast.Expr) and isinstance(n.value, ast.Constant)}
+    return any(isinstance(n, ast.Constant) and isinstance(n.value, str)
+               and marker in n.value and id(n) not in said
+               for n in ast.walk(tree))
+
+
+def _workflow_publishes(yml_text: str, marker: str) -> bool:
+    """True when a non-comment line of the workflow names `marker`."""
+    return any(marker in line for line in yml_text.splitlines()
+               if not line.lstrip().startswith("#"))
 
 # The template ships a worked demo -- six pages about a fictional Greenline urban-forestry
 # programme in Lisbon, Tallinn and Cork -- so a new wiki has something to read before it has
@@ -323,8 +350,20 @@ def check(root=None) -> Report:
                "wiki.public.json")
     elif not export.exists():
         r.fail(f"{EXPORT} does not exist in a commons")
-    elif SHARED_CUT_MARKER in export.read_text(encoding="utf-8"):
-        r.ok(f"commons exporter writes the shared cut ({SHARED_CUT_MARKER})")
+    elif _code_names(export.read_text(encoding="utf-8"), SHARED_CUT_MARKER):
+        workflow = root / EXPORT_WORKFLOW
+        if not workflow.exists():
+            r.fail(f"this is a commons but {EXPORT_WORKFLOW} does not exist, so nothing "
+                   f"publishes its export branch and every wiki reading from it gets nothing")
+        elif _workflow_publishes(workflow.read_text(encoding="utf-8"), SHARED_CUT_MARKER):
+            r.ok(f"commons exporter writes the shared cut ({SHARED_CUT_MARKER}) and "
+                 f"{EXPORT_WORKFLOW} publishes it")
+        else:
+            r.fail(f"{EXPORT} writes {SHARED_CUT_MARKER}, but {EXPORT_WORKFLOW} publishes only "
+                   f"the public cut. The file is built and then left behind, so every wiki "
+                   f"reading from this commons syncs an empty graph and is told it worked. "
+                   f"Copy the publish step from the commons version:\n"
+                   f"      cp ../xco-team-wiki/.github/workflows/export.yml .github/workflows/")
     else:
         r.fail(f"this is a commons but {EXPORT} never writes {SHARED_CUT_MARKER}. It is the "
                f"spoke exporter. A commons defaults its pages to `internal`, so the public "
