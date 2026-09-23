@@ -107,6 +107,7 @@
     "tools/test_check_prose.py",
     "ONBOARDING.md",
     "HOW-IT-WORKS.md",
+    "TECHNICAL.md",
     "tools/check_onboarding.py",
     "tools/test_check_onboarding.py",
     "tools/waiting.py",
