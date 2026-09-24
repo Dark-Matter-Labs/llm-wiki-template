@@ -64,7 +64,15 @@ The single most important operation. Done well, the wiki compounds. Done lazily
 8. **Append to the today's log file (`wiki/log/YYYY-MM-DD.md`; see `wiki/log.md`):** `## [YYYY-MM-DD] ingest | <Source Title>` plus a
    one-line note of what it touched (e.g. "new summary + updated 4 entities, 2 concepts").
 
-9. **Report back in plain language.** Tell the owner what you learned and what pages
+9. **Regenerate the wiki-context block, then commit.** Once everything is filed and before
+   committing, run `python3 tools/wiki_context.py`, and commit `CLAUDE.md` with the rest if it
+   changed. The block in `CLAUDE.md` states the corpus's size, and CI fails the pull request
+   when it is stale. An ingest that adds a few dozen pages is exactly what moves it, which is
+   how leon-llm-wiki's `main` and mission-pathways-wiki #15 both went red on 2026-09-24. The
+   tool counts what git tracks or would track, so it is safe to run before `git add`. Ignored
+   files never count, which keeps a local run in step with CI. Never edit the block by hand.
+
+10. **Report back in plain language.** Tell the owner what you learned and what pages
    changed, framed so his PR review is easy. Lead with the knowledge, not the filenames.
 
 ## Rules

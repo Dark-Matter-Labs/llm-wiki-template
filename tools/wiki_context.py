@@ -48,6 +48,7 @@ import argparse
 import json
 import os
 import pathlib
+import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -115,24 +116,38 @@ def _federation() -> dict:
         return {}
 
 
+def _files(sub: str) -> "list[pathlib.Path]":
+    """Files under `sub` that git tracks OR would track -- what a clean checkout will hold.
+
+    A CI runner sees only the repository, so a block generated from the working directory can
+    never match there: .gitignore excludes most binary sources, and several wikis ignore
+    raw/*.md and un-ignore sources one by one. Counting only the index (`git ls-files`) was the
+    first fix and was half right -- it also missed every file an ingest had written but not yet
+    staged, so the block regenerated before `git add` went stale the moment it was committed.
+    That happened twice on 2026-09-24. `--others --exclude-standard` adds exactly those files
+    and nothing .gitignore excludes, so a local run describes the commit that is about to exist.
+
+    Outside a git checkout there is no CI view to match, so the working directory is the answer.
+    """
+    try:
+        r = subprocess.run(["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard",
+                            "--", sub], cwd=ROOT, capture_output=True, text=True)
+    except OSError:
+        r = None
+    if r is None or r.returncode != 0:
+        base = ROOT / sub
+        return [p for p in base.rglob("*") if p.is_file()] if base.is_dir() else []
+    return [p for p in (ROOT / f for f in r.stdout.split("\0") if f) if p.is_file()]
+
+
 def _corpus() -> tuple[int, int, int, int]:
     """(pages, source files, big source files, largest source bytes)"""
     wiki = ROOT / "wiki"
-    pages = sum(1 for p in wiki.rglob("*.md")
-                if p.relative_to(wiki).parts[0] not in {"log", "index"}
-                and p.name not in {"log.md", "index.md"}) if wiki.is_dir() else 0
-    # Only files git TRACKS. .gitignore excludes most binary sources, so a CI runner sees a
-    # different raw/ than a local checkout -- and a block generated from the local view could
-    # never match in CI. This is the same trap that keeps check_sources.py out of CI; the fix
-    # here is to describe the repository, which is what git tracks, not the working directory.
-    import subprocess
-    try:
-        out = subprocess.run(["git", "ls-files", "-z", "raw"], cwd=ROOT,
-                             capture_output=True, text=True).stdout
-    except OSError:
-        out = ""
-    tracked = [ROOT / f for f in out.split("\0") if f]
-    sizes = [p.stat().st_size for p in tracked if p.is_file()]
+    pages = sum(1 for p in _files("wiki")
+                if p.suffix == ".md"
+                and p.relative_to(wiki).parts[0] not in {"log", "index"}
+                and p.name not in {"log.md", "index.md"})
+    sizes = [p.stat().st_size for p in _files("raw")]
     big = [s for s in sizes if s > BIG_SOURCE_BYTES]
     return pages, len(sizes), len(big), max(sizes, default=0)
 

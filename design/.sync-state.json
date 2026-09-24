@@ -1,6 +1,6 @@
 {
   "_comment": "The merge base for the shared layer: a digest of what sync_design_system last wrote here. If a file no longer matches its digest, someone changed it locally and sync will NOT overwrite it -- it becomes a candidate for tools/propose_upstream.py instead. `adapted` records the ones that differ ON PURPOSE, with the source digest at the time somebody reviewed them, so later drift in the source is measurable. Machine-written; do not hand-edit.",
-  "source": "indy-llm-wiki",
+  "source": "serene-hamilton-a3b7fa",
   "written": {
     "design/xco.tokens.json": "15aad385769ca682d94ec5709dbe26a24175fc23fd644cc1e0627217567f0b8f",
     "tools/build_tokens.py": "3450c39dbdf7fbc8e892cb08e4b988e051d8adcdd94479be35dc78b857855f81",
@@ -49,7 +49,7 @@
     ".claude/skills/gravity/compute_gravity.py": "7180939228b4acf17a0f307bd55f25afe00e0b59389095e094319e0431513fdb",
     "tools/scan_public_leaks.py": "6bbc04cb5c458a3fc8c3698193c2c8a8de424bdb98a00e501ad03b38c6d6a7f0",
     ".claude/skills/brief/SKILL.md": "cfe98e13ed5cc4b5469a2f05f7052921e7e0ab1b24649b0534acecfb84a28b0e",
-    ".claude/skills/ingest/SKILL.md": "40cf9e81823875a09b6f335330efbec3eba4a6e304f1ef8439d44ea520e0dafe",
+    ".claude/skills/ingest/SKILL.md": "408b92282bef9b7e584a3f5d884debe841523fc2aed5a945b530c44b258431d2",
     ".claude/skills/lint/SKILL.md": "b9cfacbbae4566edfea1a6168e1e01c0898fcaaed136935cece69b91b018bb3a",
     ".claude/skills/publish-check/SKILL.md": "14929a1731511b9cca2bab36799bdddf031710e16b0b205128f833976f10130c",
     ".claude/skills/query/SKILL.md": "5b6279482e924b000ce979c2de002c1a8b43df5c84637226406642edcf113666",
@@ -59,8 +59,8 @@
     ".claude/skills/office-hours/SKILL.md": "f95e1aeabfe5f2c5bfc439bb5f065be916473f97285b69274a39143fca1c9777",
     ".claude/skills/cross-check/SKILL.md": "044e0125fc4be66e5c24c74b924e5c1a920d37a4be8fff2363153379c3035a8c",
     "tools/make_social_card.py": "357f29b7d54815f1e65a31ce140c698f0a5ab9baac1dfab472e12c24cd3bce95",
-    "tools/wiki_context.py": "71c20379c0c0dec9a58b9b9b0b6394eb6b684bc0786dbaf9e5553b2be76e242b",
-    "tools/test_wiki_context.py": "8803fd328c5779b29d229071c2c2821a56bebe14b38deed7b7a538b6dc237696",
+    "tools/wiki_context.py": "5d53d1b4429c80292bcc7c067fd6c72717950b3bcd17b865aa22143ce374296f",
+    "tools/test_wiki_context.py": "43da6c3b31164da763177e2e907765e936c1365a4d180c05a62c3e5ac22405be",
     "tools/init_wiki.py": "0e70417bb6ccbdd55e32efa9f5dfb0e6b070d382cc97ec5bc3a8a95124154767",
     "tools/test_init_wiki.py": "170bf31a06d858c1a3d5605579d633a0491245064b1c3dc3dcbd3ebe2654a46b",
     ".github/workflows/sync-commons.yml": "214f45f3e8f4331a34be10b7b5416efccb80b39084c0b89a8b758cce31490e71",
