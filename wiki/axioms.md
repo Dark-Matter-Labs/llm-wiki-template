@@ -6,6 +6,7 @@ tags: [axioms, assumptions, foundations]
 status: draft
 visibility: private
 confidence: low
+validation: machine
 timestamp: 2026-08-07
 sources: []
 ---
