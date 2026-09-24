@@ -88,8 +88,13 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # MODEL AND BUDGET ARE PINNED (2026-09-24), as the monthly newsletter's are. Unpinned, the
+          # action resolves to Opus with a one-million-token context, the most expensive setup on
+          # offer; a comparable uncapped job cost $5.94 and $9.51 a run in early September, which
+          # across ten wikis with a key is $60-95 in a week when every one is due. This job reads a
+          # diff and proposes frontmatter; Sonnet does that, and the cap stops a runaway run.
           claude_args: |
-            --allowedTools Bash,Read,Edit,Write,Glob,Grep
+            --model claude-sonnet-5 --max-budget-usd 3 --allowedTools Bash,Read,Edit,Write,Glob,Grep
           prompt: |
             Run a validation pass over the material added since the last one.
 
