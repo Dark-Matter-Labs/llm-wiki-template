@@ -6,6 +6,7 @@ tags: [example, entity, city]
 status: reviewed
 visibility: internal   # public | unlisted | private (default private)
 confidence: low
+validation: machine
 timestamp: 2026-07-03
 sources: [raw/EXAMPLE-sample-source.md]
 ---
