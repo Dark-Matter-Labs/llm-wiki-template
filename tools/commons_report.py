@@ -30,12 +30,18 @@ import sys
 # still read as a fallback, because a cache written by an older sync is a degraded read
 # rather than a broken one.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import contribute  # noqa: E402
+import sync_commons  # noqa: E402
 
 
 def declared_commons():
-    """The commons this wiki reads, from design/federation.json."""
-    return list(contribute.topology().get("contributes_to") or [])
+    """The commons this wiki READS: `reads_from`, falling back to `contributes_to`.
+
+    One rule, owned by sync_commons.declared(), so the report and the fetch cannot disagree about
+    the same wiki. Until 2026-09-24 this asked contribute.py which commons the wiki *contributes*
+    to, and a wiki that reads without contributing (bioregional-finance-wiki reads rz-commons)
+    fetched successfully and then reported that it had no commons at all.
+    """
+    return sync_commons.declared()
 
 
 def cache_dirs(name):
@@ -64,7 +70,8 @@ def main(argv=None):
 
     targets = declared_commons()
     if not targets:
-        print("This wiki contributes to no commons (design/federation.json lists none).")
+        print("This wiki reads no commons (design/federation.json lists none in `reads_from`\n"
+              "or `contributes_to`).")
         return 0
 
     missing = [t for t in targets if load_commons(t)[0] is None]
