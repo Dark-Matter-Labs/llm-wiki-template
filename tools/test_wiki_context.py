@@ -138,6 +138,39 @@ def main():
               "a 90KB ignored PDF must not appear")
 
     with tempfile.TemporaryDirectory() as t:
+        # THE SAME PROPERTY, IN THE SHAPE THAT BROKE IT on 2026-09-24. Several wikis ignore
+        # raw/*.md and un-ignore sources one by one, and an ingest writes files it has not yet
+        # staged. The block must describe what a clean checkout will hold once this work is
+        # committed: ignored files never, new-but-unstaged files always. Counting only the index
+        # missed the second; counting the working directory counted the first.
+        root = repo(t, {"name": "w", "role": "spoke", "contributes_to": ["c"]})
+        (root / ".gitignore").write_text("raw/*.md\n!raw/kept.md\nwiki/scratch/\n",
+                                         encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+        (root / "raw" / "private-notes.md").write_text("x" * 90_000, encoding="utf-8")  # ignored
+        (root / "raw" / "kept.md").write_text("x" * 60_000, encoding="utf-8")    # un-ignored, unstaged
+        (root / "wiki" / "scratch").mkdir()
+        for i in range(40):                                                      # ignored pages
+            (root / "wiki" / "scratch" / f"d{i}.md").write_text("x", encoding="utf-8")
+        b = wc.render()
+        check("an ignored raw file is not counted, even when it is large",
+              "1 of those sources are over 40KB" in b,
+              "the 90KB ignored file must not appear beside the 60KB kept one")
+        check("a new source not yet staged IS counted, as CI will count it once committed",
+              "over 40KB" in b, "the un-ignored 60KB file was missed")
+        check("pages under an ignored directory are not counted",
+              "fewer than 25 pages" in b, "forty ignored drafts must not inflate the page count")
+        wc.main([])
+        subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+        subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "x"],
+                       cwd=root, check=True)
+        clean = pathlib.Path(t) / "clean"
+        subprocess.run(["git", "clone", "-q", str(root), str(clean)], check=True)
+        wc.ROOT = clean
+        check("a fresh clone -- what CI sees -- agrees with the local run",
+              wc.main(["--check"]) == 0)
+
+    with tempfile.TemporaryDirectory() as t:
         root = repo(t, {"name": "w", "role": "spoke", "contributes_to": ["c"]})
         wc.main([]); once = (root / "CLAUDE.md").read_text()
         wc.main([]); twice = (root / "CLAUDE.md").read_text()
