@@ -49,6 +49,12 @@ that mirrors one person's wiki is not a commons.
 
    Then commit and `gh pr create`. State in the PR body **what the page is for**, and that
    it needs someone else to merge it.
+
+   **Always target the commons' `main`, never another PR's branch** — even when the pages
+   link to an earlier contribution that has not merged yet. Say so in the body instead
+   ("depends on YOUR-COMMONS#<pr>; the diff narrows once that merges"). A PR based on
+   another branch can report *merged* without ever reaching `main`: xco-team-wiki#134 did
+   exactly that on 2026-09-25, and had to be repaired as #135.
 6. **Cascade happens in the commons, not here.** The receiving wiki updates its own index,
    log and cross-references when the PR is reviewed. Do not edit the commons' index from
    this side.
@@ -112,6 +118,8 @@ useful context for the reviewer, and it is not the same as asserting the commons
 - **Never contribute CRM data, capital or deal specifics, or transcripts** — refused by the
   tool, and it should never be asked for.
 - **Never edit the commons' `index.md` or log from this side.**
+- **Every contribution PR targets the commons' `main`**, never another PR's branch — a
+  stacked PR can show as merged while its pages never arrive.
 - If the tool refuses, **report the refusal plainly**. It is a boundary working, not an
   obstacle to route around.
 
