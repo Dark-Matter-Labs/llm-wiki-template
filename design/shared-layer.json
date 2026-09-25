@@ -36,6 +36,7 @@
     "tools/build_social_card.py",
     "tools/contribute.py",
     "tools/test_contribute.py",
+    ".claude/skills/contribute/SKILL.md",
     "tools/contribution_prompt.py",
     "tools/test_contribution_prompt.py",
     "tools/search.py",

@@ -23,12 +23,6 @@
       "reason": "LOCALISED \u2014 one line, `validated_by: [<owner name>]`. Verified 2026-09-10 across all eleven: every differing line is that substitution and nothing else. The guidance is identical everywhere."
     },
     {
-      "path": ".claude/skills/contribute/SKILL.md",
-      "repos": 9,
-      "versions": 6,
-      "reason": "BY ROLE \u2014 up-flow tooling; a top commons has nothing above it."
-    },
-    {
       "path": ".claude/skills/publish-web/SKILL.md",
       "repos": 9,
       "versions": 6,

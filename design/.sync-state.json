@@ -1,6 +1,6 @@
 {
   "_comment": "The merge base for the shared layer: a digest of what sync_design_system last wrote here. If a file no longer matches its digest, someone changed it locally and sync will NOT overwrite it -- it becomes a candidate for tools/propose_upstream.py instead. `adapted` records the ones that differ ON PURPOSE, with the source digest at the time somebody reviewed them, so later drift in the source is measurable. Machine-written; do not hand-edit.",
-  "source": "serene-hamilton-a3b7fa",
+  "source": "indy-llm-wiki",
   "written": {
     "design/xco.tokens.json": "15aad385769ca682d94ec5709dbe26a24175fc23fd644cc1e0627217567f0b8f",
     "tools/build_tokens.py": "3450c39dbdf7fbc8e892cb08e4b988e051d8adcdd94479be35dc78b857855f81",
@@ -28,8 +28,8 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "1caa1a56d1c1d1a678e11d5f32ed3db26ceca59862e74c6651f6197a2cda9e1d",
     "tools/test_sync_commons.py": "39fb5e7f459132381c2ce0fda3087df443873cb98a55c2fd8253c466e8fd9a94",
-    "design/shared-layer.json": "afb9a29c577df8c0bbd0fa571a03faf591c263b8f3dc9e1331fa23902216db1b",
-    "tools/drift-baseline.json": "f55451e1dad2fac761add700c2bdd9b41dd960a1373ea8e71b5b3254bc8d061f",
+    "design/shared-layer.json": "f99f984cf0105c85b90420afb79aed63f8daf51c4811aad7d27fcdd593316a7e",
+    "tools/drift-baseline.json": "430f59e8742c31465f3d3d35bc4e462a132cb12bede745af78e1bab97b576d38",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
     ".claude/skills/metacognition/SKILL.md": "20d721351217dacf24b36b7c2c26fcaf52e8a99f7a3bd39b5a3c4fd14dd75f26",
@@ -113,7 +113,8 @@
     "HOW-IT-WORKS.md": "cd9d83247df5cac64c1f97736536056bd575d040e7d854b159b68765d7b242c4",
     "TECHNICAL.md": "60c5ce3776ad512277bf01928edd8f7b1c8083c10146c59fddf1fe444740a31e",
     "tools/test_commons_report.py": "b844583ecc2293ace03b7f0eebcc412053245662b28daec3897d25267ade6038",
-    "tools/commons_report.py": "ebba8db5690e7be91f5d0d70d2d421c39090386a982de2f8a7fe3eed23eb5d1d"
+    "tools/commons_report.py": "ebba8db5690e7be91f5d0d70d2d421c39090386a982de2f8a7fe3eed23eb5d1d",
+    ".claude/skills/contribute/SKILL.md": "c885816ae4516523a5f502b288d67747f28e35c9fcba003e05bc30f7cb866024"
   },
   "adapted": {}
 }
