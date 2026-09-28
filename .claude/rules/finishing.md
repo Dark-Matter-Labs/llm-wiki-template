@@ -37,6 +37,13 @@ in this rule touches that path.
 `python3 tools/waiting.py` and say what it found. The owner should not have to know the tool exists,
 or that a thing called a branch is holding their work.
 
+**Offer one next step, and only one.** Added 28 September 2026, when the system was asked to be more
+proactive. At the start of a session, after the waiting check, run `python3 tools/coach.py` and mention
+its top suggestion once, after doing what the person came for. At the end of a finished task, offer one
+next step that follows from it, after "Shall I merge this?" if that was asked. The `coach` skill says how,
+and what must never happen: a list of tips, a suggestion mid-task, a repeat of one already declined, or
+acting on a suggestion without a yes.
+
 ## What this rule is not
 
 **It is not auto-merge.** Nothing merges without a person saying yes in that session. The whole claim

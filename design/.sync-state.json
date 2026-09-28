@@ -28,8 +28,8 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "1caa1a56d1c1d1a678e11d5f32ed3db26ceca59862e74c6651f6197a2cda9e1d",
     "tools/test_sync_commons.py": "39fb5e7f459132381c2ce0fda3087df443873cb98a55c2fd8253c466e8fd9a94",
-    "design/shared-layer.json": "f99f984cf0105c85b90420afb79aed63f8daf51c4811aad7d27fcdd593316a7e",
-    "tools/drift-baseline.json": "430f59e8742c31465f3d3d35bc4e462a132cb12bede745af78e1bab97b576d38",
+    "design/shared-layer.json": "4f0634e0ed573c8c766ab605b3b1086277e06fdca33f46e5bdefcd45574b463b",
+    "tools/drift-baseline.json": "3efe9eac910f8df4a8aea87dd08eb35cfd21d65dcbf6aebcc78e4829d02965fc",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
     ".claude/skills/metacognition/SKILL.md": "20d721351217dacf24b36b7c2c26fcaf52e8a99f7a3bd39b5a3c4fd14dd75f26",
@@ -108,13 +108,16 @@
     "tools/test_check_log_shape.py": "5de597e71125b7474adeb78ef10deb95bbc444993dc38f2af5322d453ad87d84",
     "tools/check_noindex.py": "f1dc65cbfc98b28a43eeaca3dda657894636dd39cd9d69ab84e938f234bbce1a",
     "tools/test_check_noindex.py": "419427f90108f30c0736f7bc20d94e92d73626b1f1682882ea77a80d254c0149",
-    ".claude/rules/finishing.md": "9085a9b42a62d60ad8149c66e2fd5efc68806f97e2234c5dd482861903fecdbd",
+    ".claude/rules/finishing.md": "39675483aeaacff8a71f83307200d83eb1b89205e491fbf06729c32ebc5b655d",
     "tools/test_search.py": "df60ca7bc206e2cc56e285bae67e1828c578833098f94da2fa4cd0997b312113",
     "HOW-IT-WORKS.md": "cd9d83247df5cac64c1f97736536056bd575d040e7d854b159b68765d7b242c4",
     "TECHNICAL.md": "60c5ce3776ad512277bf01928edd8f7b1c8083c10146c59fddf1fe444740a31e",
     "tools/test_commons_report.py": "b844583ecc2293ace03b7f0eebcc412053245662b28daec3897d25267ade6038",
     "tools/commons_report.py": "ebba8db5690e7be91f5d0d70d2d421c39090386a982de2f8a7fe3eed23eb5d1d",
-    ".claude/skills/contribute/SKILL.md": "c885816ae4516523a5f502b288d67747f28e35c9fcba003e05bc30f7cb866024"
+    ".claude/skills/contribute/SKILL.md": "c885816ae4516523a5f502b288d67747f28e35c9fcba003e05bc30f7cb866024",
+    ".claude/skills/coach/SKILL.md": "a1ae4299bd24c893290cfae88b45e8825367d5069c1ba707f80f162e618304da",
+    "tools/coach.py": "836454333a90055bf4fb00fcc2cbf126ab686981488617d27d91a656bce9ce4f",
+    "tools/test_coach.py": "2e587c29743efae6d687574ecfdbc23e52b2d2c87d14da6ed9957453e6de0a89"
   },
   "adapted": {}
 }

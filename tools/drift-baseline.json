@@ -43,9 +43,9 @@
     },
     {
       "path": ".github/workflows/checks.yml",
-      "repos": 10,
-      "versions": 4,
-      "reason": "BY ROLE \u2014 the gate set is not the same in every wiki, because the tools are not. This repo runs check_sources.py and sync_index_counts.py, which most wikis do not have. The one part that WAS shared drift \u2014 a hand-kept list of test files that covered 8 of 17 suites \u2014 was fixed on 2026-09-04 by making the step discover tools/test_*.py. What remains is each repo's own gates."
+      "repos": 22,
+      "versions": 5,
+      "reason": "BY ROLE \u2014 the gate set is not the same in every wiki, because the tools are not. This repo runs check_sources.py and sync_index_counts.py, which most wikis do not have. The one part that WAS shared drift \u2014 a hand-kept list of test files that covered 8 of 17 suites \u2014 was fixed on 2026-09-04 by making the step discover tools/test_*.py. What remains is each repo's own gates. FIFTH VARIANT READ 2026-09-25, count 4 -> 5 across 22 repos. It is the six commons set up 22-24 Sept (rz-commons, dm-llm-wiki, mission-pathways-wiki, people-hosts-wiki, hm-consciousness-lab-wiki, bioregional-finance-wiki), byte-identical to each other. Written by the 2026-09-23 'this commons finishes its setup' sync and copied at onboarding into the last two. It is the spoke-standard file plus one step, check_no_private.py, the commons-only warning. power-project-wiki runs the same step; its file and these six contain exactly the same run: commands. The only differences are where the step sits (after house_rules here, after cross_check there) and its comment, which here is xco-team-wiki's wording word for word. So this is a role difference with a cosmetic split, not a stray copy. Not reconciled: every repo involved is a commons, so closing the gap is a PR someone else merges. Adopting this layout in power-project-wiki, or power-project's in the six, would take it back to 4."
     },
     {
       "path": ".github/workflows/export-shared.yml",
@@ -55,9 +55,9 @@
     },
     {
       "path": ".github/workflows/export.yml",
-      "repos": 11,
-      "versions": 4,
-      "reason": "BY ROLE, PLUS ONE ANOMALY \u2014 retriaged 2026-09-10, down from six variants. Seven spokes are now byte-identical. The remaining four: one spoke standard, and three commons whose only differences are comment prose describing the same mechanism (xco-team-wiki's carries repo-specific history about the September Vercel exposure, so it legitimately differs). The anomaly is fang-llm-wiki, a SPOKE running power-project-wiki's commons workflow byte-for-byte since 2026-09-01 \u2014 it publishes wiki.shared.json, which the recorded role split says only a commons does. Left as found: the commit message reads as a deliberate choice, and reverting someone's decision is not a sync's call. Needs one conversation, not a patch."
+      "repos": 22,
+      "versions": 6,
+      "reason": "BY ROLE, PLUS ONE ANOMALY \u2014 retriaged 2026-09-10, down from six variants. Seven spokes are now byte-identical. The remaining four: one spoke standard, and three commons whose only differences are comment prose describing the same mechanism (xco-team-wiki's carries repo-specific history about the September Vercel exposure, so it legitimately differs). The anomaly is fang-llm-wiki, a SPOKE running power-project-wiki's commons workflow byte-for-byte since 2026-09-01 \u2014 it publishes wiki.shared.json, which the recorded role split says only a commons does. Left as found: the commit message reads as a deliberate choice, and reverting someone's decision is not a sync's call. Needs one conversation, not a patch. FIFTH VARIANT READ 2026-09-25, count 4 -> 5 across 22 repos. The same six new commons, byte-identical, from the 2026-09-23 'fix: publish the shared cut' commit in the first four and copied at onboarding into hm-consciousness-lab-wiki and bioregional-finance-wiki. With comment lines and step names ignored, it is identical to power-project-wiki's (and fang-llm-wiki's) commons workflow: it publishes wiki.public.json and wiki.shared.json with private pages stripped. What differs is the step name and the comment's history. One factual defect: the comment says the wiki 'published only the public cut until 2026-09-23'. That is true of five of the six, since each template 'Initial commit' ran the spoke exporter for a few minutes before setup. It is wrong for bioregional-finance-wiki, where that happened on 2026-09-24; fixed in bioregional-finance-wiki#7, merged 2026-09-25. SIXTH VARIANT READ 2026-09-25, count 5 -> 6: that fix is the whole of it. bioregional-finance-wiki's copy differs from the other five new commons by one character in one comment line, the date (2026-09-24 where they say 2026-09-23), and each date is correct for its own repo. A per-repo fact in a comment, not drift; reconciling it would make one of them wrong. (Corrected 2026-09-25: the first reading wrongly called hm-consciousness-lab-wiki's copy false too.)"
     },
     {
       "path": "SHARING-AND-ACCESS.md",
