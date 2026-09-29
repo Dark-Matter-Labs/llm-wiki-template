@@ -94,6 +94,13 @@ MAY fix frontmatter metadata when the correct value is unambiguous.
    If history is under about twice the threshold, say the pass is not yet informative rather
    than presenting a list.
 
+9. **Distance from sources.** Run `python3 tools/derivation_chains.py`. It lists pages that
+   name no source in `raw/` and lean mostly on other unsourced pages, most leaned-on first, and
+   pages that name no source and link to nothing. Drift hides in that layer: a synthesis of
+   syntheses paraphrases further from what any source said. A link is not a derivation, so
+   report the top few and propose, for each, adding the source its claims rest on or labelling it
+   `derivation: derivative`; whether a person reads the chain and stands behind it is theirs.
+
 ## Output
 
 Produce a plain-language report:
@@ -110,6 +117,7 @@ Overall: 🟢 healthy / 🟡 needs attention / 🔴 problems
 6. Duplicates — …
 7. Tags — …
 8. Dormancy — …
+9. Distance from sources — …
 
 Suggested next steps (which need your approval):
 1. …

@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "1caa1a56d1c1d1a678e11d5f32ed3db26ceca59862e74c6651f6197a2cda9e1d",
     "tools/test_sync_commons.py": "39fb5e7f459132381c2ce0fda3087df443873cb98a55c2fd8253c466e8fd9a94",
-    "design/shared-layer.json": "c3c1dbb091ceb6d1eae06af6ca57d0a7fcaab2d509d7744e6ab268d87a15aea3",
+    "design/shared-layer.json": "bf93dba085e118e0c1c76dfcaaf30f45017a3b7f031a1ee2697bebaaba9ec698",
     "tools/drift-baseline.json": "3efe9eac910f8df4a8aea87dd08eb35cfd21d65dcbf6aebcc78e4829d02965fc",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -50,7 +50,7 @@
     "tools/scan_public_leaks.py": "6bbc04cb5c458a3fc8c3698193c2c8a8de424bdb98a00e501ad03b38c6d6a7f0",
     ".claude/skills/brief/SKILL.md": "cfe98e13ed5cc4b5469a2f05f7052921e7e0ab1b24649b0534acecfb84a28b0e",
     ".claude/skills/ingest/SKILL.md": "c1c9acc8aa11192026041078c03a769283358a113c9a1c1e86ccd38aa2b93a0f",
-    ".claude/skills/lint/SKILL.md": "4b7f84a8f513f86dfb6a06fd48d638941bd823b79fd42c3aee75bf4935e5439a",
+    ".claude/skills/lint/SKILL.md": "32b27e6ee531cbbf39996dc4417d6e777a95b6b2e92c211c1eeea6a0ce319626",
     ".claude/skills/publish-check/SKILL.md": "14929a1731511b9cca2bab36799bdddf031710e16b0b205128f833976f10130c",
     ".claude/skills/query/SKILL.md": "0fbf0bdb1b85b9ec0f4721ba253c990c206025ba761548d5de3a9db899b37326",
     ".claude/skills/delta/SKILL.md": "0d6a1b83c13a9576c4ad9f741bad3fc1ca220bddf9cbdad08649bb4ffe70e98c",
@@ -126,7 +126,9 @@
     "tools/duplicates.py": "05e112cd50c7727280940659afe94910ddaf5800cd0d835213c107477f8a41fb",
     "tools/test_duplicates.py": "056fcb9d2ba60b9fa8d7647f668184dde70ebea11c5ac619d827fc9534f4a9cf",
     "tools/tag_report.py": "c8bd83fb35c95179e4a32991e2aa1660510ccfa9294acc8f613d14cda30c9961",
-    "tools/test_tag_report.py": "f47e2c054002af598f662cec1b7c09b91869b65d8bbb3e22124c67ad8e856e7d"
+    "tools/test_tag_report.py": "f47e2c054002af598f662cec1b7c09b91869b65d8bbb3e22124c67ad8e856e7d",
+    "tools/derivation_chains.py": "ba4671ea02a5c8b9802bf8ad1937672b255522f7ab2c1e020a1e542db2213682",
+    "tools/test_derivation_chains.py": "2e8c1ba5f22a8fde246efc855dc76078f040bf0cc6710ccf3a47bc5b4b83de7e"
   },
   "adapted": {}
 }
