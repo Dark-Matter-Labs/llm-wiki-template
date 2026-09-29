@@ -75,7 +75,8 @@ MAY fix frontmatter metadata when the correct value is unambiguous.
    are used on one page only, then propose (a) merging the spelling variants it groups, which
    is mechanical, and (b) folding one-page tags into broader tags already in use, which is a
    judgement: at most ten proposals a pass, the ones touching most pages. Retag only the groups
-   the owner approves; the change is frontmatter only.
+   the owner approves; the change is frontmatter only. A group the owner decides to keep apart goes
+   in `design/tags.json` under `keep_apart`, so it is not proposed again.
 
 8. **Dormancy candidates.** Run `python3 tools/staleness.py --older-than 42 --json` and
    cross it with the graph. A candidate is a page that is **all three** of: body untouched

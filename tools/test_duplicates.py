@@ -79,9 +79,12 @@ def main():
         cache.mkdir(parents=True)
         (cache / "wiki.shared.json").write_text(json.dumps({"nodes": [
             {"slug": "sal", "title": "Nobody Can Save The Salmon (v2)", "type": "concept"},
-            {"slug": "same", "title": "Salmon Trust", "type": "entity"}]}))
+            {"slug": "same", "title": "Salmon Trust", "type": "entity"},
+            {"slug": "copy", "title": "The Witnessing Grammar", "type": "concept"}]}))
         a = D.candidates(root)["against_commons"]
         check("a near-duplicate in the commons is found", any(r["commons"] == "xco-team-wiki" for r in a), str(a))
+        check("a commons copy of a page here does not repeat a within-wiki pair",
+              not any(r["b"] == "The Witnessing Grammar" for r in a), str(a))
         check("the same title in the commons is not reported (seeded or contributed copies)",
               not any(r["b"] == "Salmon Trust" and r["a"] == "Salmon Trust" for r in a), str(a))
 

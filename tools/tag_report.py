@@ -14,6 +14,9 @@ proposes is one a person can accept at a glance.
 
   python3 tools/tag_report.py
   python3 tools/tag_report.py --json
+
+A group the owner decided to keep apart ("capitals", the multi-capital idea, is not "capital") is
+listed in `design/tags.json` as {"keep_apart": [["capital", "capitals"]]} and never proposed again.
 """
 
 import argparse
@@ -38,8 +41,17 @@ def key(tag):
     return k
 
 
+def _keep_apart(root):
+    try:
+        data = json.loads((root / "design" / "tags.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return [set(g) for g in data.get("keep_apart", []) if isinstance(g, list)]
+
+
 def report(root=ROOT):
     root = pathlib.Path(root)
+    apart = _keep_apart(root)
     use = collections.Counter()
     where = collections.defaultdict(set)
     pages = 0
@@ -58,7 +70,7 @@ def report(root=ROOT):
         groups[key(t)].append(t)
     merges = []
     for k, variants in groups.items():
-        if len(variants) > 1:
+        if len(variants) > 1 and not any(set(variants) <= g for g in apart):
             variants.sort(key=lambda t: (-use[t], t))
             merges.append({"into": variants[0], "variants": variants[1:],
                            "pages": sum(use[v] for v in variants[1:]),

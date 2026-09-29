@@ -129,10 +129,13 @@ def candidates(root=ROOT):
                 v, why = verdict(p["title"], q["title"], how)
                 within.append({"a": p["title"], "b": q["title"], "a_slug": p["slug"], "b_slug": q["slug"],
                                "match": how, "verdict": v, "why": why})
+    # A commons page whose title is also a page here is a copy of that page, so a pair it forms
+    # is the within-wiki pair again. Found on the first lint run, 2026-09-29: 24 commons rows, most
+    # of them repeats. Only commons pages this wiki does not hold are compared.
+    titles = {p["title"] for p in local}
+    others = [c for c in _commons(root) if c["title"] not in titles]
     for p in local:
-        for c in _commons(root):
-            if c["title"] == p["title"]:
-                continue  # the same page, seeded or contributed; same_as covers independent ones
+        for c in others:
             how = related(p["title"], c["title"])
             if how and not _joined(p, c):
                 v, why = verdict(p["title"], c["title"], how)

@@ -48,6 +48,10 @@ def main():
         check("case variants are grouped", "cof" in into or "COF" in into, str(into))
         check("optionality and options are never merged", not any("optionality" in m["variants"] + [m["into"]] and
               "options" in m["variants"] + [m["into"]] for m in r["merges"]), str(r["merges"]))
+        (root / "design").mkdir()
+        (root / "design" / "tags.json").write_text('{"keep_apart": [["funder", "funders"]]}')
+        check("a group the owner kept apart is not proposed again",
+              not any(m["into"] == "funder" for m in T.report(root)["merges"]), str(T.report(root)["merges"]))
         check("one-page tags are counted and listed", r["used_once"] == len(r["singletons"]) and "optionality" in r["singletons"], str(r))
     print()
     if FAILED:
