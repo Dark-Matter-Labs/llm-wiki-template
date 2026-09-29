@@ -119,6 +119,7 @@
     ".github/workflows/waiting.yml",
     ".claude/skills/waiting/SKILL.md",
     ".claude/rules/finishing.md",
+    ".claude/rules/talking.md",
     ".claude/skills/coach/SKILL.md",
     "tools/coach.py",
     "tools/test_coach.py",
