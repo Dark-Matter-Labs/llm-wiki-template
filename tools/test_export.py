@@ -83,6 +83,99 @@ class ExportTests(unittest.TestCase):
             self.assertIn("beta", public)
             self.assertEqual(public["beta"]["visibility"], "unlisted")
 
+    def _cut(self, d, hide=export.HIDE_FROM_WEB):
+        nodes, t2s = export.build_nodes(d)
+        public, hidden = export.make_public(nodes, t2s, hide=hide)
+        blob = json.dumps({"meta": export.build_meta(public, "public"),
+                           "nodes": [public[s] for s in sorted(public)]})
+        return public, hidden, blob
+
+    def assertNoTrace(self, blob, title, slug):
+        self.assertNotIn(title.casefold(), blob.casefold(), "hidden TITLE leaked")
+        self.assertNotIn(slug, blob, "hidden SLUG leaked")
+
+    def test_an_unknown_tier_is_hidden_not_published(self):
+        """An allowlist, not a denylist (federation review, 2026-09-29).
+
+        The cut used to hide a page only when its tier was exactly `private` or `internal`,
+        so `Private`, `confidential` or a typo published it. --check refuses those values
+        before a publish; this holds even when --check is skipped.
+        """
+        for tier in ("Private", "confidential", "privat", "INTERNAL"):
+            with tempfile.TemporaryDirectory() as d:
+                write(d, "zzq-odd-9f3a.md", base_fm("concept", "Zzq Odd Tier 9f3a", tier))
+                write(d, "alpha.md", base_fm("concept", "Alpha", "public"))
+                for hide in (export.HIDE_FROM_WEB, export.HIDE_FROM_SHARED):
+                    public, hidden, blob = self._cut(d, hide)
+                    self.assertIn("zzq-odd-9f3a", hidden, f"tier {tier!r} was published")
+                    self.assertNoTrace(blob, "Zzq Odd Tier 9f3a", "zzq-odd-9f3a")
+                    self.assertIn("alpha", public)
+
+    def test_a_crm_page_never_travels_whatever_its_tier(self):
+        """contribute.py refused CRM pages; the exporters did not. A crm/ page mislabelled
+        `internal` would have reached the colleague mirror."""
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, "crm"))
+            write(d, os.path.join("crm", "zzq-contact-9f3a.md"),
+                  base_fm("entity", "Zzq Contact 9f3a", "internal"))
+            write(d, "alpha.md", base_fm("concept", "Alpha", "public"), "Met [[Zzq Contact 9f3a]].\n")
+            public, hidden, blob = self._cut(d, export.HIDE_FROM_SHARED)
+            self.assertIn("crm/zzq-contact-9f3a", hidden)
+            self.assertNoTrace(blob, "Zzq Contact 9f3a", "zzq-contact-9f3a")
+
+    def test_frontmatter_fields_are_cleaned_too(self):
+        """Only the body was cleaned. A public page whose `contradicts`, `commits_to`,
+        `superseded_by` or `description` named a private page carried its title out."""
+        PRIV = "Zzq Confidential Node 9f3a"
+        with tempfile.TemporaryDirectory() as d:
+            write(d, "zzq-priv-9f3a.md", base_fm("goal", PRIV, "private"))
+            extra = ('contradicts: "%s"\ncommits_to: "%s"\nfrom: "%s"\nparent: "%s"\n'
+                     'superseded_by: "%s"\ndevalued_by: "%s"' % ((PRIV,) * 6))
+            fm = base_fm("commitment", "Alpha", "public", extra).replace(
+                "description: desc for Alpha", "description: builds on [[%s]] and more" % PRIV)
+            write(d, "alpha.md", fm)
+            public, _hidden, blob = self._cut(d)
+            self.assertNoTrace(blob, PRIV, "zzq-priv-9f3a")
+            self.assertIsNone(public["alpha"]["contradicts"])
+            self.assertIn("and more", public["alpha"]["description"])
+
+    def test_link_variants_are_redacted(self):
+        """[[Title#Section]], a case variant and a markdown link each named the hidden page."""
+        PRIV = "Zzq Confidential Node 9f3a"
+        body = ("One [[%s#Terms]]. Two [[%s#Terms|the terms]]. Three [[%s]]. "
+                "Four [notes](zzq-priv-9f3a.md). Five [more](./zzq-priv-9f3a.md#top).\n"
+                % (PRIV, PRIV, PRIV.lower()))
+        with tempfile.TemporaryDirectory() as d:
+            write(d, "zzq-priv-9f3a.md", base_fm("concept", PRIV, "private"))
+            write(d, "alpha.md", base_fm("concept", "Alpha", "public"), body)
+            public, _hidden, blob = self._cut(d)
+            self.assertNoTrace(blob, PRIV, "zzq-priv-9f3a")
+            text = public["alpha"]["body"]
+            for kept in ("the terms", "notes", "more"):
+                self.assertIn(kept, text)
+
+    def test_a_markdown_link_in_different_case_is_redacted(self):
+        """Found by review the same day: the wikilink path folded case, the markdown path did
+        not, so `[roster](CRM/Roster.md)` survived beside a redacted `[[Team Roster]]`."""
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, "crm"))
+            write(d, os.path.join("crm", "roster.md"), base_fm("entity", "Team Roster", "internal"))
+            write(d, "alpha.md", base_fm("concept", "Alpha", "public"),
+                  "See [the roster](CRM/Roster.md) and [again](../wiki/crm/ROSTER.MD).\n")
+            public, _hidden, _blob = self._cut(d, export.HIDE_FROM_SHARED)
+            body = public["alpha"]["body"]
+            self.assertNotIn("roster.md", body.casefold())
+            self.assertIn("the roster", body)
+
+    def test_links_to_visible_pages_are_untouched(self):
+        with tempfile.TemporaryDirectory() as d:
+            write(d, "beta.md", base_fm("concept", "Beta", "public"))
+            body = "See [[Beta#Why]], [[beta]] and [the page](beta.md).\n"
+            write(d, "alpha.md", base_fm("concept", "Alpha", "public", 'contradicts: "Beta"'), body)
+            public, _hidden, _blob = self._cut(d)
+            self.assertEqual(public["alpha"]["body"], body)
+            self.assertEqual(public["alpha"]["contradicts"], "Beta")
+
     def test_full_export_keeps_everything(self):
         with tempfile.TemporaryDirectory() as d:
             self._fixture(d)
