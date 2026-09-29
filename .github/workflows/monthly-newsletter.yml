@@ -139,8 +139,9 @@ jobs:
       # Hardened 2026-09-29 (federation review). This step reads ingested text, which a
       # stranger may have written, so it runs as if that text were hostile: the action is
       # pinned to a commit rather than a tag that can move, the shell reaches only this
-      # repo's own tools and read-only git, the web tools are off, and checkout does not
-      # leave a write credential on disk. The push after it carries its token explicitly.
+      # repo's own tools and read-only git, edits reach only wiki/, the web tools are off,
+      # and checkout leaves no write credential on disk. The commit step refuses the run if
+      # anything outside wiki/ changed. A person still reviews the PR before it merges.
       - name: Write the issue
         if: steps.guard.outputs.enabled == 'true'
         uses: anthropics/claude-code-action@8ce9314fa9a404564fa7e954cd84f25bcba2b829  # v1, pinned 2026-09-29
@@ -166,7 +167,7 @@ jobs:
           # default. Three dollars because $2 left fifteen per cent of headroom, and a
           # run cut off mid-write is worse than a slightly dearer one. The other nine
           # wikis are between 12 and 676 pages, so the cap will not bind on any of them.
-          claude_args: --model claude-sonnet-5 --max-budget-usd 3 --allowedTools "Bash(python3 tools/*),Bash(git log*),Bash(git status*),Read,Edit,Write,Glob,Grep" --disallowedTools "WebFetch,WebSearch"
+          claude_args: --model claude-sonnet-5 --max-budget-usd 3 --allowedTools "Bash(python3 tools/*),Bash(git log*),Bash(git status*),Read,Glob,Grep,Edit(wiki/**),Write(wiki/**)" --disallowedTools "WebFetch,WebSearch"
           prompt: |
             Run the `newsletter` skill for ${{ steps.gather.outputs.month }}. The gathered
             material is at /tmp/material.json and `python3 tools/newsletter.py --json` will
@@ -281,6 +282,15 @@ jobs:
           # still a value reaching a branch name, so it is checked here too.
           printf '%s' "$MONTH" | grep -qE '^[0-9]{4}-(0[1-9]|1[0-2])$' || {
             echo "::error::unexpected month value from the gather step"; exit 1; }
+          # Only wiki/ may change (review, 2026-09-29). The model step can edit files, and
+          # an edit to tools/*.py would run through the allowed shell pattern; this refuses
+          # the run rather than committing anything written outside the wiki.
+          OUTSIDE=$(git status --porcelain --untracked-files=all | awk '{print $NF}' | grep -v '^wiki/' || true)
+          if [ -n "$OUTSIDE" ]; then
+            echo "::error::the model step changed files outside wiki/, so nothing is committed:"
+            echo "$OUTSIDE"
+            exit 1
+          fi
           BRANCH="newsletter/${MONTH}"
           git checkout -b "$BRANCH"
           git add -A

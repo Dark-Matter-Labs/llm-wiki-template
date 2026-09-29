@@ -154,6 +154,19 @@ class ExportTests(unittest.TestCase):
             for kept in ("the terms", "notes", "more"):
                 self.assertIn(kept, text)
 
+    def test_a_markdown_link_in_different_case_is_redacted(self):
+        """Found by review the same day: the wikilink path folded case, the markdown path did
+        not, so `[roster](CRM/Roster.md)` survived beside a redacted `[[Team Roster]]`."""
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, "crm"))
+            write(d, os.path.join("crm", "roster.md"), base_fm("entity", "Team Roster", "internal"))
+            write(d, "alpha.md", base_fm("concept", "Alpha", "public"),
+                  "See [the roster](CRM/Roster.md) and [again](../wiki/crm/ROSTER.MD).\n")
+            public, _hidden, _blob = self._cut(d, export.HIDE_FROM_SHARED)
+            body = public["alpha"]["body"]
+            self.assertNotIn("roster.md", body.casefold())
+            self.assertIn("the roster", body)
+
     def test_links_to_visible_pages_are_untouched(self):
         with tempfile.TemporaryDirectory() as d:
             write(d, "beta.md", base_fm("concept", "Beta", "public"))

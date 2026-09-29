@@ -188,9 +188,9 @@ def main():
         except ValueError as e:
             ok, why = True, str(e)
         check("a page whose tier is not a known one is refused", ok, why)
-        bad = [b for b in ("tester\nvisibility: public", "", "x" * 81, "a: b") if C.valid_by(b)]
+        bad = [b for b in ("tester\nvisibility: public", "Gurden\n", "A---", "A--B", "-x", "", "x" * 81, "a: b") if C.valid_by(b)]
         check("--by is refused when it could rewrite the frontmatter", not bad, f"accepted {bad!r}")
-        check("--by accepts an ordinary name", C.valid_by("Gurden Batra") and C.valid_by("gurden"))
+        check("--by accepts an ordinary name", C.valid_by("Gurden Batra") and C.valid_by("gurden") and C.valid_by("Jean-Luc O'Neil"))
         check("machine stays machine",
               val_of("another-shared") == "machine", f"got {val_of('another-shared')}")
 

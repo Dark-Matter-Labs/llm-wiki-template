@@ -87,8 +87,9 @@ jobs:
       # Hardened 2026-09-29 (federation review). This step reads ingested text, which a
       # stranger may have written, so it runs as if that text were hostile: the action is
       # pinned to a commit rather than a tag that can move, the shell reaches only this
-      # repo's own tools and read-only git, the web tools are off, and checkout does not
-      # leave a write credential on disk. The push after it carries its token explicitly.
+      # repo's own tools and read-only git, edits reach only wiki/, the web tools are off,
+      # and checkout leaves no write credential on disk. The commit step refuses the run if
+      # anything outside wiki/ changed. A person still reviews the PR before it merges.
       - name: Ask for validation decisions
         if: steps.due.outputs.due == 'true' && steps.guard.outputs.enabled == 'true'
         uses: anthropics/claude-code-action@8ce9314fa9a404564fa7e954cd84f25bcba2b829  # v1, pinned 2026-09-29
@@ -100,7 +101,7 @@ jobs:
           # across ten wikis with a key is $60-95 in a week when every one is due. This job reads a
           # diff and proposes frontmatter; Sonnet does that, and the cap stops a runaway run.
           claude_args: |
-            --model claude-sonnet-5 --max-budget-usd 3 --allowedTools "Bash(python3 tools/*),Bash(git diff*),Bash(git log*),Bash(git status*),Read,Edit,Write,Glob,Grep" --disallowedTools "WebFetch,WebSearch"
+            --model claude-sonnet-5 --max-budget-usd 3 --allowedTools "Bash(python3 tools/*),Bash(git diff*),Bash(git log*),Bash(git status*),Read,Glob,Grep,Edit(wiki/**),Write(wiki/**)" --disallowedTools "WebFetch,WebSearch"
           prompt: |
             Run a validation pass over the material added since the last one.
 
@@ -136,6 +137,15 @@ jobs:
             exit 0
           fi
           # Record the pass at the commit it covered, so the next run measures from here.
+          # Only wiki/ may change (review, 2026-09-29). The model step can edit files, and
+          # an edit to tools/*.py would run through the allowed shell pattern; this refuses
+          # the run rather than committing anything written outside the wiki.
+          OUTSIDE=$(git status --porcelain --untracked-files=all | awk '{print $NF}' | grep -v '^wiki/' || true)
+          if [ -n "$OUTSIDE" ]; then
+            echo "::error::the model step changed files outside wiki/, so nothing is committed:"
+            echo "$OUTSIDE"
+            exit 1
+          fi
           python3 tools/validation_due.py --record
           BRANCH="validation/$(date -u +%Y%m%d-%H%M%S)"
           git checkout -b "$BRANCH"

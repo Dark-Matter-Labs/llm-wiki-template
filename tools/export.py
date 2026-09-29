@@ -370,7 +370,7 @@ def _strip_private_links(body, title_to_slug, private_slugs):
     [[Title#Section]], a title in different case, and a markdown link [text](page.md).
     """
     folded = {_fold(t): s for t, s in title_to_slug.items()}
-    hidden_names = {s.rsplit("/", 1)[-1] for s in private_slugs}
+    hidden_names = {s.rsplit("/", 1)[-1].casefold() for s in private_slugs}
 
     def repl(m):
         target = _norm_title(m.group(1)).split("#", 1)[0].strip()  # robust to line-wrapped links
@@ -382,9 +382,9 @@ def _strip_private_links(body, title_to_slug, private_slugs):
 
     def md_repl(m):
         path = m.group(3).split("#", 1)[0].split("?", 1)[0]
-        if not path.endswith(".md") or "://" in path:
+        if not path.casefold().endswith(".md") or "://" in path:
             return m.group(0)
-        if path[:-3].rsplit("/", 1)[-1] in hidden_names:
+        if path[:-3].rsplit("/", 1)[-1].casefold() in hidden_names:
             return m.group(2).strip() or "[redacted]"
         return m.group(0)
 

@@ -173,11 +173,13 @@ CONTRIBUTABLE = frozenset({"internal", "unlisted", "public"})
 
 # Stamped into frontmatter as a bare scalar, so it must not be able to carry a newline, a
 # colon or a comment into the block (review, 2026-09-29). A name, and nothing else.
-BY_RE = re.compile(r"^[A-Za-z][A-Za-z .'-]{0,79}$")
+# fullmatch, because `$` also matches before a trailing newline; and a hyphen only between
+# letters, because `---` is the frontmatter delimiter (both found by review the same day).
+BY_RE = re.compile(r"[A-Za-z][A-Za-z.' ]*(?:-[A-Za-z.' ]+)*")
 
 
 def valid_by(name):
-    return bool(name) and bool(BY_RE.match(name))
+    return bool(name) and len(name) <= 80 and bool(BY_RE.fullmatch(name))
 
 
 def commons_titles(name):
