@@ -40,6 +40,18 @@ knowledge they're actually after and answer that instead.
    the raw sources. Separate what the sources say from what you infer. Flag any
    contradictions between pages rather than papering over them.
 
+   **Exact things are read fresh from the source, never from a page.** A figure, a date, a
+   contract term, a quoted sentence: open the cited file in `raw/` and take it from there, and
+   say which file and section. A page's paraphrase is fine for an argument and wrong for a number,
+   because a summary of a summary drifts (adopted 29 September 2026: past about 200 pages,
+   compiled pages stop being a safe place to hold exact detail). If the cited source is not in this
+   repo, say so rather than repeating the page's version as if it were checked.
+
+   **End with what the wiki doesn't know.** One or two lines: the part of the question the wiki
+   could not answer, and what would answer it (a source, a person, a page not yet written). An
+   answer that looks complete when it is not is the failure this prevents. If the wiki fully
+   answers it, say that in one line instead.
+
 5. **Choose the right output form** for the question: prose, a comparison table, a
    short brief, a list. Match the question.
 
