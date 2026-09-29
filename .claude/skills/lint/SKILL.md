@@ -58,10 +58,26 @@ MAY fix frontmatter metadata when the correct value is unambiguous.
 5. **Orphans.** Find pages with zero inbound `[[links]]`. Suggest which existing pages
    should link to them.
 
-6. **Duplicates.** Find pages with near-identical titles or content. List them for
-   the owner to approve a merge. Never merge or delete without approval.
+6. **Duplicates.** Run `python3 tools/duplicates.py`. It proposes pairs by title, within this
+   wiki and against the cached commons, and marks each one:
+   - **fold?** — the same title in different dress. Read both bodies; if they say the same thing,
+     propose merging into one page.
+   - **never fold** — two versions of one thing (v2 and v3, Part One and Part Two, 2025 and 2026).
+     Never propose a merge, however alike the bodies look. Propose a link, and if one replaces the
+     other, say so: a person records `superseded_by`.
+   - **check** — one title inside another. Most such pairs are distinct ("Civilization Options
+     Fund" and "... Capability Fund"). Read both before saying anything.
+   A match against a commons page, with no `same_as` between them, may be a `same_as:` proposal
+   rather than a merge. List what you propose for the owner to approve. Never merge, rename or
+   delete without approval.
 
-7. **Dormancy candidates.** Run `python3 tools/staleness.py --older-than 42 --json` and
+7. **Tags.** Run `python3 tools/tag_report.py`. Report the count of distinct tags and how many
+   are used on one page only, then propose (a) merging the spelling variants it groups, which
+   is mechanical, and (b) folding one-page tags into broader tags already in use, which is a
+   judgement: at most ten proposals a pass, the ones touching most pages. Retag only the groups
+   the owner approves; the change is frontmatter only.
+
+8. **Dormancy candidates.** Run `python3 tools/staleness.py --older-than 42 --json` and
    cross it with the graph. A candidate is a page that is **all three** of: body untouched
    for the threshold, `confidence: low`, and one inbound link or fewer. Report them; never
    set `status: dormant` yourself — see the dormancy rule in CLAUDE.md.
@@ -92,6 +108,8 @@ Overall: 🟢 healthy / 🟡 needs attention / 🔴 problems
 4. Overview drift — …
 5. Orphans — …
 6. Duplicates — …
+7. Tags — …
+8. Dormancy — …
 
 Suggested next steps (which need your approval):
 1. …
@@ -100,6 +118,10 @@ Suggested next steps (which need your approval):
 Then append `## [YYYY-MM-DD] lint | <one-line status>` to the today's log file (`wiki/log/YYYY-MM-DD.md`; see `wiki/log.md`).
 
 ## Hard rules
+- A pull request that deletes a page or rewrites a past day's log fails the history guard
+  (`tools/check_history.py`). Only a person may approve that, by adding the label
+  `approved-removal`; never add it yourself, and never work around the guard by editing history
+  another way.
 - Never delete a page without explicit approval.
 - Never rewrite page *content* in a lint pass — only repair unambiguous frontmatter.
 - Flag, propose, wait.
