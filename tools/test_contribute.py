@@ -109,9 +109,14 @@ def main():
               body="Refers to [[The Secret Position]] and to [[Another Shared]].")
         write(wiki, "another-shared", "Another Shared", vis="internal")
         write(wiki, "crm/contact-x", "Contact X", vis="private")
-        write(wiki, "peer-page", "A Peer Validated Page", vis="internal", val="peer")
-        write(wiki, "coll-page", "A Collectively Validated Page", vis="internal", val="collective")
-        write(wiki, "self-page", "A Self Validated Page", vis="internal", val="self")
+        write(wiki, "peer-page", "A Peer Validated Page", vis="internal", val="peer",
+              extra="validated_by: [Indy]\nvalidated_at: 2026-09-01\n")
+        write(wiki, "coll-page", "A Collectively Validated Page", vis="internal", val="collective",
+              extra="validated_by: [Indy]\nvalidated_at: 2026-09-01\n")
+        write(wiki, "self-page", "A Self Validated Page", vis="internal", val="self",
+              extra="validated_by: [Indy]\nvalidated_at: 2026-09-01\n")
+        write(wiki, "self-unnamed", "Self With Nobody Named", vis="internal", val="self")
+        write(wiki, "odd-tier", "An Odd Tier Page", vis="Private")
         # a private title hidden in a YAML comment — the reason frontmatter is rebuilt
         write(wiki, "sneaky", "Sneaky", vis="internal",
               extra="# see also: The Secret Position\n")
@@ -172,6 +177,20 @@ def main():
               val_of("coll-page") == "self", f"got {val_of('coll-page')}")
         check("self travels unchanged (the author still stands behind it)",
               val_of("self-page") == "self", f"got {val_of('self-page')}")
+        self_text = build(["self-page"])["wiki/self-page.md"]
+        check("a validated page carries who stood behind it, so the commons schema accepts it",
+              "validated_by: [Indy]" in self_text and "validated_at: 2026-09-01" in self_text,
+              self_text.split("---")[1][-160:])
+        check("self with nobody named is re-based to machine, never passed on unbacked",
+              val_of("self-unnamed") == "machine", f"got {val_of('self-unnamed')}")
+        try:
+            build(["odd-tier"]); ok = False; why = "no error raised"
+        except ValueError as e:
+            ok, why = True, str(e)
+        check("a page whose tier is not a known one is refused", ok, why)
+        bad = [b for b in ("tester\nvisibility: public", "", "x" * 81, "a: b") if C.valid_by(b)]
+        check("--by is refused when it could rewrite the frontmatter", not bad, f"accepted {bad!r}")
+        check("--by accepts an ordinary name", C.valid_by("Gurden Batra") and C.valid_by("gurden"))
         check("machine stays machine",
               val_of("another-shared") == "machine", f"got {val_of('another-shared')}")
 

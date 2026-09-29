@@ -290,21 +290,31 @@ def _recompute_inbound(nodes):
 
 def make_public(nodes, title_to_slug, hide=HIDE_FROM_WEB):
     """Return a new node dict with every hidden page absent, all edges to/from
-    hidden pages removed, and hidden link markup stripped from bodies.
+    hidden pages removed, and hidden link markup stripped from bodies and fields.
 
     `hide` is the set of visibility tiers to strip. Two callers, two boundaries:
       * the web export hides {private, internal} — the default;
       * the colleague mirror hides {private} only, so `internal` pages travel to
         trusted colleagues but never to the open web.
+
+    An allowlist since the federation review of 2026-09-29. A page travels only when its
+    tier is one this cut admits by name, so `Private`, `confidential` or a typo is hidden
+    rather than published; --check refuses those values, and this holds when it is skipped.
+    A page under crm/ never travels at all, whatever it is labelled: contribute.py refused
+    CRM pages and the exporters did not.
     """
-    hidden_slugs = {s for s, n in nodes.items() if n["visibility"] in hide}
+    admitted = ALLOWED_VISIBILITY - set(hide)
+    hidden_slugs = {s for s, n in nodes.items() if not _admitted(s, n, admitted)}
+    hidden_titles = {_fold(nodes[s]["title"]) for s in hidden_slugs
+                     if isinstance(nodes[s].get("title"), str)}
 
     public = {}
     for slug, n in nodes.items():
-        if n["visibility"] in hide:
+        if slug in hidden_slugs:
             continue
         m = json.loads(json.dumps(n))  # deep copy
         m["body"] = _strip_private_links(m["body"], title_to_slug, hidden_slugs)
+        _clean_fields(m, title_to_slug, hidden_slugs, hidden_titles)
         public[slug] = m
 
     # recompute edges over the visible set only (drops any edge touching a hidden node)
@@ -312,17 +322,73 @@ def make_public(nodes, title_to_slug, hide=HIDE_FROM_WEB):
     return public, hidden_slugs
 
 
+def _admitted(slug, node, admitted):
+    if slug == "crm" or slug.startswith("crm/"):
+        return False
+    return node.get("visibility") in admitted
+
+
+def _fold(s):
+    """A title as it must match: wrapped whitespace collapsed, case ignored."""
+    return _norm_title(s).casefold()
+
+
+# Frontmatter fields holding another page's exact title, and fields of free prose. Until
+# 2026-09-29 only the body was cleaned, so a public page whose `contradicts` or
+# `description` named a private page carried that title into both cuts.
+TITLE_FIELDS = ("contradicts", "commits_to", "from", "parent", "superseded_by", "devalued_by")
+TEXT_FIELDS = ("description", "resources", "until", "state")
+
+
+def _clean_fields(node, title_to_slug, hidden_slugs, hidden_titles):
+    def names_hidden(v):
+        return isinstance(v, str) and _fold(v.strip().strip("[]")) in hidden_titles
+
+    for key in TITLE_FIELDS:
+        v = node.get(key)
+        if isinstance(v, list):
+            node[key] = [x for x in v if not names_hidden(x)]
+        elif names_hidden(v):
+            node[key] = None
+    for key in TEXT_FIELDS:
+        v = node.get(key)
+        if isinstance(v, str):
+            node[key] = _strip_private_links(v, title_to_slug, hidden_slugs)
+        elif isinstance(v, list):
+            node[key] = [_strip_private_links(x, title_to_slug, hidden_slugs)
+                         if isinstance(x, str) else x for x in v]
+
+
+MDLINK_RE = re.compile(r"(!?)\[([^\]]*)\]\(([^)\s]+)\)")
+
+
 def _strip_private_links(body, title_to_slug, private_slugs):
     """Replace [[Private Title|display]] -> display, [[Private Title]] -> [redacted],
-    so neither the private title nor a navigable link to it survives in a public body."""
+    so neither the private title nor a navigable link to it survives in a public body.
+
+    Also matched since 2026-09-29, when each was found to carry the title out:
+    [[Title#Section]], a title in different case, and a markdown link [text](page.md).
+    """
+    folded = {_fold(t): s for t, s in title_to_slug.items()}
+    hidden_names = {s.rsplit("/", 1)[-1] for s in private_slugs}
+
     def repl(m):
-        target = _norm_title(m.group(1))  # robust to line-wrapped private links
+        target = _norm_title(m.group(1)).split("#", 1)[0].strip()  # robust to line-wrapped links
         display = (m.group(2) or "").strip()
-        tslug = title_to_slug.get(target)
+        tslug = title_to_slug.get(target) or folded.get(_fold(target))
         if tslug in private_slugs:
             return display if display else "[redacted]"
         return m.group(0)
-    return WIKILINK_RE.sub(repl, body)
+
+    def md_repl(m):
+        path = m.group(3).split("#", 1)[0].split("?", 1)[0]
+        if not path.endswith(".md") or "://" in path:
+            return m.group(0)
+        if path[:-3].rsplit("/", 1)[-1] in hidden_names:
+            return m.group(2).strip() or "[redacted]"
+        return m.group(0)
+
+    return MDLINK_RE.sub(md_repl, WIKILINK_RE.sub(repl, body))
 
 
 # --------------------------------------------------------------------------- #

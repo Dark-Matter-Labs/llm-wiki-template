@@ -43,28 +43,42 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 0   # the read-out reads git history for the window
+          persist-credentials: false   # see the hardening note on the write step
 
       # Without a cached commons cut the material covers this wiki only, which is a much
       # thinner newsletter. Reading the orphan `export` branch keeps the boundary: it is
       # already filtered, so a private page in the commons cannot reach this runner.
+      #
+      # WHICH commons comes from design/federation.json, through the same
+      # sync_commons.declared() the daily sync uses. Until 2026-09-29 this step fetched
+      # xco-team-wiki for every wiki, so a spoke that reads only another commons, or a wiki
+      # in a separate federation, could carry xCO's internal cut into its own newsletter.
       - name: Fetch the commons exports
         env:
           TOKEN: ${{ secrets.COMMONS_READ_TOKEN }}
-          COMMONS: ${{ vars.COMMONS_REPO }}
         run: |
-          COMMONS="${COMMONS:-Dark-Matter-Labs/xco-team-wiki}"
           if [ -z "${TOKEN}" ]; then
             echo "::notice::COMMONS_READ_TOKEN not set — the issue will cover this wiki only."
             exit 0
           fi
-          mkdir -p ".commons/${COMMONS##*/}"
-          if git clone --depth 1 --branch export \
-               "https://x-access-token:${TOKEN}@github.com/${COMMONS}.git" \
-               ".commons/${COMMONS##*/}/export" 2>/dev/null; then
-            echo "Fetched the commons export from ${COMMONS}."
-          else
-            echo "::warning::No export branch on ${COMMONS} — the issue will cover this wiki only."
+          OWNER="${GITHUB_REPOSITORY%%/*}"
+          TARGETS=$(python3 -c "import sys; sys.path.insert(0,'tools'); import sync_commons; print('\n'.join(sync_commons.declared()))")
+          if [ -z "$TARGETS" ]; then
+            echo "::notice::design/federation.json lists no commons — the issue will cover this wiki only."
+            exit 0
           fi
+          for NAME in $TARGETS; do
+            printf '%s' "$NAME" | grep -qE '^[A-Za-z0-9._-]+$' || { echo "::error::bad commons name"; exit 1; }
+            DEST=".commons/${NAME}/export"
+            mkdir -p "$(dirname "$DEST")"
+            if git -c http.https://github.com/.extraheader= clone --quiet --depth 1 --branch export \
+                 "https://x-access-token:${TOKEN}@github.com/${OWNER}/${NAME}.git" "$DEST" 2>/dev/null; then
+              git -C "$DEST" remote set-url origin "https://github.com/${OWNER}/${NAME}.git"
+              echo "Fetched the commons export from ${NAME}."
+            else
+              echo "::warning::Could not read the export branch of ${NAME} — the issue will not cover it."
+            fi
+          done
 
       # Free, deterministic, and always run. Putting the material on the run page means a
       # month with the write step switched off still leaves something a person can use.
@@ -122,9 +136,14 @@ jobs:
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           fi
 
+      # Hardened 2026-09-29 (federation review). This step reads ingested text, which a
+      # stranger may have written, so it runs as if that text were hostile: the action is
+      # pinned to a commit rather than a tag that can move, the shell reaches only this
+      # repo's own tools and read-only git, the web tools are off, and checkout does not
+      # leave a write credential on disk. The push after it carries its token explicitly.
       - name: Write the issue
         if: steps.guard.outputs.enabled == 'true'
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@8ce9314fa9a404564fa7e954cd84f25bcba2b829  # v1, pinned 2026-09-29
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           # MODEL AND BUDGET ARE PINNED, because neither was, and the default is the
@@ -147,7 +166,7 @@ jobs:
           # default. Three dollars because $2 left fifteen per cent of headroom, and a
           # run cut off mid-write is worse than a slightly dearer one. The other nine
           # wikis are between 12 and 676 pages, so the cap will not bind on any of them.
-          claude_args: --model claude-sonnet-5 --max-budget-usd 3 --allowedTools Bash,Read,Edit,Write,Glob,Grep
+          claude_args: --model claude-sonnet-5 --max-budget-usd 3 --allowedTools "Bash(python3 tools/*),Bash(git log*),Bash(git status*),Read,Edit,Write,Glob,Grep" --disallowedTools "WebFetch,WebSearch"
           prompt: |
             Run the `newsletter` skill for ${{ steps.gather.outputs.month }}. The gathered
             material is at /tmp/material.json and `python3 tools/newsletter.py --json` will

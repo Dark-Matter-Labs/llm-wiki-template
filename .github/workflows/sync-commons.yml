@@ -160,6 +160,8 @@ jobs:
             # boundary-filtered cut, so a private page in a commons cannot reach a
             # spoke even by accident.
             if git $NOHDR clone --quiet --depth 1 --branch export "$URL" "$DEST"; then
+              # Drop the token from the clone's own config (review, 2026-09-29).
+              git -C "$DEST" remote set-url origin "https://github.com/${OWNER}/${NAME}.git"
               echo "- \`${NAME}\` — fetched" >> "$GITHUB_STEP_SUMMARY"
               echo "Fetched ${NAME}."
             else

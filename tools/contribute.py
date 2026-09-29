@@ -41,6 +41,7 @@ Usage:
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -162,7 +163,21 @@ def eligible(slug, fm):
     if vis == "private":
         return False, ("marked `private` — promote it to `internal` deliberately first, "
                        "which is a disclosure decision and belongs to a person")
+    # An allowlist since 2026-09-29: `Private`, `confidential` or a typo is not a tier.
+    if vis not in CONTRIBUTABLE:
+        return False, f"tier {vis!r} is not one of {sorted(CONTRIBUTABLE)} — fix the label first"
     return True, f"{vis} — eligible"
+
+
+CONTRIBUTABLE = frozenset({"internal", "unlisted", "public"})
+
+# Stamped into frontmatter as a bare scalar, so it must not be able to carry a newline, a
+# colon or a comment into the block (review, 2026-09-29). A name, and nothing else.
+BY_RE = re.compile(r"^[A-Za-z][A-Za-z .'-]{0,79}$")
+
+
+def valid_by(name):
+    return bool(name) and bool(BY_RE.match(name))
 
 
 def commons_titles(name):
@@ -233,8 +248,19 @@ def build_bundle(wiki_dir, slugs, contributed_by, rev):
         # Stamp provenance and re-based validation. These lines are appended inside the
         # block, before the closing delimiter, so the whitelist stays authoritative.
         rebased = VALIDATION_REBASE.get(fm.get("validation", "machine"), "machine")
-        prov = [f"validation: {rebased}",
-                f"contributed_by: {contributed_by}",
+        backers = fm.get("validated_by") or []
+        backers = backers if isinstance(backers, list) else [backers]
+        # Validation travels with the names behind it, or not at all. `self` without
+        # `validated_by` fails the commons' own schema check, so a stood-behind page used to
+        # land red (review, 2026-09-29); one with nobody named was never really stood behind.
+        if rebased != "machine" and not backers:
+            rebased = "machine"
+        prov = [f"validation: {rebased}"]
+        if rebased != "machine":
+            prov.append(f"validated_by: {export_shared._yaml_list([clean(str(b)) for b in backers])}")
+            if fm.get("validated_at"):
+                prov.append(f"validated_at: {export_shared._yaml_scalar(clean(str(fm['validated_at'])))}")
+        prov += [f"contributed_by: {contributed_by}",
                 f"origin: {ORIGIN}",
                 f"origin_rev: {rev}"]
         lines = text.split("\n")
@@ -282,6 +308,8 @@ def main(argv=None):
         ap.error("give at least one slug, or --list")
     if not args.by:
         ap.error("--by is required: provenance is stamped, never invented")
+    if not valid_by(args.by):
+        ap.error("--by must be a plain name (letters, spaces, . ' -), up to 80 characters")
 
     topo = topology()
     commons, err = resolve_commons(args.to, topo)
