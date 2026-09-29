@@ -25,7 +25,8 @@ watched being written adds a step and subtracts nothing.
 1. Make the change on a branch and push it, exactly as now. The branch and the pull request are the
    undo point and the record; keep both.
 2. Say what changed, in plain language, leading with what was learned rather than which files moved.
-3. **Ask once, in the session: "Shall I merge this?"** One question. Merge on a yes.
+3. **Ask once, in the session: "Shall I merge this?"**, with what it means for a person who does not
+   know the word: "That saves it into your wiki" (see `talking.md`). One question. Merge on a yes.
 4. If the answer is no, or there is no answer, leave it. An unmerged branch is a legitimate outcome;
    an unmerged branch nobody was ever asked about is not.
 
