@@ -16,7 +16,8 @@ attention "would make all four easier to ignore." So this is built to be worth l
   - A healthy wiki gets a tip about something it can do, not an invented problem.
   - Anything the owner switches off stays off (`design/coach.json`, `{"off": ["lint", "tips"]}`).
 
-Reads only local files and git. No network, no model, no writes.
+Reads local files and git; for the waiting count in its own wiki it asks `waiting.py`, which
+asks GitHub, and falls back to a local estimate when it cannot. No model, no writes.
 
   python3 tools/coach.py            # the top suggestion
   python3 tools/coach.py --all      # every current suggestion, ranked
@@ -159,6 +160,29 @@ def _unmerged(root, pages=()):
     return len([n for n in names if n not in decided and n != "export" and not n.startswith("google-sync/")])
 
 
+def _waiting_count(root):
+    """What `waiting.py` counts as waiting, or None where it cannot answer here.
+
+    waiting.py is the authority on unsaved work: it asks GitHub which branches were proposed,
+    merged or closed, and which a page has settled with `decides:`. The local count below cannot
+    see closed proposals, so on 30 September it reported "4 waiting" beside waiting.py's
+    "Nothing is waiting". It is only consulted for the wiki this file lives in, because
+    waiting.py reads its own repository, and only when GitHub can be reached.
+    """
+    if pathlib.Path(root).resolve() != ROOT:
+        return None
+    try:
+        import waiting
+        slug = waiting.repo_slug()
+        if not slug:
+            return None
+        found = waiting.never_proposed(slug)
+        decided = waiting.decisions()
+        return len(waiting.open_proposals(slug)) + len([r for r in found if not decided.get(r["branch"])])
+    except Exception:  # no gh, no network, no permission: fall back to the local estimate
+        return None
+
+
 def _prefs(root):
     p = root / "design" / "coach.json"
     try:
@@ -232,11 +256,15 @@ def suggestions(root=ROOT, today=None, limit=3):
                 "Ingest the documents that haven't been filed yet.",
                 "Files in raw/ that no page cites.", count=len(unfiled))
 
-    n = _unmerged(root, pages)
+    n, exact = _waiting_count(root), True
+    if n is None:
+        n, exact = _unmerged(root, pages), False
     if n:
         add("waiting", 70,
-            f"{n} piece(s) of work are waiting to be saved into your wiki.",
-            "What's waiting for me?", "Branches not yet merged into main.", count=n)
+            (f"{n} piece(s) of work are waiting to be saved into your wiki." if exact else
+             f"Up to {n} piece(s) of work may be waiting to be saved into your wiki."),
+            "What's waiting for me?",
+            "waiting.py's count." if exact else "Local estimate: branches not merged into main.", count=n)
 
     dates = [d for d in (_date(m.get("timestamp")) for p, m in metas.items() if p.name not in NOT_REAL) if d]
     newest = max(dates) if dates else None
