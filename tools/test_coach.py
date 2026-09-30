@@ -137,6 +137,31 @@ def main():
         got = ids(root)
         check("a long gap since the last visit suggests catching up", "catch-up" in got, str(got))
 
+    # the waiting count defers to waiting.py where it can answer
+    with tempfile.TemporaryDirectory() as t:
+        root = fresh(t)
+        for i in range(12):
+            page(root, f"wiki/p{i}.md", timestamp="2026-09-27", validation="self")
+        log(root, "2026-09-26", "lint")
+        real_count, real_local = coach._waiting_count, coach._unmerged
+        try:
+            coach._unmerged = lambda root, pages=(): 4
+            coach._waiting_count = lambda root: 0
+            check("when waiting.py says nothing is waiting, the coach says nothing either",
+                  "waiting" not in ids(root), str(ids(root)))
+            coach._waiting_count = lambda root: 2
+            w = [s for s in coach.suggestions(root, today=TODAY, limit=None) if s["id"] == "waiting"]
+            check("when waiting.py counts work, the coach uses its number",
+                  w and w[0]["count"] == 2 and "may" not in w[0]["text"], str(w))
+            coach._waiting_count = lambda root: None
+            w = [s for s in coach.suggestions(root, today=TODAY, limit=None) if s["id"] == "waiting"]
+            check("when waiting.py cannot answer, the local count is offered as an estimate",
+                  w and w[0]["count"] == 4 and "Up to" in w[0]["text"], str(w))
+        finally:
+            coach._waiting_count, coach._unmerged = real_count, real_local
+    check("waiting.py is only asked about the wiki the coach lives in",
+          coach._waiting_count(pathlib.Path(tempfile.gettempdir())) is None)
+
     # tips rotate, and a commons is not told to share with the team
     tips_a = [s["id"] for s in coach.tips(pathlib.Path("."), datetime.date(2026, 9, 28), role="spoke")]
     tips_b = [s["id"] for s in coach.tips(pathlib.Path("."), datetime.date(2026, 9, 29), role="spoke")]

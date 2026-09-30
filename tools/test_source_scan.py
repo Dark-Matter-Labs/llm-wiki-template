@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import source_scan  # noqa: E402
 
 FAILED = []
-ZWSP, ZWNJ, ZWJ, BOM, RLO, PDF = "​", "‌", "‍", "﻿", "‮", "‬"
+ZWSP, ZWNJ, ZWJ, BOM, RLO, PDF = "\u200b", "\u200c", "\u200d", "\ufeff", "\u202e", "\u202c"
 
 
 def check(label, cond, detail=""):
