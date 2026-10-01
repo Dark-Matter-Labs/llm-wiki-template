@@ -136,6 +136,8 @@
     "tools/test_tag_report.py",
     "tools/derivation_chains.py",
     "tools/test_derivation_chains.py",
+    "tools/quote_check.py",
+    "tools/test_quote_check.py",
     "tools/newsletter.py",
     "tools/test_newsletter.py",
     ".claude/skills/newsletter/SKILL.md",

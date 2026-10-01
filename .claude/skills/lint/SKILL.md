@@ -102,6 +102,16 @@ MAY fix frontmatter metadata when the correct value is unambiguous.
    report the top few and propose, for each, adding the source its claims rest on or labelling it
    `derivation: derivative`; whether a person reads the chain and stands behind it is theirs.
 
+10. **Quotes against their sources.** Run `python3 tools/quote_check.py`. For every passage in
+   quotation marks beside a `(raw/...)` citation, it looks for those words in that file. Report
+   the share found word for word, then the quotes **not in the cited source**, which are the
+   ones to read first: usually a summary written in quotation marks, or a quote cited to the
+   wrong file. Then the ones **worded differently**, which it shows beside the source's own
+   words. Propose a fix for each (correct the wording, drop the quotation marks, or cite the
+   right file), and apply none without approval. It never decides a paraphrase is faithful and
+   never writes a verification mark; that stays with a person and `verification.py --sample 3`.
+   Say how many it could not check on this machine and why, without counting them as failures.
+
 ## Output
 
 Produce a plain-language report:
@@ -119,6 +129,7 @@ Overall: 🟢 healthy / 🟡 needs attention / 🔴 problems
 7. Tags — …
 8. Dormancy — …
 9. Distance from sources — …
+10. Quotes against their sources — …
 
 Suggested next steps (which need your approval):
 1. …
