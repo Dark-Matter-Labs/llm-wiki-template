@@ -121,6 +121,7 @@
     ".claude/rules/finishing.md",
     ".claude/rules/talking.md",
     ".claude/rules/links.md",
+    ".claude/settings.json",
     ".claude/skills/coach/SKILL.md",
     "tools/coach.py",
     "tools/test_coach.py",
