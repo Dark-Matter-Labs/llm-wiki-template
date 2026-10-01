@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "1caa1a56d1c1d1a678e11d5f32ed3db26ceca59862e74c6651f6197a2cda9e1d",
     "tools/test_sync_commons.py": "39fb5e7f459132381c2ce0fda3087df443873cb98a55c2fd8253c466e8fd9a94",
-    "design/shared-layer.json": "9d356328b1dee4cdbfb4b6d372d9b79cead175ade6f8b99c88ba9d984a4e4d7a",
+    "design/shared-layer.json": "d0a36e2f80d2e232a303d7f023b1a64ebd826413fd6cbf3ae831f226dc6cf185",
     "tools/drift-baseline.json": "3efe9eac910f8df4a8aea87dd08eb35cfd21d65dcbf6aebcc78e4829d02965fc",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -74,7 +74,7 @@
     "tools/test_learning_outcomes.py": "0c9ae03d53d132d098adf412765738be6b7b874f513fe55fcd5c9e823b71ca2a",
     ".claude/skills/inquiry/SKILL.md": "33a6bc4dd427a7b8940bb410336cf5ab46c81d94c4974e8e700eb4bd7af3f9ce",
     "tools/goals.py": "898c127e2232be956053affe3e6d981fb56e9c81dc07f02ad4c6eb2bbccb9cbc",
-    "tools/test_goals.py": "dc4116c3676ef9cee91a508485a916bda0ce2c24f52a53b59059abe484cf0c48",
+    "tools/test_goals.py": "97cb34e935f1be13571b8106667c8278e9fbdbdb6dc797e251aab720c32ad189",
     "ONBOARDING.md": "6994a80a81df4803016530271cb86c79459e7ed7e235369c54ef071d02044f4a",
     "tools/check_onboarding.py": "3e3297bc0a57a1bc7d2825d36b292f9b5a94ac6a4f62d64f4cd39281f25e957f",
     "tools/test_check_onboarding.py": "01156c210263d06db94b5e65124dc0d9b8558575e54c7dadb8273c409e6e72b3",
@@ -129,7 +129,8 @@
     "tools/test_tag_report.py": "12af7acca9c9a19f9ae55592c549c392d6b69bbf71d529b8e796259a5021b1c0",
     "tools/derivation_chains.py": "ba4671ea02a5c8b9802bf8ad1937672b255522f7ab2c1e020a1e542db2213682",
     "tools/test_derivation_chains.py": "2e8c1ba5f22a8fde246efc855dc76078f040bf0cc6710ccf3a47bc5b4b83de7e",
-    ".claude/rules/talking.md": "727543eaef80bdf4dd3d435997eea037634381da6757042b5b500b0057c2fbf5"
+    ".claude/rules/talking.md": "727543eaef80bdf4dd3d435997eea037634381da6757042b5b500b0057c2fbf5",
+    ".claude/rules/links.md": "b71b6a5df6cd764dfde9e35e8f3e5740834a2c52a77c6496dbaf68d96daba527"
   },
   "adapted": {}
 }
