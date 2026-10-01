@@ -57,6 +57,11 @@ The single most important operation. Done well, the wiki compounds. Done lazily
    - If no page exists and it's something you'd link to from elsewhere, create it.
    - Add `[[wiki-links]]` in both directions so the graph stays connected.
 
+   **Then check every quote you wrote:** `python3 tools/quote_check.py --check <each page you
+   wrote or changed>`. It fails if a passage in quotation marks is not in the source it cites.
+   Fix each one before going on: copy the source's exact words, or take the quotation marks off
+   a paraphrase. A quote "worded differently" is a near miss; make it exact.
+
 6. **Update `wiki/overview.md`** if this source shifts the big picture.
 
 7. **Update the catalogue** — add every new page with a **genuinely one-line** summary

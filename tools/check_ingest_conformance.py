@@ -75,7 +75,7 @@ def check(page_path, wiki_dir="wiki", since=None):
     # A citation may name several sources in one bracket. This split was never here, so a
     # multi-source group was tested as if it were one impossible filename and reported as
     # invented — five of them on wiki/indy-johar.md alone, every one of which exists.
-    groups = re.findall(r"\(raw/((?:[^()]+|\([^()]*\))*)\)", body)
+    groups = re.findall(r"\(raw/((?:[^()]|\([^()]*\))*)\)", body)
     cites = []
     for g in groups:
         for s in re.split(r"[;,]", "raw/" + g):

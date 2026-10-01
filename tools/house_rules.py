@@ -39,7 +39,8 @@ import sys
 # `export/` is generated from wiki/ — fixing it directly would be corrected twice
 # and drift the moment anything regenerates. Fix the source; rebuild the export.
 SKIP_DIRS = {".git", "raw", "export", "node_modules", "view", "contrib",
-             ".commons", "__pycache__"}
+             ".commons", "__pycache__",
+             ".cache"}   # quote_check.py's text copies of PDFs: raw/ by another name
 EXTS = {".md", ".html", ".txt", ".json", ".css", ".py", ".yml", ".yaml"}
 
 # Generated caches are derived artifacts, like everything under export/. They quote
