@@ -77,8 +77,12 @@ def main():
         with open(os.path.join(wiki, slug + ".md"), "w", encoding="utf-8") as fh:
             fh.write(text)
 
+    # The live goal and its commitment are dated relative to today, not fixed. goals.py calls a goal
+    # stalled after STALE_DAYS without movement, so a fixed 2026-08-01 made this test start failing on
+    # 1 October 2026, the day it became 61 days old. The other fixtures do not depend on age.
+    recent = (__import__("datetime").date.today() - __import__("datetime").timedelta(days=10)).isoformat()
     try:
-        w("g-live", GOAL.format(title="Live Goal", vis="internal", ts="2026-08-01",
+        w("g-live", GOAL.format(title="Live Goal", vis="internal", ts=recent,
                                 horizon="near", body="A goal."))
         w("g-unbacked", GOAL.format(title="Unbacked Goal", vis="internal", ts="2026-08-01",
                                     horizon="mid", body="Nothing committed."))
@@ -87,7 +91,7 @@ def main():
         w("g-lapsed", GOAL.format(title="Lapsed Goal", vis="internal", ts="2026-08-01",
                                   horizon="near", body="Something lapsed."))
 
-        w("c-held", COMMIT.format(title="Held C", vis="internal", ts="2026-08-01",
+        w("c-held", COMMIT.format(title="Held C", vis="internal", ts=recent,
                                   goal="Live Goal", res="2 people", state="held"))
         w("c-declined", COMMIT.format(title="Declined C", vis="internal", ts="2026-08-01",
                                       goal="Declined Goal", res="none", state="declined"))
