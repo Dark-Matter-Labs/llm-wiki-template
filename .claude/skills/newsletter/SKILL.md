@@ -72,9 +72,10 @@ reading is where that went — the writing is a few hundred words.
 - **`ai-detox`** governs the sentences. Plain prose, short sentences, no bullet lists, no bold in
   prose, no em dashes, no closing offer, no recap paragraph, and a list of banned words and
   phrases. A newsletter that reads as machine-written undoes the thing it is reporting.
-- **`dm-style-guide`** governs the stance. Systems-minded, inquiry-led, quietly hopeful. Plain and
-  precise about radical ideas. Hope without hype. It also carries the two house spellings, which
-  are gated on deploy.
+- **`dm-style-guide`** governs the stance: Dark Matter Labs' four publishing guides, read for
+  audience, complexity kept rather than flattened, and nothing tidier than the reality. It also
+  carries the two house spellings, which are gated on deploy. Where a wiki carries a project's
+  own voice skill, that skill governs the stance instead.
 
 Where they seem to conflict, `ai-detox` wins on sentence mechanics and `dm-style-guide` wins on
 stance. Both ban hype, so that overlap is not a conflict.
