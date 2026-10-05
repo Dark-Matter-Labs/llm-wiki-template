@@ -132,8 +132,8 @@
     ".claude/rules/talking.md": "727543eaef80bdf4dd3d435997eea037634381da6757042b5b500b0057c2fbf5",
     ".claude/rules/links.md": "b71b6a5df6cd764dfde9e35e8f3e5740834a2c52a77c6496dbaf68d96daba527",
     ".claude/settings.json": "abfd1c5d6a9623446cadd70d65f32cc0be0ac526b3cc5a416b1fd9d0d2c99e4a",
-    "tools/quote_check.py": "2d22b74d479b7e6151ffa571997753512d234cee953de832767ab68fa2500e80",
-    "tools/test_quote_check.py": "2a85138f5bca4b574f41e7a4c2c183d1593feade193d4aa85c64256035b74694"
+    "tools/quote_check.py": "2f2d5f4b34f7e6a40ed466118febb9e658390bca87ab9a050a769ef66b8c1a69",
+    "tools/test_quote_check.py": "e190c8e0c7dbea07901276671da1d34db27e71c5e7c3ee2a04b090d0368829f0"
   },
   "adapted": {}
 }

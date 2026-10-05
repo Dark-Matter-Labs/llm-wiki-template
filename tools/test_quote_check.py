@@ -231,6 +231,10 @@ def test_review_findings(root):
     check("a bracket stands for a few words, not a page of them",
           not quote_check._exact("Machines make [x] stays dear", " machines make " + "other words " * 30
                                  + "stays dear "))
+    write(root, "raw/label.html", '<p class="hero-state">[ ATLAS / EXPLANATION / CAPITAL REVISION / NON-OPERATIVE ]</p>')
+    page(root, "label", '"[ ATLAS / EXPLANATION / CAPITAL REVISION / NON-OPERATIVE ]" (raw/label.html).\n')
+    r = quote_check.run(root, pages=["wiki/label.md"])[0]
+    check("a quote that is all one bracketed label is read literally", r.verdict == "found", r.verdict)
     check("a quote with no words outside brackets and ellipses is never found",
           not quote_check._exact("[...] \u2026", " machines make "))
 
