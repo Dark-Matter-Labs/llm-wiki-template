@@ -126,12 +126,15 @@ def render():
              + decls("semantic.text",   lambda n: n.replace("--", "--text-", 1))
              + decls("semantic.border", lambda n: n.replace("--", "--border-", 1))
              + decls("semantic.meaning", lambda n: n.replace("--", "--meaning-", 1))
-             + decls("semantic.tint",    lambda n: n.replace("--", "--tint-", 1)))
+             + decls("semantic.tint",    lambda n: n.replace("--", "--tint-", 1))
+             # v8.1: the accent is its own token. A palette without it emits nothing here.
+             + decls("semantic.accent",  lambda n: n.replace("--", "--accent-", 1)))
     inverse = (decls("register.inverse.surface", lambda n: n.replace("--", "--surface-", 1))
                + decls("register.inverse.text",   lambda n: n.replace("--", "--text-", 1))
                + decls("register.inverse.border", lambda n: n.replace("--", "--border-", 1))
                + decls("register.inverse.meaning", lambda n: n.replace("--", "--meaning-", 1))
-               + decls("register.inverse.tint",    lambda n: n.replace("--", "--tint-", 1)))
+               + decls("register.inverse.tint",    lambda n: n.replace("--", "--tint-", 1))
+               + decls("register.inverse.accent",  lambda n: n.replace("--", "--accent-", 1)))
 
     # --- everything that does not change with register or theme -------------
     stable = []
@@ -152,6 +155,10 @@ def render():
                 stable.append((pre + "-".join(path[len(prefix.split(".")):]),
                                resolve(raw, index)))
     for prefix, pre in (("domain", "--domain-"),
+                        # the v8.1 identity scales, static across registers, when present
+                        ("primitive.color.field", "--field-"),
+                        ("primitive.color.signal", "--signal-"),
+                        ("primitive.color.matter", "--matter-"),
                         ("semantic.orientation", "--orient-"),
                         ("semantic.measure", "--measure-"),
                         ("semantic.motion.duration", "--motion-"),

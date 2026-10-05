@@ -182,17 +182,21 @@ def main():
     print()
     print("  -- legacy pins " + "-" * 51)
     import re as _re
+    # Since v8.1 the accent is its own token, apart from the domain colours. A wiki still
+    # on the earlier palette has no accent token, and its pins keep the old pairing.
+    def RA(path, fallback):
+        return R(path) if path in idx else R(fallback)
     PINS = {
         "docs/assets/xco.css": {
             "--shadow": R("semantic.text.primary"),
             "--highlight": R("semantic.surface.page"),
-            "--midtone": R("domain.bio.base"),
-            "--midtone-ink": R("domain.bio.ink")},
+            "--midtone": RA("semantic.accent.base", "domain.bio.base"),
+            "--midtone-ink": RA("semantic.accent.ink", "domain.bio.ink")},
         "docs/assets/xco-dusk.css": {
             "--shadow": R("register.inverse.surface.page"),
             "--highlight": R("register.inverse.text.primary"),
-            "--midtone": R("domain.bio.base"),
-            "--midtone-lift": R("register.inverse.meaning.critical")},
+            "--midtone": RA("register.inverse.accent.base", "domain.bio.base"),
+            "--midtone-lift": RA("register.inverse.accent.ink", "register.inverse.meaning.critical")},
     }
     root = os.path.join(HERE, "..")
     for path, pins in PINS.items():
@@ -233,8 +237,8 @@ def main():
             check("social card ground is semantic.surface.page",
                   hx(mode).lower() == str(want).lower(), f"card {hx(mode)}, token {want}")
             acc = hx(im.getpixel((150, 4)))
-            wanta = R("domain.bio.base")
-            check("social card accent is domain.bio.base",
+            wanta = R("semantic.accent.surface") if "semantic.accent.surface" in idx else R("domain.bio.base")
+            check("social card accent is the accent surface (domain.bio.base before v8.1)",
                   acc.lower() == str(wanta).lower(), f"card {acc}, token {wanta}")
         except ImportError:
             print("  --    Pillow absent; card pixels not verified here (CI checks size only)")
