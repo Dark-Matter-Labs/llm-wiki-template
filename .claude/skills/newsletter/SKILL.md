@@ -178,7 +178,9 @@ last, briefly.
    corpus is at HEAD" above: reading further costs money and imports the present into a report
    about the past.
 4. **Write it.** Markdown, in `wiki/newsletter/YYYY-MM.md`, `visibility: internal` unless the
-   owner says otherwise, `type: synthesis`.
+   owner says otherwise, `type: synthesis`, with every field a synthesis page carries:
+   `validation: machine`, `derivation: derivative` and `sources: []` included. The schema check
+   refuses an issue without `sources:`, which is how learning-system's September draft failed.
 5. **Produce the sending formats** with `python3 tools/learning_outcomes.py --format slack` and
    `--format html` for the window, and put the HTML at `docs/newsletter/YYYY-MM.html` only if the
    issue is `public`. An `internal` issue never goes in `docs/`.
@@ -189,6 +191,11 @@ last, briefly.
    "not X but Y", the sentence whose only job is to say the last one mattered.
 8. **Log it** — `## [YYYY-MM-DD] rebuild | newsletter — <month>` — and run
    `python3 tools/sync_log_index.py`.
+9. **Run `python3 tools/gates.py` last, and fix what it reports** in the issue or the log entry,
+   then run it again. On 2 October eight of nine drafts failed their wiki's checks after the
+   writing was done: em dashes in the log entry more often than in the issue, a missing frontmatter
+   field, a stale page count. Fix only what you wrote. A banned phrase inside someone's quoted
+   words stays as they said it; say so in the log entry and leave that one failure for a person.
 
 ## Sending it, when a person decides to
 
