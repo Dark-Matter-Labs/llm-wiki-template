@@ -92,6 +92,7 @@ BRACKET_CHARS = 40     # what a bracketed change may stand for: a word or a shor
 WIKILINK = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\]")
 TOKEN = re.compile("[^\\W_]+(?:[-\u2010\u2011'\u2019][^\\W_]+)*")
 UNIT_START = re.compile(r"^\s*(?:[-*+]|\d+\.)\s|^\s*\|")
+FILLERS = {"uh", "um", "erm", "uhm"}   # spoken hesitations in transcripts, never part of what was said
 TEXT_TYPES = {".md", ".markdown", ".txt", ".csv", ".json"}
 MARKUP_TYPES = {".html", ".htm", ".svg"}
 SKIP_DIRS = {"log", "index"}
@@ -126,7 +127,11 @@ def _clean(s: str) -> str:
 def _norm(token: str) -> str:
     # The house rule spells civilization with a z, inside quotations too, so a source's
     # "civilisation" and the page's "civilization" are the same word for this purpose.
-    return re.sub("[-\u2010\u2011'\u2019]", "", token.lower()).replace("civilis", "civiliz")
+    w = re.sub("[-\u2010\u2011'\u2019]", "", token.lower()).replace("civilis", "civiliz")
+    if len(w) >= 6:     # British and American spellings of one word; short words like four, rise left alone
+        w = re.sub(r"([iy])s(e|ed|es|ing|ation|ations|er|ers)$", r"\1z\2", w)
+        w = re.sub(r"our(s|ed|ing|al|ally|able|ably|ite|ites|er|ers)?$", r"or\1", w)
+    return w
 
 
 def _tokens(s: str):
@@ -134,8 +139,11 @@ def _tokens(s: str):
     c = _clean(s)
     starts, ws = array("l"), []
     for m in TOKEN.finditer(c):
+        w = _norm(m.group())
+        if w in FILLERS:
+            continue
         starts.append(m.start())
-        ws.append(_norm(m.group()))
+        ws.append(w)
     return c, starts, ws
 
 
@@ -188,7 +196,10 @@ def _blockquote(start: int, text: str, cites: list):
     inner = "\n".join(re.sub(r"^\s*>\s?", "", ln) for ln in text.split("\n"))
     inner = CITE.sub("", inner)
     inner = "\n".join(ln for ln in inner.split("\n") if not re.match(r"^\s*[\u2014\u2013-]\s", ln))
-    inner = " ".join(inner.split()).strip("\"\u201c\u201d ")
+    inner = " ".join(inner.split())
+    # A quoted block often ends with its locator after the closing mark: > "..." \u00a705
+    marked = re.match(r'^["\u201c](.+)["\u201d]\s*(?:\u00a7\s*[\w.\-]+)?\s*$', inner)
+    inner = (marked.group(1) if marked else inner).strip("\"\u201c\u201d ")
     if len(words(inner)) >= MIN_WORDS:
         yield start, _unlink(inner), sources_in(cites[0].group(1))
 
@@ -260,10 +271,14 @@ INLINE_TAGS = re.compile(r"</?(?:a|b|i|em|strong|span|mark|u|small|abbr|code)\b[
 
 
 def _strip_markup(s: str) -> str:
-    """HTML to text. Inline tags join, block tags separate: "<b>reach</b>able" is one word."""
+    """HTML to text, read two ways. Joining inline tags keeps "<b>reach</b>able" one word, but glues
+    a label in its own tag to the next word: "<span>Settlement</span>Parliament" became one token
+    and the quote "Parliament authorises..." could never be found (2026-10-05). Separating them
+    has the opposite fault. So both readings are kept, and a quote found in either is found."""
     s = re.sub(r"(?is)<(script|style)\b.*?</\1>|<!--.*?-->", " ", s)
-    s = INLINE_TAGS.sub("", s)
-    return html.unescape(re.sub(r"<[^>]+>", " ", s))
+    joined = html.unescape(re.sub(r"<[^>]+>", " ", INLINE_TAGS.sub("", s)))
+    spaced = html.unescape(re.sub(r"<[^>]+>", " ", s))
+    return joined if joined == spaced else joined + "\n\n" + spaced
 
 
 def _office_text(xml: str, para: str) -> str:

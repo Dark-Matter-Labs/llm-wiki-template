@@ -84,6 +84,11 @@ def test_normalising():
     check("a word hyphenated across a line break in a PDF is one word",
           n("is consti-\ntutive here") == n("is constitutive here"))
     check("markdown emphasis is not part of the words", n("*not* a _forecast_") == n("not a forecast"))
+    check("British and American spellings are the same word",
+          n("substrate stabilisation, prioritising behaviours") == n("substrate stabilization, prioritizing behaviors"))
+    check("and their longer forms", n("behavioural, favourable, analysed") == n("behavioral, favorable, analyzed"))
+    check("short words are left alone: four is not for, rise is not rize", n("four rise") != n("for rize"))
+    check("a spoken uh or um is not a word of the quote", n("which are not uh again targetable") == n("which are not again targetable"))
     check("a dash between words is a gap, not a letter", n("open\u2014and closed") == n("open and closed"))
 
 
@@ -235,6 +240,19 @@ def test_review_findings(root):
     page(root, "label", '"[ ATLAS / EXPLANATION / CAPITAL REVISION / NON-OPERATIVE ]" (raw/label.html).\n')
     r = quote_check.run(root, pages=["wiki/label.md"])[0]
     check("a quote that is all one bracketed label is read literally", r.verdict == "found", r.verdict)
+    write(root, "raw/labels.html", '<td><span class="k">Settlement</span>Parliament authorises the body each year.</td>'
+                                   '<p>Its <b>reach</b>able range of futures stays open here.</p>')
+    page(root, "labels", '"Parliament authorises the body each year" (raw/labels.html).\n\n'
+                         '"Its reachable range of futures stays open" (raw/labels.html).\n')
+    rs = quote_check.run(root, pages=["wiki/labels.md"])
+    check("a word after a label set in its own tag is still the first word", rs[0].verdict == "found", rs[0].verdict)
+    check("a word split by a formatting tag is still one word", rs[1].verdict == "found", rs[1].verdict)
+    write(root, "raw/locator.md", "The danger is compensated degradation: continuity purchased by consuming the capacity.\n")
+    page(root, "locator", '> "The danger is compensated degradation: continuity purchased by consuming the\n'
+                          '> capacity." \u00a705 (raw/locator.md)\n')
+    rs = quote_check.run(root, pages=["wiki/locator.md"])
+    check("a quoted block followed by its section number is the quote alone",
+          [r.verdict for r in rs] == ["found"], str([(r.quote, r.verdict) for r in rs]))
     check("a quote with no words outside brackets and ellipses is never found",
           not quote_check._exact("[...] \u2026", " machines make "))
 
