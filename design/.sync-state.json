@@ -88,8 +88,8 @@
     ".claude/skills/waiting/SKILL.md": "40bed41c0c628aa374879ce27bc5dc38f0cf00f6a2e7eaf113b3932e56780154",
     "tools/newsletter.py": "6411ad1d54f2c8d133f2c9e6a43b386d2acd7ac6b3cb93a204985a6d8394470e",
     "tools/test_newsletter.py": "e4305353a8ffc445d66331cf9f0d5b458cb309435b4004efad91062ea7060009",
-    ".claude/skills/newsletter/SKILL.md": "d7c4d088740e84adee0f600175b95eee46a70bc466deb8c17900123c1eb61f19",
-    ".github/workflows/monthly-newsletter.yml": "44873c89f037afe7d9b7dc9e0ee40456d8cb87369b6c492d6e2c0e3aa883b0a6",
+    ".claude/skills/newsletter/SKILL.md": "d9baeaddf78ebc1f3ac53345d486a3f63c9b98907d72213998e62e2060de9319",
+    ".github/workflows/monthly-newsletter.yml": "b5472716dd9905ff11451a4e3ecf69580aa57005c1e0fbb7402f3c91aac54f83",
     "tools/patterns.py": "fc2eb16ffadf49b742dcf56ec7fe8f3a720b2bda369e361ceedb6c54acb0a32c",
     "tools/test_patterns.py": "5b61d3a27c968a10a0a153a5e588538457f09c3f1f0f55c66245bf2a385ae6bc",
     "tools/community.py": "b21c9ff37493ff9b2f120eaa82dad809a6cb6e96540852f5af70c6adfebd9441",
@@ -132,7 +132,7 @@
     ".claude/rules/talking.md": "727543eaef80bdf4dd3d435997eea037634381da6757042b5b500b0057c2fbf5",
     ".claude/rules/links.md": "b71b6a5df6cd764dfde9e35e8f3e5740834a2c52a77c6496dbaf68d96daba527",
     ".claude/settings.json": "abfd1c5d6a9623446cadd70d65f32cc0be0ac526b3cc5a416b1fd9d0d2c99e4a",
-    "tools/quote_check.py": "8139a0fda10f6c49302911f57c369d4473835b133ce7109dbfe9f0b6a79f7440",
+    "tools/quote_check.py": "2d22b74d479b7e6151ffa571997753512d234cee953de832767ab68fa2500e80",
     "tools/test_quote_check.py": "2a85138f5bca4b574f41e7a4c2c183d1593feade193d4aa85c64256035b74694"
   },
   "adapted": {}

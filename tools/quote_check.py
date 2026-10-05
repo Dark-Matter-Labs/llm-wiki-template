@@ -347,7 +347,8 @@ def source_text(root: pathlib.Path, rel: str, names: dict | None = None):
         if ext == ".docx":
             return _zip_xml(path, r"word/(?:document|footnotes|endnotes|comments)\.xml", "</w:p>"), ""
         if ext == ".pptx":
-            return _zip_xml(path, r"ppt/slides/slide\d+\.xml", "</a:p>"), ""
+            # Slides and their speaker notes: a deck's caveats usually live in the notes.
+            return _zip_xml(path, r"ppt/(?:slides/slide|notesSlides/notesSlide)\d+\.xml", "</a:p>"), ""
     except (zipfile.BadZipFile, KeyError, OSError) as e:
         return None, f"can't read this file ({type(e).__name__})"
     return None, f"can't read {ext or 'this kind of'} files here"

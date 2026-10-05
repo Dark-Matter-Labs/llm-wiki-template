@@ -178,6 +178,14 @@ jobs:
             log file. Do NOT git commit, push, or open a PR, and do NOT run gh — the next
             step does that. Do NOT send anything anywhere.
 
+            LAST, after both files are written: run `python3 tools/gates.py` and fix every
+            failure in the issue or the log entry, then run it again, until it passes or
+            the only failures left are ones you did not cause. The prose check reads the
+            log entry as closely as the issue: no em dashes in a sentence, none of its
+            banned words. The issue's frontmatter needs `sources: []` like any synthesis
+            page. Do not edit other files to make a check pass; the next step regenerates
+            the page counts and the month's log index itself.
+
       # The write step can report success having done nothing at all. Found 2026-09-18:
       # the action refuses to run when the workflow file differs from the default
       # branch — a sensible protection against a branch rewriting what the action does
@@ -207,6 +215,17 @@ jobs:
             exit 1
           fi
           echo "Issue present at wiki/newsletter/${MONTH}.md ($(wc -w < "wiki/newsletter/${MONTH}.md") words)."
+
+      # The counts an issue changes, regenerated rather than left to the model. On 2 October
+      # xco-team-wiki's draft failed only because the router's page count was one short once
+      # the issue existed. Both tools write inside wiki/ alone, so the commit step's guard
+      # still holds; a wiki without a tiered index has no sync_index_counts.py and skips it.
+      - name: Regenerate the counts the issue changed
+        if: steps.guard.outputs.enabled == 'true'
+        run: |
+          for t in sync_index_counts sync_log_index; do
+            if [ -f "tools/$t.py" ]; then python3 "tools/$t.py"; fi
+          done
 
       # The house gates, run against what the model just wrote.
       #
