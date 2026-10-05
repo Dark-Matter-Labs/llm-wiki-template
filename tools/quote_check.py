@@ -371,6 +371,11 @@ def _parts(q: str) -> list:
             if ws:
                 out.append((ws, pending))
                 pending = 0
+    if not out and BRACKETED.fullmatch(q.strip()):
+        # The whole quote is one bracketed label, "[ ATLAS / EXPLANATION ]": a page's own words,
+        # not an editor's change to someone else's, so it is read as written.
+        literal = " ".join(words(q))
+        return [(literal, 0)] if literal else []
     return out
 
 
