@@ -76,7 +76,8 @@ def svg():
     ink = R("semantic.text.primary")
     soft = R("semantic.text.secondary")
     rule = R("semantic.border.strong")
-    accent = R("domain.bio.base")
+    # v8.1 gives the accent its own token (the ember); before it, the accent was bio.base.
+    accent = R("semantic.accent.surface") if "semantic.accent.surface" in idx else R("domain.bio.base")
 
     # The stacks resolve to a real installed face; rsvg picks the first it finds.
     serif = "Iowan Old Style, Palatino, Baskerville, Georgia, serif"

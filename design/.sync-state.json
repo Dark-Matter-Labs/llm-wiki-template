@@ -2,12 +2,12 @@
   "_comment": "The merge base for the shared layer: a digest of what sync_design_system last wrote here. If a file no longer matches its digest, someone changed it locally and sync will NOT overwrite it -- it becomes a candidate for tools/propose_upstream.py instead. `adapted` records the ones that differ ON PURPOSE, with the source digest at the time somebody reviewed them, so later drift in the source is measurable. Machine-written; do not hand-edit.",
   "source": "indy-llm-wiki",
   "written": {
-    "design/xco.tokens.json": "15aad385769ca682d94ec5709dbe26a24175fc23fd644cc1e0627217567f0b8f",
-    "tools/build_tokens.py": "3450c39dbdf7fbc8e892cb08e4b988e051d8adcdd94479be35dc78b857855f81",
-    "tools/test_tokens.py": "f97b7ad1568e5c53ad1336cdc64bc6c5330771d16bf65845e3b228034dea89da",
+    "design/xco.tokens.json": "9fd9f053dbce8e17a8b8eeb9dbe6cd69e63ec0a5d998bd5b7f09b1ae62a991d5",
+    "tools/build_tokens.py": "d7504ff3aa463b700f6cb3bc6abea6ea47ecf471f2f069cceddeb17e10215bb9",
+    "tools/test_tokens.py": "a593b132f8654c0ea1731caf84fc47a8c7bbe1dfe5193da6f82a3bc712534e1b",
     "tools/house_rules.py": "0a5aec886e467fa2f62d66e02b7f1f1a88f6d1a97d1dc79216779bdc3bd9955b",
     "tools/test_house_rules.py": "856b5344116b75fcd9aa21a4e1b9ad83f919ace05f4c641bc6f353564e273512",
-    "tools/build_social_card.py": "036e43d852f5a8cc20dc7bfdbef376ae4c68c8446a9a46273eb73c7f64876bc2",
+    "tools/build_social_card.py": "41343a09319313e37c514e5bb886937a0ac06fe0c66dbceada4d17ad8143a0b3",
     "tools/contribute.py": "4d70eef0108d7931ce1f6e30f690a8bbc1a19ba4e8abe1e7fe6d026c07773ee6",
     "tools/test_contribute.py": "e37d647c9dbcb1f7604547af1dd6fd269cd126375b3e134f584eaeadf5870461",
     "tools/contribution_prompt.py": "0bf75fb51a622a911efa87ce975f279063cc3f400a3473f2b705de45312d01b5",
@@ -37,8 +37,8 @@
     ".claude/skills/rebuild-parity/SKILL.md": "4020221d11e8209703094ec26d10623db6d2b073f0ead595cd53908076243b04",
     ".claude/skills/source-proportion/SKILL.md": "ce92b8f01c993faa7f8087ebd958eda38ef9cd35bf7eee59935270ba6d6f5c6c",
     "docs/assets/xco2.css": "5e1a076528b8a5ffff24c607534c8318c08206fe360792abd47a6d8ef5ffe512",
-    "docs/assets/xco.css": "945ed7fa60108c4a9b7d234af093ee89e0015a097c8ccb705fcefdcfdb18be76",
-    "docs/assets/xco-dusk.css": "cf58ae57e334087500a6f677c10404affb9dc9e461455085d084701240e93b62",
+    "docs/assets/xco.css": "6d28a3d1198bc33d185c250bb96c3c34266c47fe6f01e3590cd8bcae80162b68",
+    "docs/assets/xco-dusk.css": "0e4d31b0382b584fc52a46cb8726c6af6b9fcca094c0189d08db34368cdf7806",
     "tools/propose_upstream.py": "40e4a8fae0d52e68c72d7aaf534f223de9bcd839b3167e9e900fc34b2217d57e",
     "tools/test_propose_upstream.py": "be1c1631e4c0dc48044334a3e606728f01744dbd5d46486bde15fde57494ea42",
     ".claude/skills/reflect/SKILL.md": "490c9140691724e8172b86d4c1a1036a20fe36be832a2e404ab6b9470fbcc40e",
@@ -146,5 +146,21 @@
     ".claude/skills/dm-style-guide/scripts/mechanical_check.py": "ff075302896c86233be06fbb231e70e7f8b539afc44001d510a982da3c301737",
     ".claude/skills/dm-style-guide/scripts/risk_assessment.py": "42b2534b595537c19b1c32f0bb06eb7722ddf2ae4c30529767e7674bb8be2621"
   },
-  "adapted": {}
+  "adapted": {
+    "design/xco.tokens.json": {
+      "reviewed_at": "2026-10-05",
+      "source_digest": "9fd9f053dbce8e17a8b8eeb9dbe6cd69e63ec0a5d998bd5b7f09b1ae62a991d5",
+      "why": "Not an xCO wiki: keeps the earlier xCO palette on purpose; the Polyphonic Style Guide v8.1 repaint (2026-10-05) went to the 15 xCO wikis only, at Gurden's decision."
+    },
+    "docs/assets/xco.css": {
+      "reviewed_at": "2026-10-05",
+      "source_digest": "6d28a3d1198bc33d185c250bb96c3c34266c47fe6f01e3590cd8bcae80162b68",
+      "why": "Not an xCO wiki: keeps the earlier xCO palette on purpose; the Polyphonic Style Guide v8.1 repaint (2026-10-05) went to the 15 xCO wikis only, at Gurden's decision."
+    },
+    "docs/assets/xco-dusk.css": {
+      "reviewed_at": "2026-10-05",
+      "source_digest": "0e4d31b0382b584fc52a46cb8726c6af6b9fcca094c0189d08db34368cdf7806",
+      "why": "Not an xCO wiki: keeps the earlier xCO palette on purpose; the Polyphonic Style Guide v8.1 repaint (2026-10-05) went to the 15 xCO wikis only, at Gurden's decision."
+    }
+  }
 }
