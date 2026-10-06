@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "1caa1a56d1c1d1a678e11d5f32ed3db26ceca59862e74c6651f6197a2cda9e1d",
     "tools/test_sync_commons.py": "39fb5e7f459132381c2ce0fda3087df443873cb98a55c2fd8253c466e8fd9a94",
-    "design/shared-layer.json": "7c8c0014b3a30f1e8cba5e126ff14f1bc5b1eb62090275a31622cbf425c32c67",
+    "design/shared-layer.json": "ba61c384762fdd6e7bbca40dfcb6e83ddc381048f38d84e764f2ce553c736cf0",
     "tools/drift-baseline.json": "3efe9eac910f8df4a8aea87dd08eb35cfd21d65dcbf6aebcc78e4829d02965fc",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -144,7 +144,8 @@
     ".claude/skills/dm-style-guide/references/situating-and-positionality.md": "612f3ff883b79a989fb31037e5aeb7469cfbae92dcabce82d865a96008b3f35e",
     ".claude/skills/dm-style-guide/references/writing-principles.md": "64aab184d6a6a82a1e198ec5b1bd2f4eef8a6612bf58b617e439b2824c0d5891",
     ".claude/skills/dm-style-guide/scripts/mechanical_check.py": "ff075302896c86233be06fbb231e70e7f8b539afc44001d510a982da3c301737",
-    ".claude/skills/dm-style-guide/scripts/risk_assessment.py": "42b2534b595537c19b1c32f0bb06eb7722ddf2ae4c30529767e7674bb8be2621"
+    ".claude/skills/dm-style-guide/scripts/risk_assessment.py": "42b2534b595537c19b1c32f0bb06eb7722ddf2ae4c30529767e7674bb8be2621",
+    ".claude/rules/plain-register.md": "a09df147062740cd085983c8498c4a57ce53603ad480003b9f09071d3113a85e"
   },
   "adapted": {
     "design/xco.tokens.json": {
