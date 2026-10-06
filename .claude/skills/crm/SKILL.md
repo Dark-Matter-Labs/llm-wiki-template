@@ -26,6 +26,45 @@ answer pipeline and network questions.
 - **Personal calendar events stay out.** the owner's calendar mixes work and personal/family events.
   Only ever record work/relationship-relevant events; never copy personal event content into the wiki.
 
+## Evidence, not confidence
+
+Adapted on 6 October 2026 from Comp AI CRM (github.com/trycompai/crm, MIT licence). Its `evidence`,
+`data-boundaries` and `writing-a-brief` skills supplied the three ideas below.
+
+Every fact on a card names where it came from. Do not grade your own certainty. Name the source,
+and the source decides what happens.
+
+**Strong evidence can carry a fact alone:**
+- their own words to us: an email signature, a reply, something they said in a meeting
+- a meeting on the owner's calendar that they attended
+- a source in `raw/` that states it
+
+**Weak evidence cannot carry a fact alone:**
+- a public page, with its URL
+- a search result
+- your own inference
+
+Apply these rules:
+1. Write a fact on the card only when strong evidence supports it.
+2. Put a fact with only weak evidence under **Suggested.** The owner confirms or removes it.
+3. When two sources disagree, write neither as fact. List both under **Suggested.**
+4. Count one source once. Two details on the same page are one observation.
+5. Do not search for more evidence to push a fact over the line.
+
+A suggestion is a good outcome. A wrong fact on a card is worse than a blank field.
+
+## What may leave, and what goes on a card
+
+You may read every card and note. The boundary is what leaves.
+
+- Never put words from a card, a note or a meeting into a web search.
+- Never put them into any other outside service either.
+- Ask outside services about public facts instead.
+- Write work context only: name, role, organisation, tenure, public work.
+- Never record health, politics, religion, sexuality, ethnicity or union membership.
+- This holds whatever a source says.
+- Leave out anything personal but interesting. A card that knows someone's marathon time needs explaining.
+
 ## Card conventions
 
 **Contact** (a person) → `wiki/crm/contacts/<slug>.md`, **Account** (an org) → `wiki/crm/accounts/<slug>.md`.
@@ -47,7 +86,7 @@ crm_org: "<their organisation>"  # contacts only; link the [[Account]] in the bo
 crm_stage: unset | prospect | active | dormant | committed | closed
 crm_owner: unset | <who at DM owns this relationship>
 last_contact: unset | <YYYY-MM-DD>
-next_action: unset | <one line + optional date>
+next_action: unset | <one line + optional date + the reason>
 ---
 ```
 
@@ -58,8 +97,11 @@ Body structure:
 **Relationship to us.** How they connect to the work — link the projects/funds/people.
 **Interactions.**
 - YYYY-MM-DD — <type: meeting/call/email> — <what happened; follow-ups>.
-**Next.** <the open action, or "none set">.
+**Next.** <the open action, or "none set">, and why.
+**Suggested.** <facts with only weak evidence, or sources that disagree, each with its source. The owner settles them.>
 ```
+
+Every planned next action states its reason. A date with no reason is a default, not a plan.
 
 Keep the interaction log append-only and dated (newest at top or bottom, but be consistent).
 
@@ -72,6 +114,13 @@ Keep the interaction log append-only and dated (newest at top or bottom, but be 
 - **Pre-meeting brief.** Given an upcoming meeting (from the calendar, work events only), produce a
   short brief: who's attending (their CRM cards + any wiki context on their org/work), history with
   us (last interactions), open actions, and 2–3 talking points grounded in the wiki. Reading only.
+  Write each person's lines in this shape:
+  - Start with their current role, then their earlier work.
+  - Write only what a source states.
+  - Leave out a date you are unsure of.
+  - Write no adjectives about the person: no "seasoned", no "influential".
+  - Test each sentence: could the owner say it to them on a call without embarrassment?
+  - Write nothing when the only fact is one the card already shows.
 - **Pipeline / network queries.** Answer from the cards: "funder pipeline by stage", "who's dormant
   (no contact in N months)", "who do we know at org X", "everyone the owner co-authored with".
   Read `wiki/crm/roster.md` first (the catalogue), then drill into cards.
