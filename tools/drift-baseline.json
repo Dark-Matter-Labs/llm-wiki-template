@@ -120,6 +120,12 @@
       "versions": 11,
       "reason": "CORRECT AND PERMANENT, per-repo by design. It records per-FILE prose counts for one corpus, so eleven versions across eleven repos is the intended state and identical copies would mean the record was not per-repo, which is the bug it exists to prevent. Deliberately excluded from SHARED for the same reason: shipping indy-llm-wiki's 850-file baseline into a 12-page wiki would be nonsense. Each repo recorded its own on 2026-09-15, which is also the moment somebody decides what their starting debt is.",
       "per_repo": true
+    },
+    {
+      "path": ".claude/skills/google-sync/SKILL.md",
+      "repos": 3,
+      "versions": 2,
+      "reason": "Robyn's wiki adds a two-way Apps Script bridge to Google Sheets (2026-09-25); xco-team-wiki and learning-system-wiki keep the read-only version. Recorded 2026-10-06, pending Robyn's decision on the bridge. Fold back to one version once it is settled."
     }
   ],
   "_ratchet": "`versions` is the number of variants somebody REVIEWED. --check fails if a path gains one, so recording a path mutes it at a level rather than forever. Entries with \"per_repo\": true are exempt: one variant per repo is their designed state, so the count rises whenever a wiki joins and gating on it would fail every onboarding."
