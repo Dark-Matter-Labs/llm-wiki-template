@@ -151,17 +151,20 @@
     "design/xco.tokens.json": {
       "reviewed_at": "2026-10-05",
       "source_digest": "9fd9f053dbce8e17a8b8eeb9dbe6cd69e63ec0a5d998bd5b7f09b1ae62a991d5",
-      "why": "Not an xCO wiki: keeps the earlier xCO palette on purpose; the Polyphonic Style Guide v8.1 repaint (2026-10-05) went to the 15 xCO wikis only, at Gurden's decision."
+      "why": "Not an xCO wiki: keeps the earlier xCO palette on purpose; the Polyphonic Style Guide v8.1 repaint (2026-10-05) went to the 15 xCO wikis only, at Gurden's decision.",
+      "for": "llm-wiki-template"
     },
     "docs/assets/xco.css": {
       "reviewed_at": "2026-10-05",
       "source_digest": "6d28a3d1198bc33d185c250bb96c3c34266c47fe6f01e3590cd8bcae80162b68",
-      "why": "Not an xCO wiki: keeps the earlier xCO palette on purpose; the Polyphonic Style Guide v8.1 repaint (2026-10-05) went to the 15 xCO wikis only, at Gurden's decision."
+      "why": "Not an xCO wiki: keeps the earlier xCO palette on purpose; the Polyphonic Style Guide v8.1 repaint (2026-10-05) went to the 15 xCO wikis only, at Gurden's decision.",
+      "for": "llm-wiki-template"
     },
     "docs/assets/xco-dusk.css": {
       "reviewed_at": "2026-10-05",
       "source_digest": "0e4d31b0382b584fc52a46cb8726c6af6b9fcca094c0189d08db34368cdf7806",
-      "why": "Not an xCO wiki: keeps the earlier xCO palette on purpose; the Polyphonic Style Guide v8.1 repaint (2026-10-05) went to the 15 xCO wikis only, at Gurden's decision."
+      "why": "Not an xCO wiki: keeps the earlier xCO palette on purpose; the Polyphonic Style Guide v8.1 repaint (2026-10-05) went to the 15 xCO wikis only, at Gurden's decision.",
+      "for": "llm-wiki-template"
     }
   }
 }
