@@ -65,6 +65,25 @@ def main():
     check("a URL is not prose", C.count("see https://x.test/robust-landscape here")["words"] == 0)
     check("a quotation is somebody else's words",
           C.count("> This is a robust, comprehensive tapestry.\n")["words"] == 0)
+    # Quoted words inside a sentence are somebody else's words too. Until 2026-10-06 only the
+    # blockquote above was excluded, though the module said quotations were; a quoted document
+    # title in a table cell failed georgia-llm-wiki's ratchet.
+    check("a quoted title in a sentence is not prose",
+          C.count('The pack is titled "Legal Risk vs Ecosystem Harm" in full.')["words"] == 0)
+    check("...nor in curly quotes",
+          C.count("The pack is titled \u201cLegal Risk vs Ecosystem Harm\u201d in full.")["words"] == 0)
+    check("...nor in a table cell",
+          C.count('| Trustee pack | framed as "Legal Risk vs Ecosystem Harm" (raw/x.md) | Draft |')["words"] == 0)
+    check("...nor when the quote wraps onto the next line",
+          C.count('The pack is titled "Legal Risk vs\nEcosystem Harm" in full.')["words"] == 0)
+    check("a dash inside a quotation is the speaker's",
+          C.count('He said "now \u2014 or later" and left.')["emdash"] == 0)
+    check("words just outside a quotation still count",
+          C.count('A robust plan sits beside "a quoted line".')["words"] == 1)
+    check("an apostrophe does not open a quotation",
+          C.count("Indy's robust plan isn't finished.")["words"] == 1)
+    check("a lone inch mark does not hide the rest of the line",
+          C.count('A 12" screen is robust.')["words"] == 1)
     check("frontmatter is not prose",
           C.count("---\ntags: [robust, landscape]\n---\n\nplain text\n")["words"] == 0)
     # A catalogue row is navigation, and its em dash is a separator rather than a sentence.
