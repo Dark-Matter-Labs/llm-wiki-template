@@ -139,6 +139,38 @@ def main():
     check("the real pattern is restored after the mutation",
           C.count("- **[A Title](a-title.md)** — one line about it\n")["emdash"] == 0)
 
+    # Added 2026-10-06. A row wrapped onto a second line was matched on its first line only, so
+    # the continuation counted as prose. robyn-llm-wiki's router wraps most of its rows, and the
+    # shared check would have counted 78 separators there; her copy skipped the whole file
+    # instead, which also hid the router's real sentences. The row is the item, not the line.
+    check("a catalogue row wrapped onto a second line is not prose",
+          C.count("- **[A Title](a-title.md)** —\n  `concept` — the list — and more\n", router=True)["emdash"] == 0)
+    check("...nor one whose separator starts the next line",
+          C.count("- **[A Long Title](a.md)**\n  — `summary` — what it is\n", router=True)["emdash"] == 0)
+    check("...nor a wrapped wiki-link row",
+          C.count("- [[Some Page]] — one line\n  that wraps — onto two\n", router=True)["emdash"] == 0)
+    # The guards. A row ends where the item ends, and a wrapped sentence is still a sentence.
+    check("a wrapped sentence that merely begins with a link is still prose",
+          C.count("- **[A Title](a.md)** is a robust thing\n  — really\n", router=True)["emdash"] == 1)
+    check("...and its banned words still count",
+          C.count("- **[A Title](a.md)** is a robust thing\n  — really\n", router=True)["words"] == 1)
+    check("the next bullet after a wrapped row is read again",
+          C.count("- [[P]] — row\n  continues\n- A robust sentence — here.\n", router=True)["emdash"] == 1)
+    check("...and so is the next unindented line",
+          C.count("- [[P]] — row\n  continues\nA sentence — here.\n", router=True)["emdash"] == 1)
+    check("...and a nested bullet under a row",
+          C.count("- [[P]] — row\n  - a nested sentence — here\n", router=True)["emdash"] == 1)
+    check("a wrapped bullet that opens with a page link but has no separator stays prose",
+          C.count("- [[P]] is about\n  a robust landscape — here\n", router=True)["emdash"] == 1)
+    check("...and its banned words still count",
+          C.count("- [[P]] is about\n  a robust landscape — here\n", router=True)["words"] == 2)
+    check("a wrapped row pointing outside the wiki is still prose",
+          C.count("- [a thing](https://x.test) —\n  robust — and more\n", router=True)["emdash"] == 2)
+    # Only in the router. Elsewhere a page-link bullet is usually a see-also list, and the lines
+    # it wraps onto are sentences: applied everywhere, this rule hid 156 lines of prose.
+    check("outside the router, a wrapped row's continuation is still prose",
+          C.count("- [[Some Page]] — one line\n  that wraps — onto two\n")["emdash"] == 1)
+
     # A heading is a label, not a sentence. The house log header is `# Log — 2026-09-16`, so
     # under the old counting EVERY new day file failed the ratchet on its own template, one
     # em dash, forever. A gate that fires on the act of starting a page teaches people to

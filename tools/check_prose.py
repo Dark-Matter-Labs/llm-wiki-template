@@ -119,14 +119,64 @@ CATALOGUE_ROW = re.compile(
     r"|\*{0,2}\[[^\]\n]+\]\((?!\w+:)[^)\s]+\)\*{0,2}\s*\u2014"  # - **[Title](page.md)** — one line
     r")")
 
+#: A row whose page title is long enough that its separator starts the next line:
+#: `- **[A Long Title](page.md)**` then `  — what it is`. The head names a local page and
+#: nothing else; the first continuation line opens with the em dash.
+ROW_HEAD = re.compile(
+    r"\s*[-*]\s*(?:\[\[[^\]\n]*\]\]|\*{0,2}\[[^\]\n]+\]\((?!\w+:)[^)\s]+\)\*{0,2})\s*$")
+BULLET = re.compile(r"\s*[-*]\s")
+#: A CATALOGUE_ROW whose separator follows its head. Only such a row, or a ROW_HEAD whose next
+#: line opens with the dash, carries its wrapped lines with it. CATALOGUE_ROW also drops a
+#: bullet that merely opens with `[[...]]`, and extending that to its continuation hid real
+#: sentences ("the same certification landscape", malik-llm-wiki). Which targets count as a
+#: page stays CATALOGUE_ROW's decision; this only asks where the dash is.
+SEPARATOR_AFTER_HEAD = re.compile(
+    r"\s*[-*]\s*(?:\[\[[^\]\n]*\]\]|\*{0,2}\[[^\]\n]+\]\([^)\s]+\)\*{0,2})\s*\u2014")
 
-def prose(text: str) -> str:
-    """Only what a person reads through. Everything else is not prose and must not count."""
+
+def _drop_catalogue_rows(text: str) -> str:
+    """Every line of every catalogue row, including the lines a wrapped row continues onto.
+
+    Added 2026-10-06. Rows were matched a line at a time, so a row wrapped onto a second line
+    lost only its first: robyn-llm-wiki's router wraps most of its rows, and the shared check
+    counted 78 separators there. Her copy skipped the whole file instead, which also hid the
+    router's real sentences. A row with its separator runs to the end of its list item:
+    indented lines that are not a new bullet. A blank line, an unindented line or a nested bullet ends it. Removing
+    lines can only lower a count, so every file this changes moves down, never up.
+    """
+    lines = text.splitlines()
+    out, in_row = [], False
+    for i, line in enumerate(lines):
+        if in_row and line.strip() and line[:1].isspace() and not BULLET.match(line):
+            continue
+        in_row = False
+        nxt = lines[i + 1] if i + 1 < len(lines) else ""
+        if CATALOGUE_ROW.match(line):
+            in_row = bool(SEPARATOR_AFTER_HEAD.match(line))   # else the one line, as before
+            continue
+        if ROW_HEAD.match(line) and nxt[:1].isspace() and nxt.lstrip().startswith("\u2014"):
+            in_row = True
+            continue
+        out.append(line)
+    return "\n".join(out)
+
+
+def prose(text: str, router: bool = False) -> str:
+    """Only what a person reads through. Everything else is not prose and must not count.
+
+    `router` is True for `wiki/index.md` alone, where a wrapped catalogue row is navigation
+    across all its lines. Elsewhere a bullet that opens with a page link is usually a see-also
+    list, and the lines it wraps onto are sentences: applied everywhere, the wrapped-row rule
+    hid 156 lines of prose across the federation to fix one router.
+    """
     text = re.sub(r"^---\n.*?\n---\n", "", text, flags=re.S)       # frontmatter
     # Catalogue rows go FIRST, before `[[...]]` is blanked: the pattern that identifies a row
     # is the wiki-link at its head, and stripping that first leaves a line nothing can match.
     # The initial version did this last and silently counted every row it was written to skip.
-    text = "\n".join(l for l in text.splitlines() if not CATALOGUE_ROW.match(l))
+    if router:
+        text = _drop_catalogue_rows(text)
+    else:
+        text = "\n".join(l for l in text.splitlines() if not CATALOGUE_ROW.match(l))
     text = re.sub(r"```.*?```", " ", text, flags=re.S)             # fenced code
     text = re.sub(r"`[^`\n]*`", " ", text)                         # inline code
     text = re.sub(r"\[\[[^\]]*\]\]", " ", text)                    # page titles are names
@@ -158,7 +208,7 @@ def prose(text: str) -> str:
 HEADING = re.compile(r"\s*#{1,6}\s")
 
 
-def sentences(text: str) -> str:
+def sentences(text: str, router: bool = False) -> str:
     """Prose minus its headings, for the two rules that are about SENTENCES.
 
     The em dash rule and the X-not-Y rule describe how a sentence is built, and a heading is
@@ -169,12 +219,12 @@ def sentences(text: str) -> str:
     Banned words and phrases are still counted in headings, deliberately. "Leveraging Robust
     Synergy" is bad writing wherever it sits, and nothing about a heading excuses it.
     """
-    return "\n".join(l for l in prose(text).splitlines() if not HEADING.match(l))
+    return "\n".join(l for l in prose(text, router).splitlines() if not HEADING.match(l))
 
 
-def count(text: str) -> dict:
-    t = prose(text)
-    s = sentences(text)
+def count(text: str, router: bool = False) -> dict:
+    t = prose(text, router)
+    s = sentences(text, router)
     return {"words": len(WORD_RE.findall(t)),
             "phrases": len(PHRASE_RE.findall(t)),
             "xnoty": len(XNOTY_RE.findall(s)),
@@ -186,6 +236,8 @@ def count(text: str) -> dict:
 #: description with an em dash across several hundred rows. Scanning them made the tool
 #: contradict the skill it implements, and every new catalogue row failed the ratchet.
 SKIP = ("wiki/index/",)
+#: The router: catalogue rows with prose around them, so read, but with wrapped rows skipped whole.
+ROUTER = "wiki/index.md"
 
 
 def scan(root=SCAN) -> dict:
@@ -194,7 +246,7 @@ def scan(root=SCAN) -> dict:
         rel = p.relative_to(ROOT).as_posix()
         if any(rel.startswith(s) for s in SKIP):
             continue
-        c = count(p.read_text(encoding="utf-8", errors="ignore"))
+        c = count(p.read_text(encoding="utf-8", errors="ignore"), router=(rel == ROUTER))
         if any(c.values()):
             out[str(p.relative_to(ROOT))] = c
     return out
