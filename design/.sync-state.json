@@ -42,7 +42,7 @@
     "tools/propose_upstream.py": "40e4a8fae0d52e68c72d7aaf534f223de9bcd839b3167e9e900fc34b2217d57e",
     "tools/test_propose_upstream.py": "be1c1631e4c0dc48044334a3e606728f01744dbd5d46486bde15fde57494ea42",
     ".claude/skills/reflect/SKILL.md": "490c9140691724e8172b86d4c1a1036a20fe36be832a2e404ab6b9470fbcc40e",
-    "tools/test_export.py": "3068a512cd6e9b8dc6b5045308ba2737bc450d7e2f7806573d3f524d8d5630db",
+    "tools/test_export.py": "9b39845b2c8c64ab2bb8e9967ebbda736aa94dc54ee71957dc2c558b9944de1c",
     "tools/audit_design.py": "5c3fb4bd267825521d987b7242ad96ad4798bbdc3c783ed013908396ce154c48",
     "tools/check_log_shape.py": "876415fb8b56e3cf3fb0e1a6f60e39ccda8eb5e670ebca5bef01cec69a2df6c7",
     "tools/sync_log_index.py": "0dc2a98e918078a9b344e589da99ce304fc247a5e6e7d7b2d74832376dd53637",
