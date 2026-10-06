@@ -38,11 +38,13 @@ tools/test_export.py and by --check-level schema validation.
 """
 
 import argparse
+import html
 import json
 import os
 import re
 import sys
 from datetime import datetime, timezone
+from urllib.parse import unquote
 
 SCHEMA_VERSION = "1.0"
 
@@ -359,7 +361,45 @@ def _clean_fields(node, title_to_slug, hidden_slugs, hidden_titles):
                          if isinstance(x, str) else x for x in v]
 
 
-MDLINK_RE = re.compile(r"(!?)\[([^\]]*)\]\(([^)\s]+)\)")
+# [text](target) and [text](target "title"); group 3 is the target.
+MDLINK_RE = re.compile(r"(!?)\[([^\]]*)\]\(\s*(<[^>\n]*>|[^)\s]+)"
+                       r"(?:\s+(?:\"[^\"\n]*\"|'[^'\n]*'|\([^)\n]*\)))?\s*\)")
+# A reference definition, "[label]: target". Not anchored to a line start, so one inside a
+# quote or a list, or with its target wrapped onto the next line, is caught too. Group 1 is
+# the target.
+MDREF_RE = re.compile(r"\[[^\[\]\n]+\]:[ \t]*(?:\n[ \t>]*)?(<[^>\n]*>|[^\s<>]+)[^\n]*")
+# A raw HTML link or image: href=... or src=..., quoted or not. Group 3 is the target.
+HTMLATTR_RE = re.compile(r"\b(href|src)(\s*=\s*)(\"[^\"]*\"|'[^']*'|[^\s>\"']+)", re.IGNORECASE)
+URL_SCHEME_RE = re.compile(r"^[a-z][a-z0-9+.-]*:", re.IGNORECASE)
+PAGE_EXTS = (".md", ".markdown", ".html", ".htm")
+
+
+def _link_target_name(target):
+    """The page name a markdown link points at, casefolded, or None if it names no page.
+
+    Normalised so every spelling of one page compares equal (security review, 2026-10-06):
+    `[d](wiki/secret)` and `[c](./sub/../secret)` carried the slug out because only targets
+    ending in `.md` were checked. Drops quotes, <>, %- and &-escapes, #anchor, ?query, `.`
+    and `..` segments, a leading `wiki/`, page extensions and a trailing `/index`.
+    """
+    path = unquote(html.unescape(target.strip("\"'<>")))
+    path = path.split("#", 1)[0].split("?", 1)[0]
+    if URL_SCHEME_RE.match(path):
+        return None  # https:, mailto:, data: ... — not a page in this wiki
+    parts = []
+    for seg in path.replace("\\", "/").split("/"):
+        if seg == "..":
+            parts = parts[:-1]
+        elif seg not in ("", "."):
+            parts = parts + [seg]
+    if parts[:1] and parts[0].casefold() == "wiki":
+        parts = parts[1:]
+    names = [p.casefold() for p in parts]
+    while names and any(names[-1].endswith(ext) for ext in PAGE_EXTS):
+        names[-1] = names[-1].rsplit(".", 1)[0]  # secret.md.html -> secret
+    if len(names) > 1 and names[-1] == "index":
+        names = names[:-1]  # secret/index.md names the page secret
+    return names[-1] if names and names[-1] else None
 
 
 def _strip_private_links(body, title_to_slug, private_slugs):
@@ -368,6 +408,8 @@ def _strip_private_links(body, title_to_slug, private_slugs):
 
     Also matched since 2026-09-29, when each was found to carry the title out:
     [[Title#Section]], a title in different case, and a markdown link [text](page.md).
+    Since 2026-10-06 a markdown link is matched however its target is spelled; see
+    _link_target_name.
     """
     folded = {_fold(t): s for t, s in title_to_slug.items()}
     hidden_names = {s.rsplit("/", 1)[-1].casefold() for s in private_slugs}
@@ -381,14 +423,25 @@ def _strip_private_links(body, title_to_slug, private_slugs):
         return m.group(0)
 
     def md_repl(m):
-        path = m.group(3).split("#", 1)[0].split("?", 1)[0]
-        if not path.casefold().endswith(".md") or "://" in path:
-            return m.group(0)
-        if path[:-3].rsplit("/", 1)[-1].casefold() in hidden_names:
+        # Compared by last segment, as before: a hidden page's name is the disclosure,
+        # whatever directory the link puts in front of it.
+        if _link_target_name(m.group(3)) in hidden_names:
             return m.group(2).strip() or "[redacted]"
         return m.group(0)
 
-    return MDLINK_RE.sub(md_repl, WIKILINK_RE.sub(repl, body))
+    def ref_repl(m):
+        # The label stays in the text that uses it, like a link's display text; only the
+        # definition that names the page goes.
+        return "" if _link_target_name(m.group(1)) in hidden_names else m.group(0)
+
+    def html_repl(m):
+        if _link_target_name(m.group(3)) in hidden_names:
+            return m.group(1) + m.group(2) + '"#"'
+        return m.group(0)
+
+    body = WIKILINK_RE.sub(repl, body)
+    body = MDREF_RE.sub(ref_repl, MDLINK_RE.sub(md_repl, body))
+    return HTMLATTR_RE.sub(html_repl, body)
 
 
 # --------------------------------------------------------------------------- #

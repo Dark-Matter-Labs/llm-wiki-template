@@ -167,6 +167,27 @@ class ExportTests(unittest.TestCase):
             self.assertNotIn("roster.md", body.casefold())
             self.assertIn("the roster", body)
 
+    def test_a_markdown_link_without_md_or_with_dot_segments_is_redacted(self):
+        """Found by security review on 2026-10-06: only targets ending in `.md` were checked,
+        so a bare slug, a `wiki/` prefix or a `..` segment carried the hidden slug out. The
+        review of the fix found a title, a reference definition, raw HTML, `/index.md`, other
+        extensions and an &-escape did too."""
+        PRIV = "Zzq Confidential Node 9f3a"
+        body = ("One [dee](wiki/zzq-priv-9f3a). Two [cee](./sub/../zzq-priv-9f3a). "
+                "Three [eee](zzq-priv-9f3a.md#part). Four [eff](zzq-priv-9f3a \"t\"). "
+                "Five [gee][r]. Six [aitch][q]. Seven <a href='wiki/zzq-priv-9f3a'>eye</a>. "
+                "Eight [jay](zzq-priv-9f3a/index.md). Nine [kay](zzq-priv-9f3a&#46;md.htm).\n\n"
+                "[r]: ../wiki/zzq-priv-9f3a.html\n> [q]:\n> zzq-priv-9f3a.markdown\n")
+        with tempfile.TemporaryDirectory() as d:
+            write(d, "zzq-priv-9f3a.md", base_fm("concept", PRIV, "private"))
+            write(d, "alpha.md", base_fm("concept", "Alpha", "public"), body)
+            for hide in (export.HIDE_FROM_WEB, export.HIDE_FROM_SHARED):
+                public, _hidden, blob = self._cut(d, hide)
+                self.assertNoTrace(blob, PRIV, "zzq-priv-9f3a")
+                text = public["alpha"]["body"]
+                for kept in ("dee", "cee", "eee", "eff", "gee", "aitch", "eye", "jay", "kay"):
+                    self.assertIn(kept, text)
+
     def test_links_to_visible_pages_are_untouched(self):
         with tempfile.TemporaryDirectory() as d:
             write(d, "beta.md", base_fm("concept", "Beta", "public"))
