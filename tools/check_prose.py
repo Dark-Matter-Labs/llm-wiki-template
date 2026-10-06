@@ -132,6 +132,13 @@ def prose(text: str) -> str:
     text = re.sub(r"\[\[[^\]]*\]\]", " ", text)                    # page titles are names
     text = re.sub(r"\[([^\]]*)\]\([^)\s]*\)", r"\1", text)         # link text, never the target
     text = re.sub(r"https?://\S+", " ", text)
+    # Quoted words inside a sentence, straight or curly. A quote may wrap onto one more line,
+    # since pages are hard-wrapped, but never across a blank line, so an unpaired mark (an inch
+    # sign, a stray quote) cannot hide a paragraph. Only the blockquote below was excluded until
+    # 2026-10-06, though this module said quotations were; a quoted title in a table cell failed
+    # georgia-llm-wiki's ratchet. Removing text can only lower a count, so the ratchet holds.
+    text = re.sub(r'"[^"\n]*(?:\n[^"\n]+)?"', " ", text)
+    text = re.sub("\u201c[^\u201d\n]*(?:\n[^\u201d\n]+)?\u201d", " ", text)
     # A quotation is somebody else's words. Same reason `raw/` is never corrected.
     #
     # A CATALOGUE ROW is not prose either. `- [[Some Page]] — what it is` is the house's
