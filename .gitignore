@@ -64,3 +64,6 @@ contrib/
 # tools/sync_commons.py. Never edited, never a source of truth, never committed --
 # duplicating a commons is what the federation exists to avoid.
 .commons/
+
+# The Needs-you page is built and locked at publish time, never saved in the wiki.
+docs/needs-you/
