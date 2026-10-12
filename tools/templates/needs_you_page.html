@@ -30,7 +30,9 @@ h1{font:400 40px/1.05 var(--serif);margin:6px 0 2px;letter-spacing:-.02em}
 .mod > h2{font:500 11.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--weak);margin:0 0 12px;display:flex;justify-content:space-between;gap:8px}
 .mod > h2 span{text-transform:none;letter-spacing:0;font-family:var(--sans);font-weight:400}
 @media (min-width:1000px){
-  .mod[data-size=wide]{grid-column:span 8}.mod[data-size=narrow]{grid-column:span 4}.mod[data-size=full]{grid-column:span 12}
+  /* Two columns that stack independently, so a long list on one side leaves no hole on the other. */
+  .grid{grid-template-columns:minmax(0,4fr) minmax(0,8fr)}
+  .stack{display:flex;flex-direction:column;gap:16px;min-width:0}
   .tabs{display:none!important}
 }
 .section{margin:16px 0 8px;font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--weak)}
@@ -54,12 +56,14 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .skill span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
 .skill i{font-style:normal;color:var(--weak)}
 .map{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
-@media (min-width:1000px){.map{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}
+@media (min-width:1000px){.area-panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 24px;align-items:start}
+  .area-panel > .kind,.area-panel > h3{grid-column:1}.area-panel > p{grid-column:1}.area-panel > ul{grid-column:2;grid-row:1 / span 3;margin-top:0}.area-panel > button{grid-column:1;justify-self:start}}
 .map svg{width:100%;height:auto;display:block;background:var(--raised);border:1px solid var(--rule);border-radius:14px}
 .map svg text{font:400 17px var(--sans);fill:var(--ink);pointer-events:none}
 .map svg .count{font:500 13px var(--mono);fill:var(--weak)}
 .map svg circle{fill:var(--area);stroke:var(--area-line);stroke-width:1;cursor:pointer;transition:fill .2s}
-.map svg circle:hover,.map svg circle.on{fill:var(--ember)}
+.map svg circle:hover,.map svg g.on circle{fill:var(--ember)}
+.map svg g.on text{fill:#101F2D}
 .map svg line{stroke:var(--area-line);stroke-linecap:round}
 .area-panel{background:var(--raised);border:1px solid var(--rule);border-radius:14px;padding:14px}
 .area-panel h3{font:400 22px/1.15 var(--serif);margin:0 0 6px}
@@ -78,7 +82,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:min(420px,calc(100vw - 24px));display:flex;gap:4px;background:var(--raised);border:1px solid var(--rule);border-radius:16px;padding:5px;box-shadow:0 6px 24px var(--shade);z-index:4}
 .tabs button{flex:1;border:0;background:transparent;color:var(--muted);font:500 13.5px var(--sans);padding:10px 4px;border-radius:11px;cursor:pointer;min-height:44px}
 .tabs button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
-@media (max-width:999px){.mod{display:none}.mod.tab-on{display:block}.top h1{font-size:34px}}
+@media (max-width:999px){.stack{display:contents}.mod{display:none}.mod.tab-on{display:block}.top h1{font-size:34px}}
 .shade{position:fixed;inset:0;background:var(--shade);display:none;align-items:flex-end;justify-content:center;z-index:5}
 @media (min-width:700px){.shade{align-items:center}}
 .shade.open{display:flex}
@@ -117,7 +121,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .hit:focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:4px}
 .tip{position:fixed;z-index:8;background:var(--ink);color:var(--paper);font-size:13px;line-height:1.4;padding:8px 10px;border-radius:9px;pointer-events:none;max-width:240px;display:none}
 .tip b{font-weight:500}
-.cols{display:flex;align-items:flex-end;gap:4px;height:140px;border-bottom:1px solid var(--rule)}
+.cols{display:flex;align-items:flex-end;gap:6px;height:240px;border-bottom:1px solid var(--rule)}
 .col{flex:1;height:100%;display:flex;flex-direction:column-reverse;gap:2px;cursor:default;min-width:0;justify-content:flex-start}
 .col i{display:block;width:100%;min-height:0}
 .col i.top{border-radius:4px 4px 0 0}
@@ -172,13 +176,13 @@ const GROUPS = [["yes","Say yes"],["concern","Concerns"],["todo","To do"]];
 const MODULES = [
   {id:"needs", title:"Needs you", size:"narrow", tab:"needs"},
   {id:"map", title:"Your wiki at a glance", size:"wide", tab:"more"},
-  {id:"growth", title:"How your wiki grew", size:"wide", tab:"more"},
   {id:"onboarding", title:"Getting started", size:"narrow", tab:"more"},
-  {id:"cando", title:"Your wiki can do", size:"wide", tab:"cando"},
+  {id:"growth", title:"How your wiki grew", size:"wide", tab:"more"},
+  {id:"work", title:"What kind of work", size:"wide", tab:"more"},
   {id:"trust", title:"Who stands behind it", size:"narrow", tab:"more"},
-  {id:"work", title:"What kind of work", size:"narrow", tab:"more"},
   {id:"moved", title:"What moved this week", size:"narrow", tab:"more"},
   {id:"travels", title:"How your work travels", size:"narrow", tab:"more"},
+  {id:"cando", title:"Your wiki can do", size:"wide", tab:"cando"},
 ];
 const LAYOUT_KEY = "needs-you-layout-v1";   // layout only: which modules show, in what order. Never content.
 let layout = (function(){ try { const l = JSON.parse(localStorage.getItem(LAYOUT_KEY)); if (l && Array.isArray(l.order)) return l; } catch(e){} return {order: MODULES.map(m => m.id), hidden: []}; })();
@@ -284,29 +288,36 @@ const RENDER = {
       box.append(el("div", "empty", "Your wiki is still small."), el("p", "note", "Areas appear here as pages start linking to each other. " + m.pages_total + " pages so far."));
       return;
     }
-    const wrap = el("div", "map"), W = 640, H = 380, ns = "http://www.w3.org/2000/svg";
+    const wrap = el("div", "map"), W = 760, H = 460, ns = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", "0 0 " + W + " " + H); svg.setAttribute("role", "img");
     svg.setAttribute("aria-label", "Your wiki in " + m.areas.length + " areas. Each circle is a group of pages that link to each other.");
     // Circle area is proportional to pages, scaled so the circles fill about a third of the space.
     const total = m.areas.reduce((t, a) => t + a.size, 0), k = Math.sqrt(W * H * 0.30 / Math.PI / total);
     const nodes = m.areas.map((a, i) => { const ang = 2.39996 * i, rad = 18 * Math.sqrt(i + 0.5);   // a sunflower spiral: even, deterministic
-      return {a, r: Math.max(20, k * Math.sqrt(a.size)), x: W / 2 + rad * 4 * Math.cos(ang), y: H / 2 + rad * 3 * Math.sin(ang)}; });
+      const r = Math.max(22, k * Math.sqrt(a.size)), label = a.label.length > 22 ? a.label.slice(0, 21) + "…" : a.label, lw = label.length * 9.4;
+      // A label sits inside its circle when it fits, otherwise underneath, and the space underneath is kept clear.
+      return {a, r, label, lw, inside: lw <= 2 * r - 14, x: W / 2 + rad * 4 * Math.cos(ang), y: H / 2 + rad * 3 * Math.sin(ang)}; });
+    // Everything that takes space: each circle, and each label drawn below its circle.
+    const shapes = n => n.inside ? [[0, 0, n.r]] : [[0, 0, n.r], [0, n.r + 15, Math.max(14, n.lw / 2)]];
     // Settle: overlapping areas push apart, linked areas pull gently together, everything stays inside.
     for (let it = 0; it < 400; it++) {
       for (const l of m.links) { const p = nodes[l.a], q = nodes[l.b], dx = q.x - p.x, dy = q.y - p.y, d = Math.hypot(dx, dy) || 1, want = p.r + q.r + 30;
         if (d > want) { const f = (d - want) / d * 0.004 * Math.min(5, l.weight); p.x += dx * f; p.y += dy * f; q.x -= dx * f; q.y -= dy * f; } }
       for (const p of nodes) { p.x += (W / 2 - p.x) * 0.004; p.y += (H / 2 - p.y) * 0.004; }
       for (let pass = 0; pass < 3; pass++) for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
-        const p = nodes[i], q = nodes[j], dx = q.x - p.x, dy = q.y - p.y, d = Math.hypot(dx, dy) || 0.01, min = p.r + q.r + 10;
-        if (d < min) { const push = (min - d) / 2, ux = dx / d, uy = dy / d; p.x -= ux * push; p.y -= uy * push; q.x += ux * push; q.y += uy * push; } }
-      for (const p of nodes) { p.x = Math.min(W - p.r - 6, Math.max(p.r + 6, p.x)); p.y = Math.min(H - p.r - 6, Math.max(p.r + 6, p.y)); }
+        const p = nodes[i], q = nodes[j];
+        for (const [ax, ay, ar] of shapes(p)) for (const [bx, by, br] of shapes(q)) {
+          const dx = (q.x + bx) - (p.x + ax), dy = (q.y + by) - (p.y + ay), d = Math.hypot(dx, dy) || 0.01, min = ar + br + 10;
+          if (d < min) { const push = (min - d) / 2, ux = dx / d, uy = dy / d; p.x -= ux * push; p.y -= uy * push; q.x += ux * push; q.y += uy * push; } } }
+      for (const p of nodes) { const half = Math.max(p.r, p.inside ? 0 : p.lw / 2), below = p.inside ? p.r : p.r + 26;
+        p.x = Math.min(W - half - 6, Math.max(half + 6, p.x)); p.y = Math.min(H - below - 6, Math.max(p.r + 6, p.y)); }
     }
     const maxW = Math.max(1, ...m.links.map(l => l.weight));
     for (const l of m.links) { const line = document.createElementNS(ns, "line"), p = nodes[l.a], q = nodes[l.b];
       line.setAttribute("x1", p.x); line.setAttribute("y1", p.y); line.setAttribute("x2", q.x); line.setAttribute("y2", q.y); line.setAttribute("stroke-width", 1 + 5 * l.weight / maxW); svg.append(line); }
     const panel = el("div", "area-panel");
     function pick(n, circle){
-      svg.querySelectorAll("circle").forEach(c => c.classList.remove("on")); if (circle) circle.classList.add("on");
+      svg.querySelectorAll("g").forEach(g => g.classList.remove("on")); if (circle) circle.parentNode.classList.add("on");
       panel.replaceChildren(el("div", "kind", n.a.size + " pages"), el("h3", null, n.a.label));
       if (n.a.about) panel.append(el("p", null, n.a.about));
       const ul = el("ul"); for (const t of n.a.pages) { const li = el("li"); if (DATA.links[t]) li.append(link(DATA.links[t], t, "")); else li.textContent = t; ul.append(li); } panel.append(ul);
@@ -315,7 +326,7 @@ const RENDER = {
     for (const n of nodes) { const g = document.createElementNS(ns, "g"), c = document.createElementNS(ns, "circle");
       c.setAttribute("cx", n.x); c.setAttribute("cy", n.y); c.setAttribute("r", n.r); c.setAttribute("tabindex", "0"); c.setAttribute("role", "button"); c.setAttribute("aria-label", n.a.label + ", " + n.a.size + " pages");
       c.addEventListener("click", () => pick(n, c)); c.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(n, c); } });
-      const inside = n.r >= 52, short = n.a.label.length > 18 ? n.a.label.slice(0, 17) + "…" : n.a.label;
+      const inside = n.inside, short = n.label;
       const t = document.createElementNS(ns, "text"); t.setAttribute("x", n.x); t.setAttribute("y", inside ? n.y - 2 : n.y + n.r + 18); t.setAttribute("text-anchor", "middle"); t.textContent = short;
       const s = document.createElementNS(ns, "text"); s.setAttribute("x", n.x); s.setAttribute("y", inside ? n.y + 18 : n.y + 5); s.setAttribute("text-anchor", "middle"); s.setAttribute("class", "count"); s.textContent = n.a.size;
       g.append(c, t, s); svg.append(g); }
@@ -459,14 +470,16 @@ function render(){
   document.getElementById("hello").textContent = NAME;
   const live = DATA.items.filter((_, i) => !later.includes(i) && !done.includes(i)).length;
   document.getElementById("count").textContent = live ? live + (live === 1 ? " thing needs you" : " things need you") : "Nothing needs you right now";
-  const grid = document.getElementById("grid"); grid.replaceChildren();
+  const grid = document.getElementById("grid"), narrow = el("div", "stack"), wide = el("div", "stack"); grid.replaceChildren(narrow, wide);
   const known = new Set(MODULES.map(m => m.id));
   const order = layout.order.filter(id => known.has(id)).concat(MODULES.map(m => m.id).filter(id => !layout.order.includes(id)));
   for (const id of order) {
     if (layout.hidden.includes(id)) continue;
+    if (id === "onboarding" && DATA.modules.onboarding.every(s => s.done)) continue;   // finished: nothing left to show
     const m = MODULES.find(x => x.id === id), sec = el("section", "mod"); sec.dataset.size = m.size; sec.dataset.tab = m.tab; sec.setAttribute("aria-label", m.title);
     if (m.tab === tab) sec.classList.add("tab-on");
-    sec.append(el("h2", null, m.title)); RENDER[id](sec); grid.append(sec);
+    sec.style.order = order.indexOf(id);   // the phone shows one column, in the chosen order
+    sec.append(el("h2", null, m.title)); RENDER[id](sec); (m.size === "narrow" ? narrow : wide).append(sec);
   }
   document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.tab === tab));
 }

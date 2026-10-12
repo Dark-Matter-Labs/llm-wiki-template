@@ -157,7 +157,7 @@
     "tools/build_needs_you_page.py": "f912c84dafc286957ae448f33e8d0b7a0518312632cf953029277d40bdc8c975",
     "tools/test_build_needs_you_page.py": "d3c2e258570a1ec16b4845346ad75355c4db8656c97324440d013d4290dde772",
     "tools/encrypt_page.mjs": "179508d99b9f8910c3f9086c213bc1a043c12fbdbe57748d744401ba0987905b",
-    "tools/templates/needs_you_page.html": "f5420c525a1919ecea4b8cc145327867e54b9b4c052ccf6d58af9e4c31ab8ad5"
+    "tools/templates/needs_you_page.html": "849bc34d7dccb12c429aa80098dcfd03c0af530123a2bae20c4103ab7c906c60"
   },
   "adapted": {
     "design/xco.tokens.json": {
