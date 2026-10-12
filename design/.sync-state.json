@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "1caa1a56d1c1d1a678e11d5f32ed3db26ceca59862e74c6651f6197a2cda9e1d",
     "tools/test_sync_commons.py": "39fb5e7f459132381c2ce0fda3087df443873cb98a55c2fd8253c466e8fd9a94",
-    "design/shared-layer.json": "0e7ad02ebf9802b3f47daac002b3f483bb4dabd86ada77af85231be265e5427b",
+    "design/shared-layer.json": "3f29e34919111f3157549c7c66536b79a32198d297cc23ef64f779ee292dbfa7",
     "tools/drift-baseline.json": "ba4bbdf1dbb23d3d3d147f7918beead2a4f7866d494903c1c6248195dbb7742f",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -147,7 +147,17 @@
     ".claude/skills/dm-style-guide/scripts/risk_assessment.py": "42b2534b595537c19b1c32f0bb06eb7722ddf2ae4c30529767e7674bb8be2621",
     ".claude/rules/plain-register.md": "a09df147062740cd085983c8498c4a57ce53603ad480003b9f09071d3113a85e",
     "tools/check_sources.py": "507e133617bddfff033a0e5efd9ea4646e6a198fc35844b1b1316aef1f2de4fa",
-    "tools/test_check_sources.py": "eb7291bd7551b2ce1b50e154dff80218e603755949427fdb3617e954b39356f1"
+    "tools/test_check_sources.py": "eb7291bd7551b2ce1b50e154dff80218e603755949427fdb3617e954b39356f1",
+    "tools/needs_you.py": "2f3d29e8e49bc8ec0273dad37b9b943bbddefaae9ab660a1f8449747bb10cd00",
+    "tools/test_needs_you.py": "18015f3bba1959f6ef00a79b63ed376df5413aafa263eccfc88938599a76c512",
+    "tools/skill_menu.py": "32d7b1582477ccd24ffffe0e4a8e804d8a95c1583999ea9526cb1928a2d0e92b",
+    "tools/test_skill_menu.py": "d584a09ba9c4551e41bfd20c41ed48ac27971adbd48b43a8cecdbf86fe6434b3",
+    "tools/view_modules.py": "8d42eefdd55a24f50a9f7ba9025b9bd641e2e631ec946475b1cc1db3bb890dd0",
+    "tools/test_view_modules.py": "a379dc5f4a9b630ac88558e737733cde55538e75112b274bfbb9634c8a1a6f70",
+    "tools/build_needs_you_page.py": "f912c84dafc286957ae448f33e8d0b7a0518312632cf953029277d40bdc8c975",
+    "tools/test_build_needs_you_page.py": "d3c2e258570a1ec16b4845346ad75355c4db8656c97324440d013d4290dde772",
+    "tools/encrypt_page.mjs": "179508d99b9f8910c3f9086c213bc1a043c12fbdbe57748d744401ba0987905b",
+    "tools/templates/needs_you_page.html": "f5420c525a1919ecea4b8cc145327867e54b9b4c052ccf6d58af9e4c31ab8ad5"
   },
   "adapted": {
     "design/xco.tokens.json": {
