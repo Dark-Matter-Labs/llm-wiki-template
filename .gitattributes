@@ -12,7 +12,7 @@
 # is the way a union merge would go wrong.
 wiki/log/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md merge=union
 
-# The month index is NOT union-merged. It is generated from the day files, and its
-# rows change rather than accumulate, so union would produce duplicate day rows that
-# merge silently. It conflicts instead — and the resolution is never to hand-merge it
-# but to run `python3 tools/sync_log_index.py`, which CI verifies with --check.
+# The month index is NOT union-merged. It is generated from the day files and kept sorted, and
+# since 2026-10-12 each row is a plain link to its day: no counts, so a row never changes once
+# written and two changes logged on the same day no longer clash here. Two drafts that each start a
+# different new day can still clash; never hand-merge it, run `python3 tools/sync_log_index.py`.

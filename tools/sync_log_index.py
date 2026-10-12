@@ -25,6 +25,14 @@ hand-written row before this tool existed. Regenerating is idempotent: run it ag
 an unchanged day file and the index is byte-identical, so it is safe to run after every
 edit rather than only when something looks wrong.
 
+**Rows carry no counts since 2026-10-12.** The entry count and operations breakdown made the
+day's row change with every entry, so any two changes logged on the same day both rewrote it and
+GitHub could not combine them: every clash settled by hand or by `rollout.py refresh` that day was
+this file, never a day file (those are union-merged, see `.gitattributes`). Nothing read the
+counts; they were carried over from the hand-typed rows. A row is now a link that never changes
+once written, so the index only moves when a new day starts. The day files are still read, so a
+malformed entry heading still fails here.
+
 Months exempt from the per-day convention (`PRE_SPLIT_MONTHS`, kept in sync with
 `check_log_shape.py`) are left alone — they are single files by design and were never
 retrofitted.
@@ -121,13 +129,10 @@ def build_month_index(month: str, days: "list[str]") -> str:
         "Index of the month's daily log files. Entries live in **one file per day** so that two",
         "sessions working on the same day never collide on the same file. Newest day at the bottom.",
         "",
-        "| Day | Entries | Operations |",
-        "|---|---|---|",
     ]
     for day in sorted(days):
-        counts = entry_counts(LOG / f"{day}.md")
-        total = sum(n for _k, n in counts)
-        lines.append(f"| [{day}]({day}.md) | {total} | {format_ops(counts)} |")
+        entry_counts(LOG / f"{day}.md")   # still read: a malformed entry heading fails here
+        lines.append(f"- [{day}]({day}.md)")
     lines.append("")
     lines.append("Format and the full month list live in [`wiki/log.md`](../log.md).")
     lines.append("")
