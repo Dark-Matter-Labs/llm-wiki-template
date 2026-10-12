@@ -39,6 +39,7 @@ import json
 import os
 import re
 import subprocess
+import time
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -208,25 +209,43 @@ def unlanded(files, found):
             "unlanded_files": sum(1 for n in missing if n)}
 
 
+def proposal_state(rollup, mergeable, is_draft):
+    """A proposal's state in plain words, from its checks and whether GitHub can still save it.
+
+    A clash beats green checks: GitHub greys out the save button, and the wiki's own checks never
+    run on a clashing change, so the few that do run pass and made it look ready (2026-10-12).
+    """
+    if is_draft:
+        return "a draft, not finished"
+    if mergeable == "CONFLICTING":
+        return "clashes with work saved since"
+    checks = [c.get("conclusion") or c.get("state") or "" for c in (rollup or [])]
+    if not checks or all(c == "" for c in checks):
+        return "still being checked"
+    if any(c in ("FAILURE", "CANCELLED", "TIMED_OUT") for c in checks):
+        return "a check says something is wrong"
+    if all(c in ("SUCCESS", "NEUTRAL", "SKIPPED") for c in checks):
+        return "checked and ready"
+    return "still being checked"
+
+
 def open_proposals(slug):
     """Pull requests waiting for a person, with their checks in plain words."""
     rows = _gh_json(["pr", "list", "-R", slug, "--state", "open", "--limit", "50",
-                     "--json", "number,title,url,createdAt,statusCheckRollup,isDraft"]) or []
+                     "--json", "number,title,url,createdAt,statusCheckRollup,isDraft,mergeable"]) or []
     out = []
     for p in rows:
-        checks = [c.get("conclusion") or c.get("state") or "" for c in
-                  (p.get("statusCheckRollup") or [])]
-        if not checks or all(c == "" for c in checks):
-            state = "still being checked"
-        elif any(c in ("FAILURE", "CANCELLED", "TIMED_OUT") for c in checks):
-            state = "a check says something is wrong"
-        elif all(c in ("SUCCESS", "NEUTRAL", "SKIPPED") for c in checks):
-            state = "checked and ready"
-        else:
-            state = "still being checked"
+        mergeable = p.get("mergeable")
+        # A list often answers UNKNOWN until someone opens the proposal; asking for it starts the
+        # check, so ask again for any that would otherwise be offered a yes.
+        for _ in range(3):
+            if mergeable != "UNKNOWN" or proposal_state(p.get("statusCheckRollup"), None, p.get("isDraft")) != "checked and ready":
+                break
+            time.sleep(2)
+            mergeable = (_gh_json(["pr", "view", str(p["number"]), "-R", slug, "--json", "mergeable"]) or {}).get("mergeable")
         out.append({"number": p["number"], "title": p["title"], "url": p["url"],
                     "since": (p.get("createdAt") or "")[:10],
-                    "state": "a draft, not finished" if p.get("isDraft") else state})
+                    "state": proposal_state(p.get("statusCheckRollup"), mergeable, p.get("isDraft"))})
     return out
 
 

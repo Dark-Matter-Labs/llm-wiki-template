@@ -170,7 +170,7 @@ const NAME = __NAME__;
 const BUILT = __BUILT__;
 const KIND = {proposal:"A change ready for you",contradiction:"A decision",stand_behind:"Stand behind a page",
   broken:"Something is broken",waits:"Waiting on someone",questions:"Open questions",
-  quotes:"A check",overview:"Your overview",never_proposed:"Unsaved work",suggestion:"A suggestion"};
+  quotes:"A check",overview:"Your overview",never_proposed:"Unsaved work",clash:"Needs updating first",suggestion:"A suggestion"};
 const GROUPS = [["yes","Say yes"],["concern","Concerns"],["todo","To do"]];
 // The modules, in their default order. size: how wide on a big screen. tab: where it sits on a phone.
 const MODULES = [
@@ -213,7 +213,7 @@ function act(item, card){
     s.append(el("div", "kind", "A change ready for you"), h, el("span", "check", "✓ CHECKS PASSED"), el("p", null, item.title), el("p", null, item.why));
     const row = el("div", "row"), no = el("button", "ghost", "Not yet"); no.onclick = closeSheet;
     row.append(link(a.target, "Open it on GitHub", "primary"), no); s.append(row);
-    s.append(el("p", "howto", "GitHub opens the proposed change. Sign in if it asks, then press the green button at the bottom to save it into your wiki."));
+    s.append(el("p", "howto", "GitHub opens the proposed change. Sign in if it asks, scroll down to the green “Merge pull request” button and press it, then press “Confirm merge”. That saves it into your wiki."));
   });
   else if (a.type === "decide") openSheet(s => {
     const h = el("h3", null, "Which one wins?"); h.id = "sh";

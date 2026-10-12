@@ -38,10 +38,10 @@ HERE = pathlib.Path(__file__).resolve().parent
 OVERVIEW_BEHIND = 5        # fewer new pages than this is not yet worth a person's time
 ORDER = {"proposal": 0, "contradiction": 1, "stand_behind": 2,           # say yes
          "broken": 3, "waits": 4, "questions": 5,                            # concerns
-         "quotes": 6, "overview": 7, "never_proposed": 8, "suggestion": 9}   # to do
+         "clash": 6, "quotes": 7, "overview": 8, "never_proposed": 9, "suggestion": 10}   # to do
 GROUP = {"proposal": "yes", "contradiction": "yes", "stand_behind": "yes",
          "broken": "concern", "waits": "concern", "questions": "concern",
-         "quotes": "todo", "overview": "todo", "never_proposed": "todo", "suggestion": "todo"}
+         "clash": "todo", "quotes": "todo", "overview": "todo", "never_proposed": "todo", "suggestion": "todo"}
 
 
 def _n(count: int, one: str, many: str) -> str:
@@ -102,6 +102,13 @@ def _proposal(p: dict) -> dict | None:
         return None
     if state == "checked and ready":
         action = {"type": "yes", "label": "Save it into your wiki", "target": p.get("url")}
+    elif state.startswith("clashes"):
+        # GitHub cannot save it as it stands, so a yes would lead to a greyed-out button.
+        return {"kind": "clash", "ref": p.get("number"), "title": p.get("title", "A proposed change"),
+                "why": "It clashes with work saved since it was written, so it can't be saved as it is.",
+                "action": {"type": "ask", "label": "Bring it up to date",
+                           "say": f"My proposed change “{p.get('title', '')}” (#{p.get('number')}) clashes with work "
+                                  "saved since. Bring it up to date so I can save it, and tell me if anything needs my decision."}}
     elif state.startswith("a check says"):
         action = {"type": "look", "label": "Look first: a check found a problem", "target": p.get("url")}
     else:
