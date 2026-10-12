@@ -28,6 +28,13 @@ permissions:
   # empty and empty looked like "none have ever been proposed". The tool now refuses to
   # produce that list at all when it cannot ask — but the permission is the actual fix.
   pull-requests: read
+  # And whether each proposal's checks passed. GitHub answers that only with all three of
+  # these; without them it refuses the whole lookup, and in a week when a proposal is open the
+  # report would say it could not ask. Found 2026-10-12 by the Needs-you list, which runs the
+  # same tool and silently showed no proposals until these were granted.
+  checks: read
+  statuses: read
+  actions: read
 
 concurrency:
   group: waiting
