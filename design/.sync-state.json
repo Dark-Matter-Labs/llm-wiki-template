@@ -45,7 +45,7 @@
     "tools/test_export.py": "9b39845b2c8c64ab2bb8e9967ebbda736aa94dc54ee71957dc2c558b9944de1c",
     "tools/audit_design.py": "5c3fb4bd267825521d987b7242ad96ad4798bbdc3c783ed013908396ce154c48",
     "tools/check_log_shape.py": "876415fb8b56e3cf3fb0e1a6f60e39ccda8eb5e670ebca5bef01cec69a2df6c7",
-    "tools/sync_log_index.py": "0dc2a98e918078a9b344e589da99ce304fc247a5e6e7d7b2d74832376dd53637",
+    "tools/sync_log_index.py": "fc415bcdc4c9f6791324c49079e53dab6b4548cef98408e6b1a93b8d32dd6702",
     ".claude/skills/gravity/compute_gravity.py": "7180939228b4acf17a0f307bd55f25afe00e0b59389095e094319e0431513fdb",
     "tools/scan_public_leaks.py": "6bbc04cb5c458a3fc8c3698193c2c8a8de424bdb98a00e501ad03b38c6d6a7f0",
     ".claude/skills/brief/SKILL.md": "cfe98e13ed5cc4b5469a2f05f7052921e7e0ab1b24649b0534acecfb84a28b0e",
