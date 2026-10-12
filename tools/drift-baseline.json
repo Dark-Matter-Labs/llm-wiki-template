@@ -24,9 +24,9 @@
     },
     {
       "path": ".claude/skills/publish-web/SKILL.md",
-      "repos": 9,
-      "versions": 6,
-      "reason": "BY ROLE \u2014 a publishing surface, not a discipline."
+      "repos": 23,
+      "versions": 7,
+      "reason": "BY ROLE \u2014 a publishing surface, not a discipline. SEVENTH VARIANT READ 2026-10-12, count 6 -> 7. prateek-llm-wiki opens the skill with his own house-style note (rule 30, 2026-10-11: house style is an ongoing project, a designer will build it). indy-llm-wiki's copy took in the xCO Polyphonic Communication Style Guide v8.1 (#616, 2026-10-06), which must not travel to the Dm wikis. Both are deliberately local."
     },
     {
       "path": "design/social-card.json",
@@ -37,15 +37,15 @@
     },
     {
       "path": ".claude/skills/crm/SKILL.md",
-      "repos": 9,
+      "repos": 22,
       "versions": 4,
-      "reason": "DELIBERATELY PERSONAL \u2014 the CRM must never reach a commons, and shipping the skill invites the pages."
+      "reason": "DELIBERATELY PERSONAL \u2014 the CRM must never reach a commons, and shipping the skill invites the pages. RE-READ 2026-10-12. A fifth variant appeared when ocean-studio-wiki was created from an older template copy. Reconciled the same day: every commons now carries the same not-used note (ocean-studio-wiki#217, learning-system-wiki#132), so the count is back to 4."
     },
     {
       "path": ".github/workflows/checks.yml",
-      "repos": 22,
-      "versions": 5,
-      "reason": "BY ROLE \u2014 the gate set is not the same in every wiki, because the tools are not. This repo runs check_sources.py and sync_index_counts.py, which most wikis do not have. The one part that WAS shared drift \u2014 a hand-kept list of test files that covered 8 of 17 suites \u2014 was fixed on 2026-09-04 by making the step discover tools/test_*.py. What remains is each repo's own gates. FIFTH VARIANT READ 2026-09-25, count 4 -> 5 across 22 repos. It is the six commons set up 22-24 Sept (rz-commons, dm-llm-wiki, mission-pathways-wiki, people-hosts-wiki, hm-consciousness-lab-wiki, bioregional-finance-wiki), byte-identical to each other. Written by the 2026-09-23 'this commons finishes its setup' sync and copied at onboarding into the last two. It is the spoke-standard file plus one step, check_no_private.py, the commons-only warning. power-project-wiki runs the same step; its file and these six contain exactly the same run: commands. The only differences are where the step sits (after house_rules here, after cross_check there) and its comment, which here is xco-team-wiki's wording word for word. So this is a role difference with a cosmetic split, not a stray copy. Not reconciled: every repo involved is a commons, so closing the gap is a PR someone else merges. Adopting this layout in power-project-wiki, or power-project's in the six, would take it back to 4."
+      "repos": 23,
+      "versions": 7,
+      "reason": "BY ROLE \u2014 the gate set is not the same in every wiki, because the tools are not. This repo runs check_sources.py and sync_index_counts.py, which most wikis do not have. The one part that WAS shared drift \u2014 a hand-kept list of test files that covered 8 of 17 suites \u2014 was fixed on 2026-09-04 by making the step discover tools/test_*.py. What remains is each repo's own gates. FIFTH VARIANT READ 2026-09-25, count 4 -> 5 across 22 repos. It is the six commons set up 22-24 Sept (rz-commons, dm-llm-wiki, mission-pathways-wiki, people-hosts-wiki, hm-consciousness-lab-wiki, bioregional-finance-wiki), byte-identical to each other. Written by the 2026-09-23 'this commons finishes its setup' sync and copied at onboarding into the last two. It is the spoke-standard file plus one step, check_no_private.py, the commons-only warning. power-project-wiki runs the same step; its file and these six contain exactly the same run: commands. The only differences are where the step sits (after house_rules here, after cross_check there) and its comment, which here is xco-team-wiki's wording word for word. So this is a role difference with a cosmetic split, not a stray copy. Not reconciled: every repo involved is a commons, so closing the gap is a PR someone else merges. Adopting this layout in power-project-wiki, or power-project's in the six, would take it back to 4. SIXTH AND SEVENTH VARIANTS READ 2026-10-12, count 5 -> 7 across 23 repos. robyn-llm-wiki adds one step, name_check.py, for Robyn's name corrections (2026-10-04). people-hosts-wiki adds five People Circle gates: law sources, case shape, no names above private, private reflections, and the DPIA hold (Iyana's answers, 2026-10-07). Both are their own tools, so BY ROLE holds. An eighth variant, ocean-studio-wiki's, was the commons file in a different order and was reconciled to the commons standard the same day (ocean-studio-wiki#217)."
     },
     {
       "path": ".github/workflows/export-shared.yml",
@@ -126,6 +126,27 @@
       "repos": 3,
       "versions": 2,
       "reason": "Robyn's wiki adds a two-way Apps Script bridge to Google Sheets (2026-09-25); xco-team-wiki and learning-system-wiki keep the read-only version. Recorded 2026-10-06, pending Robyn's decision on the bridge. Fold back to one version once it is settled."
+    },
+    {
+      "path": "design/tags.json",
+      "repos": 2,
+      "versions": 2,
+      "per_repo": true,
+      "reason": "CORRECT AND PERMANENT, PER REPO. Each owner's own decisions about which tags tag_report.py must never propose merging. Indy's (2026-09-29) keeps capital and capitals apart; Prateek's (2026-10-11) keeps six groups apart, among them the two Hindu Kush Himalaya spellings. One variant per wiki is the designed state. Read 2026-10-12."
+    },
+    {
+      "path": "design/prose-names.json",
+      "repos": 2,
+      "versions": 2,
+      "per_repo": true,
+      "reason": "CORRECT AND PERMANENT, PER REPO. The names a wiki has ruled may carry a long dash, which that wiki's prose check reads as names rather than sentences (prateek-llm-wiki#229, 2026-10-11). ocean-studio-wiki's list adds Seascaping BANOS after its rename on 2026-10-12. Each list is that wiki's own ruling. Read 2026-10-12."
+    },
+    {
+      "path": "tools/sources-baseline.json",
+      "repos": 23,
+      "versions": 23,
+      "per_repo": true,
+      "reason": "CORRECT AND PERMANENT, PER REPO. Each wiki's record of the sources its pages cite that are not in its own raw/ on the curator's machine. check_sources.py joined the shared layer on 2026-10-12; the list it checks against is that wiki's alone."
     }
   ],
   "_ratchet": "`versions` is the number of variants somebody REVIEWED. --check fails if a path gains one, so recording a path mutes it at a level rather than forever. Entries with \"per_repo\": true are exempt: one variant per repo is their designed state, so the count rises whenever a wiki joins and gating on it would fail every onboarding."

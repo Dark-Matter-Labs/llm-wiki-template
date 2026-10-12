@@ -28,8 +28,8 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "1caa1a56d1c1d1a678e11d5f32ed3db26ceca59862e74c6651f6197a2cda9e1d",
     "tools/test_sync_commons.py": "39fb5e7f459132381c2ce0fda3087df443873cb98a55c2fd8253c466e8fd9a94",
-    "design/shared-layer.json": "5fd18f61559806056190949bda27ebd18231ca2bcb0fa36491ba0816d292f3cf",
-    "tools/drift-baseline.json": "9983f5537730a6a18955251431dd78e0e04af411f0a35e55b34b4f46acb02410",
+    "design/shared-layer.json": "0e7ad02ebf9802b3f47daac002b3f483bb4dabd86ada77af85231be265e5427b",
+    "tools/drift-baseline.json": "ba4bbdf1dbb23d3d3d147f7918beead2a4f7866d494903c1c6248195dbb7742f",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
     ".claude/skills/metacognition/SKILL.md": "20d721351217dacf24b36b7c2c26fcaf52e8a99f7a3bd39b5a3c4fd14dd75f26",
@@ -50,7 +50,7 @@
     "tools/scan_public_leaks.py": "6bbc04cb5c458a3fc8c3698193c2c8a8de424bdb98a00e501ad03b38c6d6a7f0",
     ".claude/skills/brief/SKILL.md": "cfe98e13ed5cc4b5469a2f05f7052921e7e0ab1b24649b0534acecfb84a28b0e",
     ".claude/skills/ingest/SKILL.md": "f484609246a9b00b3e2e8f7f22db1a94e29f336f6c77a92c8c2a66965d9c3542",
-    ".claude/skills/lint/SKILL.md": "ac9941687cc06201b77310bdcaf2db9f88530ea8a5c7d0a1c47d1b143aa2767b",
+    ".claude/skills/lint/SKILL.md": "806b7efbde089fb0357f3fe2d21eb284ca9880cab011b7bf5bc7e61ce6581939",
     ".claude/skills/publish-check/SKILL.md": "14929a1731511b9cca2bab36799bdddf031710e16b0b205128f833976f10130c",
     ".claude/skills/query/SKILL.md": "0fbf0bdb1b85b9ec0f4721ba253c990c206025ba761548d5de3a9db899b37326",
     ".claude/skills/delta/SKILL.md": "0d6a1b83c13a9576c4ad9f741bad3fc1ca220bddf9cbdad08649bb4ffe70e98c",
@@ -145,7 +145,9 @@
     ".claude/skills/dm-style-guide/references/writing-principles.md": "64aab184d6a6a82a1e198ec5b1bd2f4eef8a6612bf58b617e439b2824c0d5891",
     ".claude/skills/dm-style-guide/scripts/mechanical_check.py": "ff075302896c86233be06fbb231e70e7f8b539afc44001d510a982da3c301737",
     ".claude/skills/dm-style-guide/scripts/risk_assessment.py": "42b2534b595537c19b1c32f0bb06eb7722ddf2ae4c30529767e7674bb8be2621",
-    ".claude/rules/plain-register.md": "a09df147062740cd085983c8498c4a57ce53603ad480003b9f09071d3113a85e"
+    ".claude/rules/plain-register.md": "a09df147062740cd085983c8498c4a57ce53603ad480003b9f09071d3113a85e",
+    "tools/check_sources.py": "d96b9fb7858da85ea0ee3bf6888554383ad9ecdcd28ed6bfbb62952119ba2e30",
+    "tools/test_check_sources.py": "f02bcb45bd63abb7daa02b9f999aa3842ee274fa1784ccebd54ce0be7657b079"
   },
   "adapted": {
     "design/xco.tokens.json": {
