@@ -81,6 +81,10 @@ URL = re.compile(r"https?://\S+")
 #
 # Two spans are protected: a whole `sources:` line, and any `(raw/…)` inline citation.
 SOURCES_LINE = re.compile(r"^\s*sources:", re.I)
+# A `tags:` line is labels, and labels stay lowercase like slugs (CLAUDE.md: "only prose is
+# corrected"). Added 2026-10-12, when two pages tagged with a bare lowercase xco turned
+# prateek-llm-wiki's main copy red. Titles and descriptions are still checked.
+TAGS_LINE = re.compile(r"^\s*tags:\s*\[", re.I)
 # One level of nesting, because the filenames carry parentheses. Without it the span ends at
 # the first ")" INSIDE the name and everything after it is left unprotected — which is the
 # 2026-08 defect above waiting to happen again, one bracket further along the path.
@@ -131,7 +135,7 @@ def scan_text(text, fix=False):
                 lines[i - 1] = _fix_links_only(line)
             continue
         # A `sources:` line is entirely paths into an immutable directory. Never ours.
-        if SOURCES_LINE.match(line):
+        if SOURCES_LINE.match(line) or TAGS_LINE.match(line):
             continue
 
         # Blank out URLs and raw/ citations for detection so neither trips a rule.
