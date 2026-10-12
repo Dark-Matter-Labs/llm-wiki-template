@@ -26,6 +26,12 @@ W = "XCO"          # the WRONG casing, built from code points so that
 w = "civilis"   # no --fix run can ever rewrite it
 
 CASES = [
+    # --- tags are labels, not prose (2026-10-12) ------------------------------
+    # prateek-llm-wiki tagged two pages with a bare lowercase tag and its main copy went red.
+    # A tag is a label, and labels stay lowercase; the page's title and description still count.
+    (f"tags: [{W.lower()}, position, option]", False, f"tags: [{W.lower()}, position, option]"),
+    (f"  tags: [portfolio, {W.lower()}]",     False, f"  tags: [portfolio, {W.lower()}]"),
+    (f"title: The {W} portfolio",             True,  "title: The xCO portfolio"),
     # --- rule 2: casing that must be corrected ------------------------------
     (f"Built with {W}.",              True,  "Built with xCO."),
     ("ending sentence with " + W.lower(), True, "ending sentence with xCO"),
