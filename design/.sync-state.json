@@ -84,7 +84,7 @@
     "tools/test_check_prose.py": "2a6b26cf288367d701b91d280c792df95a1eba0f7282ee1e58947573d8eab1f6",
     "tools/waiting.py": "76cb8b9d8971c90e344dfba94b77244282dc651e6f916e43dc7ab6a521f31708",
     "tools/test_waiting.py": "23c9d12869652f05201d109e948be9ab08dd8cc0fbae38e1f3ba6ebd2f3f8f26",
-    ".github/workflows/waiting.yml": "91b3a425803b17e5e1c7e71e01142e91e2644ba3d873897b5501ba021b62ee39",
+    ".github/workflows/waiting.yml": "8958077013f005fcb854f75e92e70fe39d513efe0adb7ab9cc5567709d569764",
     ".claude/skills/waiting/SKILL.md": "40bed41c0c628aa374879ce27bc5dc38f0cf00f6a2e7eaf113b3932e56780154",
     "tools/newsletter.py": "6411ad1d54f2c8d133f2c9e6a43b386d2acd7ac6b3cb93a204985a6d8394470e",
     "tools/test_newsletter.py": "e4305353a8ffc445d66331cf9f0d5b458cb309435b4004efad91062ea7060009",
