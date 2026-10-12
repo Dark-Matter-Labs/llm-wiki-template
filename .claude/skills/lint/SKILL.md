@@ -36,7 +36,7 @@ MAY fix frontmatter metadata when the correct value is unambiguous.
    the churn figure is a proxy for meaning, not a measure of it. A small wiki will correctly
    report nothing.
 
-2b. **Cited sources resolve.** *(Where this wiki has `tools/check_sources.py` — it is not yet in every wiki; skip the step and say so if it is absent.)* Run `python3 tools/check_sources.py --report`. It reports
+2b. **Cited sources resolve.** *(In every wiki since 2026-10-12.)* Run `python3 tools/check_sources.py --report`. It reports
    frontmatter `sources:` that do not resolve against the local `raw/` library, split into
    *path drift* (the file exists elsewhere — mechanically fixable, just repoint it) and *absent*.
 
@@ -48,6 +48,8 @@ MAY fix frontmatter metadata when the correct value is unambiguous.
    Absent entries are baselined in `tools/sources-baseline.json`. Some are missing only on this
    machine — the curator holds the authoritative library — so **report them, never delete the
    citation**. An uncheckable citation is a question for a person, not a defect to tidy away.
+   In a commons, expect many absent files: contributed pages cite the contributing wiki's `raw/`,
+   which the commons never held. Its baseline records them; only a new one is worth a question.
 
 3. **Coverage gaps.** Scan pages for things mentioned repeatedly (people, orgs,
    concepts, tools) that lack their own page. List them; don't auto-create.

@@ -140,6 +140,8 @@
     "tools/test_coach.py",
     "tools/source_scan.py",
     "tools/test_source_scan.py",
+    "tools/check_sources.py",
+    "tools/test_check_sources.py",
     "tools/check_history.py",
     "tools/test_check_history.py",
     ".github/workflows/history-guard.yml",

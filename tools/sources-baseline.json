@@ -1,0 +1,5 @@
+{
+  "_comment": "Sources cited in frontmatter that do not resolve against the local raw/ library. Some may exist only on the curator's machine \u2014 raw/ binaries are gitignored by design. A debt register, not an exemption: it must only ever shrink. --check fails on anything not listed here.",
+  "recorded": "2026-10-12",
+  "absent": []
+}
