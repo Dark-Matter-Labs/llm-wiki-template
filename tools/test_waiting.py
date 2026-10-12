@@ -421,6 +421,14 @@ def main():
     check("the report uses no git vocabulary", not leaked, f"leaked: {leaked}")
     check("...and still says what to do", "propose" in text.lower())
 
+    # 8b. A change that clashes with work saved since cannot be saved, whatever its checks say.
+    #     Robyn was offered "yes" on two on 2026-10-12 and found no button to press.
+    ok = [{"conclusion": "SUCCESS"}]
+    check("a clashing change is never called ready, even with its checks passed",
+          W.proposal_state(ok, "CONFLICTING", False) == "clashes with work saved since")
+    check("a mergeable change with its checks passed is ready", W.proposal_state(ok, "MERGEABLE", False) == "checked and ready")
+    check("a draft stays a draft", W.proposal_state(ok, "CONFLICTING", True) == "a draft, not finished")
+
     # 9. A quiet repo reads as quiet, not as broken.
     text = W.render({"repo": "owner/repo", "proposals": [], "never_proposed": []})
     check("nothing waiting is stated plainly", "Nothing is waiting" in text)

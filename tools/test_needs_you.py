@@ -61,6 +61,11 @@ def main():
     check("a change still being checked waits, without a yes",
           [i["action"]["type"] for i in items if i["kind"] == "proposal" and i["ref"] == 4] == ["wait"])
 
+    clash = N.build_items({"proposals": [proposal(5, "clashes with work saved since", title="Wiki lens 2.0")]}, [], [], {}, 0, {})
+    check("a change that clashes is never offered a yes", clash and clash[0]["action"]["type"] != "yes", str(clash))
+    check("...it asks Claude to bring it up to date, naming it",
+          clash and "Wiki lens 2.0" in clash[0]["action"].get("say", "") and clash[0]["group"] == "todo", str(clash))
+
     c = next(i for i in items if i["kind"] == "contradiction")
     check("a contradiction shows both pages with what each says, and asks which wins",
           c["action"]["type"] == "decide" and "Bollier" in c["action"]["pages"][0]["says"]

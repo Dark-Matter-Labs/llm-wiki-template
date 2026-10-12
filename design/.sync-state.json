@@ -82,8 +82,8 @@
     ".claude/skills/dm-style-guide/SKILL.md": "8ca3a7b82bc4054688362e43d1abd318b2edf03a2f040740450ee9bcffd630d0",
     "tools/check_prose.py": "4cacb3f344c376b9dfa978e027165ac3b9c7cda2258dc871498500a6e1d2f90e",
     "tools/test_check_prose.py": "2a6b26cf288367d701b91d280c792df95a1eba0f7282ee1e58947573d8eab1f6",
-    "tools/waiting.py": "76cb8b9d8971c90e344dfba94b77244282dc651e6f916e43dc7ab6a521f31708",
-    "tools/test_waiting.py": "23c9d12869652f05201d109e948be9ab08dd8cc0fbae38e1f3ba6ebd2f3f8f26",
+    "tools/waiting.py": "7e69bd88f5d1b6e427feb4ebb3631341802a7e9d460ea82a25bee89dc6f8b875",
+    "tools/test_waiting.py": "5212aea15305e19b21c9258a04245dcf2daaddcd739a98531a65e6bed08d8535",
     ".github/workflows/waiting.yml": "8958077013f005fcb854f75e92e70fe39d513efe0adb7ab9cc5567709d569764",
     ".claude/skills/waiting/SKILL.md": "40bed41c0c628aa374879ce27bc5dc38f0cf00f6a2e7eaf113b3932e56780154",
     "tools/newsletter.py": "6411ad1d54f2c8d133f2c9e6a43b386d2acd7ac6b3cb93a204985a6d8394470e",
@@ -148,8 +148,8 @@
     ".claude/rules/plain-register.md": "a09df147062740cd085983c8498c4a57ce53603ad480003b9f09071d3113a85e",
     "tools/check_sources.py": "507e133617bddfff033a0e5efd9ea4646e6a198fc35844b1b1316aef1f2de4fa",
     "tools/test_check_sources.py": "eb7291bd7551b2ce1b50e154dff80218e603755949427fdb3617e954b39356f1",
-    "tools/needs_you.py": "2f3d29e8e49bc8ec0273dad37b9b943bbddefaae9ab660a1f8449747bb10cd00",
-    "tools/test_needs_you.py": "18015f3bba1959f6ef00a79b63ed376df5413aafa263eccfc88938599a76c512",
+    "tools/needs_you.py": "0e6ce015a40f7efeeae7a8356732f156f030769b37e3ee423a6c0babd1cc274d",
+    "tools/test_needs_you.py": "882ea6dd4fc32ba4ebd1cfb382bd96449b8409b8f40190bb95a146e0a798157e",
     "tools/skill_menu.py": "32d7b1582477ccd24ffffe0e4a8e804d8a95c1583999ea9526cb1928a2d0e92b",
     "tools/test_skill_menu.py": "d584a09ba9c4551e41bfd20c41ed48ac27971adbd48b43a8cecdbf86fe6434b3",
     "tools/view_modules.py": "8d42eefdd55a24f50a9f7ba9025b9bd641e2e631ec946475b1cc1db3bb890dd0",
@@ -157,7 +157,7 @@
     "tools/build_needs_you_page.py": "f912c84dafc286957ae448f33e8d0b7a0518312632cf953029277d40bdc8c975",
     "tools/test_build_needs_you_page.py": "d3c2e258570a1ec16b4845346ad75355c4db8656c97324440d013d4290dde772",
     "tools/encrypt_page.mjs": "179508d99b9f8910c3f9086c213bc1a043c12fbdbe57748d744401ba0987905b",
-    "tools/templates/needs_you_page.html": "849bc34d7dccb12c429aa80098dcfd03c0af530123a2bae20c4103ab7c906c60"
+    "tools/templates/needs_you_page.html": "645d7a463664a80878caa14da430a3f420e3ddebcf621308a4c34a7e90cb47ab"
   },
   "adapted": {
     "design/xco.tokens.json": {
