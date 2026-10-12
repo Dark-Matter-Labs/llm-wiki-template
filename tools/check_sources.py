@@ -74,6 +74,7 @@ import json
 import pathlib
 import re
 import sys
+import unicodedata
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 WIKI = ROOT / "wiki"
@@ -123,14 +124,30 @@ def declared_sources(text: str) -> "list[str]":
     return [s for s in items if s.startswith("raw/")]
 
 
+def same_path(path: str) -> str:
+    """A path as a reader sees it: any kind of space is a space, and an accented letter has one spelling.
+
+    Added 2026-10-12. A folder in indy-llm-wiki's raw/ has a non-breaking space after a dash, and
+    five pages cite it with an ordinary one. The citations were right; the folder name carries an
+    invisible quirk, and raw/ is never renamed. Asking pages to copy an invisible character would
+    make them worse, so the comparison ignores it instead.
+    """
+    return re.sub(r"[  -​  　]", " ", unicodedata.normalize("NFC", path))
+
+
+def raw_paths() -> "set[str]":
+    return {same_path(f.relative_to(ROOT).as_posix()) for f in RAW.rglob("*") if f.is_file()} if RAW.is_dir() else set()
+
+
 def audit() -> dict:
     """Every declared source, classified. `drift` is mechanically fixable; `absent` is not."""
     base = by_basename()
+    present = raw_paths()
     ok, drift, absent = 0, [], []
     for p in pages():
         rel = p.relative_to(ROOT).as_posix()
         for s in declared_sources(p.read_text(encoding="utf-8")):
-            if (ROOT / s).exists():
+            if (ROOT / s).exists() or same_path(s) in present:
                 ok += 1
             elif base.get(s.split("/")[-1]):
                 drift.append({"page": rel, "cited": s, "found_at": base[s.split("/")[-1]][0]})

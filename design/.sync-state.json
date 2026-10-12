@@ -146,8 +146,8 @@
     ".claude/skills/dm-style-guide/scripts/mechanical_check.py": "ff075302896c86233be06fbb231e70e7f8b539afc44001d510a982da3c301737",
     ".claude/skills/dm-style-guide/scripts/risk_assessment.py": "42b2534b595537c19b1c32f0bb06eb7722ddf2ae4c30529767e7674bb8be2621",
     ".claude/rules/plain-register.md": "a09df147062740cd085983c8498c4a57ce53603ad480003b9f09071d3113a85e",
-    "tools/check_sources.py": "d96b9fb7858da85ea0ee3bf6888554383ad9ecdcd28ed6bfbb62952119ba2e30",
-    "tools/test_check_sources.py": "f02bcb45bd63abb7daa02b9f999aa3842ee274fa1784ccebd54ce0be7657b079"
+    "tools/check_sources.py": "507e133617bddfff033a0e5efd9ea4646e6a198fc35844b1b1316aef1f2de4fa",
+    "tools/test_check_sources.py": "eb7291bd7551b2ce1b50e154dff80218e603755949427fdb3617e954b39356f1"
   },
   "adapted": {
     "design/xco.tokens.json": {

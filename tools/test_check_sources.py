@@ -65,6 +65,22 @@ def main():
               and json.loads(check_sources.BASELINE.read_text())["absent"] == ["raw/gone.pdf"])
         check("--check passes once it is recorded", check_sources.main(["--check"]) == 0)
 
+    # Found 2026-10-12 in indy-llm-wiki: a folder in raw/ carries a non-breaking space after a
+    # dash, and five pages cite it with an ordinary space. The citation is right; the folder name
+    # has an invisible quirk, and raw/ is never renamed. Spaces of either kind, and the two
+    # Unicode spellings of one accented letter, are the same path to a reader.
+    with tempfile.TemporaryDirectory() as d:
+        root = pathlib.Path(d)
+        (root / "wiki").mkdir()
+        (root / "raw" / "Proposal – Indy, Kirsten").mkdir(parents=True)
+        (root / "raw" / "Proposal – Indy, Kirsten" / "doc.pdf").write_text("x")
+        (root / "raw" / "Café notes.md").write_text("x")
+        (root / "wiki" / "p.md").write_text(page('sources: ["raw/Proposal – Indy, Kirsten/doc.pdf", "raw/Café notes.md"]'))
+        check_sources.ROOT, check_sources.WIKI, check_sources.RAW = root, root / "wiki", root / "raw"
+        r = check_sources.audit()
+        check("a citation differing only by an invisible space or an accent's spelling resolves",
+              r["ok"] == 2 and not r["drift"] and not r["absent"], str(r))
+
     print()
     if FAILED:
         print(f"{len(FAILED)} FAILED")
