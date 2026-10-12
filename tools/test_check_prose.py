@@ -22,6 +22,14 @@ import check_prose as C  # noqa: E402
 HERE = pathlib.Path(__file__).resolve().parent
 
 
+def offenders(out: str) -> str:
+    """The lines of a --check run that say which file rose and by what, joined onto one line."""
+    lines = [ln.strip() for ln in out.splitlines()]
+    named = [ln for ln in lines
+             if ln.startswith(("ROSE ", "NEW ")) or re.fullmatch(r"\w+: \d+ -> \d+", ln)]
+    return "; ".join(named) or next((ln for ln in reversed(lines) if ln), "")
+
+
 def main():
     fails = []
 
@@ -225,7 +233,21 @@ def main():
     r = subprocess.run([sys.executable, str(HERE / "check_prose.py"), "--check"],
                        capture_output=True, text=True)
     check("--check passes on this repo as it stands", r.returncode == 0,
-          (r.stdout or "").strip().splitlines()[-1:] or "")
+          offenders(r.stdout or ""))
+
+    # The failure message must name the file. It used to print --check's last line, which is
+    # the generic --update-baseline hint, so a draft log entry with one banned word in it read
+    # as "the prose test fails on main". Added 2026-10-08, after that misreading in
+    # bioregional-finance-wiki.
+    sample = ("prose — 2 file(s) carry findings: words 1 · phrases 0 · xnoty 0 · emdash 3\n\n"
+              "  ROSE  wiki/a.md\n          emdash: 2 -> 3\n"
+              "  NEW   wiki/log/2026-10-08.md  words 1\n\n"
+              "  New prose is meant to be clean. If this is recovered or imported work, record it\n"
+              "  with `--update-baseline --reason '...'` so the debt is visible and attributed.\n")
+    check("a failing --check names what rose, not the hint",
+          offenders(sample) == "ROSE  wiki/a.md; emdash: 2 -> 3; "
+                               "NEW   wiki/log/2026-10-08.md  words 1",
+          repr(offenders(sample)))
 
     r = subprocess.run([sys.executable, str(HERE / "check_prose.py")],
                        capture_output=True, text=True)

@@ -173,3 +173,9 @@ jobs:
 
       - name: Sensitive-terms scan on public surfaces
         run: python3 tools/scan_public_leaks.py
+
+      - name: No credentials or readers' personal links in the wiki
+        # Keys, signed tokens and email links written for one reader, in raw/, wiki/ and docs/.
+        # Added 2026-10-12 after a Substack email's reader tokens reached prateek-llm-wiki.
+        # The report never prints a value. No untrusted input.
+        run: python3 tools/source_scan.py --secrets --check
