@@ -128,6 +128,19 @@ def main():
     check("no item names who wrote anything", not any("author" in i or "by" in i for i in items))
     check("every item has exactly one action", all(isinstance(i.get("action"), dict) for i in items))
 
+    fu = N.build_items(waiting={}, coach=[], contradictions=[], overview={}, quotes_not_in_source=0,
+                               descriptions={}, followups={"overdue": 2, "due_soon": 1, "no_next_step": 5,
+                                                           "gone_quiet": 0, "cards": 9})
+    card = [i for i in fu if i["kind"] == "followups"]
+    check("follow-ups appear as a count, with the overdue number",
+          len(card) == 1 and card[0]["title"] == "3 follow-ups are due this week, 2 of them overdue", str(card))
+    check("a follow-up card hands off to Claude rather than naming anyone",
+          card and card[0]["action"]["say"] == "What follow-ups are due?")
+    none = N.build_items(waiting={}, coach=[], contradictions=[], overview={}, quotes_not_in_source=0,
+                                 descriptions={}, followups={"overdue": 0, "due_soon": 0, "no_next_step": 0,
+                                                             "gone_quiet": 0, "cards": 3})
+    check("nothing due means no follow-up card", not [i for i in none if i["kind"] == "followups"])
+
     print()
     if FAILED:
         print(f"{len(FAILED)} FAILED")

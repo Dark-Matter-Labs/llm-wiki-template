@@ -251,8 +251,9 @@ def suggestions(root=ROOT, today=None, limit=3):
                    if f not in body and pathlib.Path(f).stem not in body]
         if unfiled:
             add("unfiled-sources", 80,
-                f"{len(unfiled)} document(s) you added haven't been filed into the wiki yet, so questions "
-                "can't draw on them.",
+                (f"{len(unfiled)} documents you added haven't" if len(unfiled) > 1
+                 else "1 document you added hasn't") + " been filed into the wiki yet, so questions "
+                "can't draw on " + ("them." if len(unfiled) > 1 else "it."),
                 "Ingest the documents that haven't been filed yet.",
                 "Files in raw/ that no page cites.", count=len(unfiled))
 

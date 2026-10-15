@@ -128,6 +128,23 @@ Keep the interaction log append-only and dated (newest at top or bottom, but be 
   the relevant calendar) to find work meetings, **filter out personal/family events**, and propose
   interaction log entries + new contact cards for external attendees — The owner approves each.
 
+## Follow-ups and logging (tools/crm.py)
+
+- **Log in one sentence.** When the person says something like "Met Ana today, she'll intro us to
+  the water utility, follow up Friday", find the card (create it first if needed) and run:
+
+      python3 tools/crm.py log <card> --kind meeting --note "what happened" \
+          --next "the next step" --due YYYY-MM-DD --why "the reason"
+
+  It appends the dated line, moves `last_contact` forward only, and sets the next step with its due
+  date (`next_action_due`) and reason. Turn "Friday" into a date and say which date you chose. Set
+  `--stage` or `--owner` only when the person said so. A plan goes in `--next`, never in the log.
+- **What's due.** On "what follow-ups are due", or in a weekly review, run `python3 tools/crm.py due`:
+  overdue first, then due this week, then open relationships with no next step. Offer one move for
+  each. The Needs-you page shows the counts only; names stay in the wiki.
+- **Find leads.** For new organisations worth approaching, use the `leads` skill. A card is created
+  only on a yes.
+
 ## Bookkeeping
 - Update `wiki/crm/roster.md` (the private catalogue) when you add a contact/account.
 - Append to the current month's log file (`wiki/log/YYYY-MM.md`; see `wiki/log.md`): `## [YYYY-MM-DD] crm | <what changed>` (e.g. "logged 2 meetings, +1 contact").
