@@ -162,7 +162,7 @@ def discover(wiki_dir):
             if not fn.endswith(".md"):
                 continue
             path = os.path.join(root, fn)
-            rel = os.path.relpath(path, wiki_dir)
+            rel = os.path.relpath(path, wiki_dir).replace(os.sep, "/")  # the same on Windows (from prateek-llm-wiki)
             slug = rel[:-3]  # drop .md; keeps subdir, e.g. "examples/greenline-summary"
             with open(path, encoding="utf-8") as fh:
                 fm, body = split_frontmatter(fh.read())

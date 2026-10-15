@@ -27,7 +27,7 @@ markdown pages that sits between the owner and their raw sources.
 
 - **It is connected to `xco-team-wiki`.** Yes — the connection is real and it runs in both directions.
 - **Up:** when the owner says *"share this with the team"*, the `contribute` skill stages a sanitised, provenance-stamped bundle and opens a pull request against it. It never pushes. A `private` page is refused outright.
-- **Down:** every day, its shared cut is cloned from `xco-team-wiki` into `.commons/<name>/` so this wiki can read what the group knows. If `.commons/` is empty, run `python3 tools/sync_commons.py` — the cache is gitignored, so a fresh checkout has none and the tools that depend on it will look broken until it is filled.
+- **Down:** every Monday morning, its shared cut is cloned from `xco-team-wiki` into `.commons/<name>/` so this wiki can read what the group knows. If `.commons/` is empty, run `python3 tools/sync_commons.py` — the cache is gitignored, so a fresh checkout has none and the tools that depend on it will look broken until it is filled.
 - **What comes down is not merged.** It is there to be measured against: `delta` reads it, `gravity` reads it, and `contribution_prompt.py` uses it to name pages worth sharing. Nothing from a commons is written into `wiki/` without a person deciding.
 
 ### Retrieval order — search, then graph, then read
