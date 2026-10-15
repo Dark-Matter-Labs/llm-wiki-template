@@ -185,6 +185,9 @@
     "tools/test_build_needs_you_page.py",
     "tools/encrypt_page.mjs",
     "tools/templates/needs_you_page.html",
+    "tools/crm.py",
+    "tools/test_crm.py",
+    ".claude/skills/leads/SKILL.md",
     "docs/assets/xco2.css",
     "docs/assets/xco.css",
     "docs/assets/xco-dusk.css"

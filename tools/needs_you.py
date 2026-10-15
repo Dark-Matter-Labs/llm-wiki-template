@@ -38,10 +38,10 @@ HERE = pathlib.Path(__file__).resolve().parent
 OVERVIEW_BEHIND = 5        # fewer new pages than this is not yet worth a person's time
 ORDER = {"proposal": 0, "contradiction": 1, "stand_behind": 2,           # say yes
          "broken": 3, "waits": 4, "questions": 5,                            # concerns
-         "clash": 6, "quotes": 7, "overview": 8, "never_proposed": 9, "suggestion": 10}   # to do
+         "clash": 6, "followups": 6.5, "quotes": 7, "overview": 8, "never_proposed": 9, "suggestion": 10}   # to do
 GROUP = {"proposal": "yes", "contradiction": "yes", "stand_behind": "yes",
          "broken": "concern", "waits": "concern", "questions": "concern",
-         "clash": "todo", "quotes": "todo", "overview": "todo", "never_proposed": "todo", "suggestion": "todo"}
+         "clash": "todo", "followups": "todo", "quotes": "todo", "overview": "todo", "never_proposed": "todo", "suggestion": "todo"}
 
 
 def _n(count: int, one: str, many: str) -> str:
@@ -119,10 +119,30 @@ def _proposal(p: dict) -> dict | None:
             "action": action}
 
 
+def _followups(c: dict | None) -> list[dict]:
+    """Counts only, from tools/crm.py counts: this page is published (locked), and a CRM name
+    must never reach it, so the card says how many and the person asks Claude for who."""
+    if not c:
+        return []
+    due = c.get("overdue", 0) + c.get("due_soon", 0)
+    if due:
+        late = f", {c['overdue']} of them overdue" if c.get("overdue") else ""
+        title = f"{_n(due, 'follow-up is', 'follow-ups are')} due this week{late}"
+    elif c.get("no_next_step"):
+        title = f"{_n(c['no_next_step'], 'open relationship has', 'open relationships have')} no next step"
+    else:
+        return []
+    return [{"kind": "followups", "ref": "followups", "title": title,
+             "why": "Names stay in your wiki; this page only counts them.",
+             "action": {"type": "ask", "label": "See who, with Claude", "say": "What follow-ups are due?"}}]
+
+
 def build_items(waiting: dict, coach: list, contradictions: list, overview: dict,
                 quotes_not_in_source: int, descriptions: dict,
-                open_questions: dict | None = None, checks_failing: bool | None = None) -> list[dict]:
+                open_questions: dict | None = None, checks_failing: bool | None = None,
+                followups: dict | None = None) -> list[dict]:
     items: list[dict] = _concerns(open_questions, checks_failing)
+    items += _followups(followups)
     for p in (waiting or {}).get("proposals", []):
         item = _proposal(p)
         if item:
@@ -276,6 +296,7 @@ def gather(root: pathlib.Path, network: bool = True) -> list[dict]:
                        contradictions=_contradictions(root), overview=_overview(root),
                        quotes_not_in_source=missing, descriptions=_descriptions(root),
                        open_questions=_run_json(root, ["tools/open_questions.py", "--json"]) or {},
+                       followups=_run_json(root, ["tools/crm.py", "counts", "--json"]) if (root / "tools" / "crm.py").exists() and (root / "wiki" / "crm").is_dir() else None,
                        checks_failing=_checks_failing(root) if network else None)
 
 
