@@ -179,7 +179,7 @@ def render() -> str:
         L.append(f"- **Up:** when the owner says *\"share this with the team\"*, the `contribute` "
                  f"skill stages a sanitised, provenance-stamped bundle and opens a pull request "
                  f"against {each}. It never pushes. A `private` page is refused outright.")
-        L.append(f"- **Down:** every day, {theirs} shared cut is cloned from {pretty} into "
+        L.append(f"- **Down:** every Monday morning, {theirs} shared cut is cloned from {pretty} into "
                  f"`.commons/<name>/` "
                  f"so this wiki can read what the group knows. If `.commons/` is empty, run "
                  f"`python3 tools/sync_commons.py` — the cache is gitignored, so a fresh checkout "
