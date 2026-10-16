@@ -119,10 +119,43 @@ def pages():
         yield p
 
 
+# Links into another wiki of the federation, such as [[indy:Title]] or [[ocean:Title]], read by the
+# lens (Prateek's lab lens, 16 October 2026). The prefix is the first word of a member wiki's name, which
+# is unique across the federation. A title is checked against that wiki's shared copy when it is cached
+# in .commons/; with no cached copy, the link is taken on trust, because this wiki cannot see it.
+def other_wikis() -> dict:
+    try:
+        d = json.loads((ROOT / "design" / "shared-layer.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    names = [d.get("source", "")] + list(d.get("siblings", [])) + list(d.get("external_members", []))
+    return {n.split("-")[0].lower(): n for n in names if n}
+
+
+def cached_titles(repo: str):
+    path = ROOT / ".commons" / repo / "export" / "wiki.shared.json"
+    try:
+        nodes = json.loads(path.read_text(encoding="utf-8")).get("nodes", [])
+    except (OSError, ValueError):
+        return None
+    return {export._norm_title(n.get("title") or "") for n in nodes}
+
+
+def resolves_elsewhere(target: str, wikis: dict, cache: dict) -> bool:
+    prefix, sep, title = target.partition(":")
+    repo = wikis.get(prefix.strip().lower()) if sep else None
+    if not repo:
+        return False
+    if repo not in cache:
+        cache[repo] = cached_titles(repo)
+    return cache[repo] is None or export._norm_title(title) in cache[repo]
+
+
 def audit() -> "tuple[list[dict], int]":
     """Unresolved links, and the total scanned. Resolution is the exporter's own."""
     nodes, _t2s = export.build_nodes(str(WIKI))
     known = {export._norm_title(n["title"]) for n in nodes.values()}
+    wikis, cache = other_wikis(), {}
 
     broken, total = [], 0
     for p in pages():
@@ -132,7 +165,7 @@ def audit() -> "tuple[list[dict], int]":
         for m in export.WIKILINK_RE.finditer(scan):
             total += 1
             target = export._norm_title(m.group(1))
-            if target in known:
+            if target in known or resolves_elsewhere(target, wikis, cache):
                 continue
             s = max(0, m.start() - 34)
             broken.append({
