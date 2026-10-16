@@ -323,6 +323,9 @@ def build(since: datetime.date, until: datetime.date, audience: str = "internal"
 
     # ── STILL OPEN ──────────────────────────────────────────────────────────────────
     titles = {n["title"]: n for n in pages}
+    import contradictions  # `stands_with` (both stand) is read from the pages, not the export
+    standing = {frozenset((t, str(p["stands_with"]))) for t, p in contradictions.load(str(WIKI)).items()
+                if p.get("stands_with")}
     open_contradictions = []
     for n in pages:
         tgt = n.get("contradicts")
@@ -330,7 +333,7 @@ def build(since: datetime.date, until: datetime.date, audience: str = "internal"
             continue
         other = titles.get(tgt)
         closed = (other and (other.get("superseded_by") or other.get("devalued_by"))) or \
-                 n.get("superseded_by") or n.get("devalued_by")
+                 n.get("superseded_by") or n.get("devalued_by") or frozenset((n["title"], tgt)) in standing
         if not closed:
             open_contradictions.append((name(n), name(other) if other else None))
     goals = [n for n in pages if n.get("type") == "goal"]

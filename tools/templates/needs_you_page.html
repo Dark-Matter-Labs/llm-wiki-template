@@ -216,14 +216,16 @@ function act(item, card){
     s.append(el("p", "howto", "GitHub opens the proposed change. Sign in if it asks, scroll down to the green “Merge pull request” button and press it, then press “Confirm merge”. That saves it into your wiki."));
   });
   else if (a.type === "decide") openSheet(s => {
-    const h = el("h3", null, "Which one wins?"); h.id = "sh";
-    s.append(el("div", "kind", "A decision"), h, el("p", null, "The other page stays readable, with a note pointing to the one that won."));
+    const h = el("h3", null, "Which one wins, or do both stand?"); h.id = "sh";
+    s.append(el("div", "kind", "A decision"), h, el("p", null, "The other page stays readable, with a note pointing to the one that won. If there is no single truth, keep both: each then points to the other."));
     const pair = el("div", "pair"), [p1, p2] = a.pages;
     for (const [pg, other] of [[p1, p2], [p2, p1]]) { const d = el("div"); d.append(el("b", null, pg.title)); if (pg.says) d.append(el("p", null, pg.says));
       const row = el("div", "row"), b = el("button", "primary calm", "This one wins");
       b.onclick = () => handoff("In the disagreement between “" + pg.title + "” and “" + other.title + "”, “" + pg.title + "” wins. Record it on the page that loses.", "A decision");
       row.append(b); if (DATA.links[pg.title]) row.append(link(DATA.links[pg.title], "Read it")); d.append(row); pair.append(d); }
-    const no = el("button", "ghost", "Not yet"); no.onclick = closeSheet; s.append(pair, no);
+    const both = el("button", "ghost", "Both stand");
+    both.onclick = () => handoff("In the disagreement between “" + p1.title + "” and “" + p2.title + "”, there is no single truth: both stand. Record that both views stand.", "A decision");
+    const no = el("button", "ghost", "Not yet"); no.onclick = closeSheet; const end = el("div", "row"); end.append(both, no); s.append(pair, end);
   });
   else if (a.type === "confirm") openSheet(s => {
     const h = el("h3", null, "Do you stand behind this page?"); h.id = "sh";

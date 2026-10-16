@@ -152,9 +152,9 @@ def build_items(waiting: dict, coach: list, contradictions: list, overview: dict
         items.append({
             "kind": "contradiction", "ref": newer,
             "title": f"Two pages disagree: “{newer}” and “{older}”",
-            "why": "They say different things about the same subject. Only a person decides which one wins; "
-                   "the other stays readable, pointing to the winner.",
-            "action": {"type": "decide", "label": "Choose which one wins",
+            "why": "They say different things about the same subject. Only a person decides: one wins, and the other "
+                   "stays readable, pointing to the winner; or both stand, each pointing to the other.",
+            "action": {"type": "decide", "label": "Choose which one wins, or keep both",
                        "pages": [{"title": t, "says": descriptions.get(t, "")} for t in (newer, older)]},
         })
 
