@@ -114,6 +114,35 @@ def main():
             check("a link wrapped across a newline resolves",
                   targets_reported(t, "See [[A Real\nTarget]] for more.") == [])
 
+        # ---- links into another wiki: [[indy:Title]] (Prateek's lab lens, 16 October 2026) ----
+        def cross(t, body, cached=None):
+            root = build(t, body)
+            (root / "design").mkdir()
+            (root / "design" / "shared-layer.json").write_text(json.dumps(
+                {"source": "indy-llm-wiki", "siblings": ["xco-team-wiki", "ocean-studio-wiki"]}))
+            if cached is not None:
+                d = root / ".commons" / "ocean-studio-wiki" / "export"
+                d.mkdir(parents=True)
+                (d / "wiki.shared.json").write_text(json.dumps({"nodes": [{"title": x} for x in cached]}))
+            broken, _ = cl.audit()
+            return sorted(b["target"] for b in broken)
+
+        with tempfile.TemporaryDirectory() as t:
+            check("a link into another federation wiki is not reported as broken",
+                  cross(t, "See [[indy:Cascading Risk]] and [[ocean:Anything]].") == [])
+        with tempfile.TemporaryDirectory() as t:
+            check("the prefix is read without regard to case",
+                  cross(t, "See [[xCO:Page Title]].") == [])
+        with tempfile.TemporaryDirectory() as t:
+            check("an unknown prefix is still a broken link",
+                  cross(t, "See [[nowhere:Page Title]].") == ["nowhere:Page Title"])
+        with tempfile.TemporaryDirectory() as t:
+            check("with the other wiki's shared copy cached, a missing title there is reported",
+                  cross(t, "See [[ocean:Real There]] and [[ocean:Not There]].", cached=["Real There"]) == ["ocean:Not There"])
+        with tempfile.TemporaryDirectory() as t:
+            check("a local page whose title has a colon still resolves locally",
+                  cross(t, "See [[A Real Target]].") == [])
+
         with tempfile.TemporaryDirectory() as t:
             root = build(t, "See [[No Such Page]] and [[Another Dead One]].")
             cl.BASELINE.write_text(json.dumps({"unresolved": [
