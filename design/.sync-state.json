@@ -158,9 +158,9 @@
     "tools/test_build_needs_you_page.py": "d3c2e258570a1ec16b4845346ad75355c4db8656c97324440d013d4290dde772",
     "tools/encrypt_page.mjs": "179508d99b9f8910c3f9086c213bc1a043c12fbdbe57748d744401ba0987905b",
     "tools/templates/needs_you_page.html": "645d7a463664a80878caa14da430a3f420e3ddebcf621308a4c34a7e90cb47ab",
-    "tools/crm.py": "da7e0e38082d60bf5aa470d0530578671a0d648e5fbd058ce378a9524bee0f65",
-    "tools/test_crm.py": "3520ed57d80df1eb64358905fb068b62c94afd837d3f652a900cfbe5048b614d",
-    ".claude/skills/leads/SKILL.md": "e67a30025a2ad22eb73b447c6623a3f0da14236d37ed219edf1b34ee680f95bd"
+    "tools/crm.py": "d9d9e1291a6a9ea47b0faaf1b31b09f8c38aa997b5d3b6deee06def051f782e8",
+    "tools/test_crm.py": "75073e8a19790e75308516bb0cbd5733638df1b8f5e390a9c6cf8561a9164b27",
+    ".claude/skills/leads/SKILL.md": "e90ca287a9aa8a8ab2d920f1e10396facae31f2c2b885f24ab6b6e384e65016e"
   },
   "adapted": {
     "design/xco.tokens.json": {

@@ -116,7 +116,30 @@ def main():
         found = [x["title"] for x in crm.leads(root)]
         results.append(check("leads are uncarded, unlinked organisations only", found == ["New Org"]))
         results.append(check("leads count how often the wiki links them", crm.leads(root)[0]["mentions"] == 2))
+        # This wiki's own work is not a lead (Prateek's leads were his own projects, 16 October 2026).
+        page(root, "our-project", "Our Project", ["water"])
+        page(root, "our-tool", "Our Tool", ["our-studio"])
         (root / "design").mkdir(exist_ok=True)
+        (root / "design" / "crm.json").write_text('{"own_work_tags": ["our-studio"]}')
+        crm.main(["--root", str(root), "not-a-lead", "our project"])
+        found = [x["title"] for x in crm.leads(root)]
+        results.append(check("own work, by title or by tag, is not a lead", found == ["New Org"]))
+        saved = json.loads((root / "design" / "crm.json").read_text())
+        results.append(check("not-a-lead keeps the page's own title and the tags already there",
+                             saved == {"own_work_tags": ["our-studio"], "own_work": ["Our Project"]}))
+        try:
+            crm.main(["--root", str(root), "not-a-lead", "No Such Page"])
+            unknown_refused = False
+        except SystemExit:
+            unknown_refused = True
+        results.append(check("not-a-lead refuses a title the wiki does not have", unknown_refused))
+        (root / "design" / "crm.json").write_text("{not json")
+        try:
+            crm.leads(root)
+            bad_refused = False
+        except SystemExit:
+            bad_refused = True
+        results.append(check("a broken design/crm.json stops with a message", bad_refused))
         (root / "design" / "federation.json").write_text('{"role": "commons"}')
         def refused_in_commons(args):
             try:

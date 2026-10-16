@@ -11,6 +11,7 @@ seeded default, and no tool listed what was due. A field nobody reads is a field
         [--date YYYY-MM-DD] [--next "the next step" --due YYYY-MM-DD --why "the reason"] \\
         [--stage active] [--owner "Name"]
     python3 tools/crm.py leads [--top 12] [--json]       organisations the wiki knows with no card yet
+    python3 tools/crm.py not-a-lead "Page title"         mark a page as this wiki's own work, never a lead
 
 Rules it keeps (from the crm skill):
 - It never contacts anyone and drafts nothing to send.
@@ -37,6 +38,7 @@ SKIP_FILES = {"index.md", "log.md"}
 SKIP_DIRS = {"index", "log"}
 OURS_TAGS = {"dark-matter-labs", "xco"}
 PLACE_TAGS = {"place", "geography"}
+OWN_WORK = pathlib.Path("design") / "crm.json"   # this wiki's own work: {"own_work": [titles], "own_work_tags": [tags]}
 DATE = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
 
 
@@ -206,12 +208,55 @@ def log(path: pathlib.Path, *, kind: str, note: str, when: dt.date, today: dt.da
 
 # ---------------------------------------------------------------- leads
 
+def own_work(root: pathlib.Path) -> tuple[set[str], set[str]]:
+    """The titles and tags that mark this wiki's own work, lowercased, from design/crm.json.
+
+    A project page carries domain tags, like an organisation's, so exclusion by OURS_TAGS alone
+    offered Prateek his own projects as leads (16 October 2026). Each wiki names its own work here.
+    """
+    path = root / OWN_WORK
+    if not path.exists():
+        return set(), set()
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError as e:
+        raise SystemExit(f"crm: {OWN_WORK} is not valid JSON ({e}). Fix it, or delete it to start again.")
+    low = lambda key: {str(x).strip().lower() for x in data.get(key, []) if str(x).strip()}
+    return low("own_work"), low("own_work_tags")
+
+
+def mark_own_work(root: pathlib.Path, title: str) -> str:
+    """Record a page as this wiki's own work, by its exact title. Refuses a title the wiki does not have."""
+    wanted = title.strip().lower()
+    match = None
+    for p in sorted((root / "wiki").rglob("*.md")):
+        if "crm" in p.relative_to(root / "wiki").parts:
+            continue
+        t = field(frontmatter(p.read_text(encoding="utf-8"))[0], "title")
+        if t and t.lower() == wanted:
+            match = t
+            break
+    if not match:
+        raise SystemExit(f"crm: no page is titled {title!r}. Use the title as `leads` shows it.")
+    path = root / OWN_WORK
+    data = {}
+    if path.exists():
+        own_work(root)  # stops on broken JSON before anything is overwritten
+        data = json.loads(path.read_text(encoding="utf-8"))
+    titles = data.get("own_work", [])
+    if match.lower() not in {x.lower() for x in titles}:
+        data["own_work"] = titles + [match]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return match
+
 def leads(root: pathlib.Path, top: int = 12) -> list[dict]:
     """Organisations the wiki knows that have no card and no link from one, most linked-to first.
 
     Found by exclusion, as luck_candidates.reach_gaps does: org pages carry domain tags, not an
     org marker. People are left out: a person with no card is a different gap.
     """
+    own_titles, own_tags = own_work(root)
     known = set()
     for c in cards(root):
         known.add(c["title"].lower())
@@ -225,8 +270,8 @@ def leads(root: pathlib.Path, top: int = 12) -> list[dict]:
         fm, body = frontmatter(text)
         bodies.append(body)
         title, tags = field(fm, "title"), tags_of(fm)
-        if (field(fm, "type") == "entity" and title and title.lower() not in known
-                and not tags & (OURS_TAGS | PLACE_TAGS) and "person" not in tags):
+        if (field(fm, "type") == "entity" and title and title.lower() not in known | own_titles
+                and not tags & (OURS_TAGS | PLACE_TAGS | own_tags) and "person" not in tags):
             pages[title] = {"title": title, "path": p.relative_to(root).as_posix(),
                             "description": field(fm, "description")[:140]}
     corpus = "\n".join(bodies)
@@ -263,6 +308,7 @@ def main(argv=None) -> int:
     lg.add_argument("--date"); lg.add_argument("--next"); lg.add_argument("--due"); lg.add_argument("--why")
     lg.add_argument("--stage"); lg.add_argument("--owner")
     ld = sub.add_parser("leads"); ld.add_argument("--top", type=int, default=12); ld.add_argument("--json", action="store_true")
+    nl = sub.add_parser("not-a-lead"); nl.add_argument("title")
     a = ap.parse_args(argv)
     root = pathlib.Path(a.root)
     today = as_date(a.today) if a.today else dt.date.today()
@@ -275,7 +321,7 @@ def main(argv=None) -> int:
             print(json.dumps(r, indent=2))
         else:
             _print_due(r)
-    elif a.cmd in ("log", "leads") and is_commons(root):
+    elif a.cmd in ("log", "leads", "not-a-lead") and is_commons(root):
         raise SystemExit(COMMONS_REFUSAL)
     elif a.cmd == "log":
         when = as_date(a.date) if a.date else today
@@ -286,6 +332,9 @@ def main(argv=None) -> int:
         entry = log(path, kind=a.kind, note=a.note, when=when, today=today, nxt=a.next, due_on=due_on,
                     why=a.why, stage=a.stage, owner=a.owner)
         print(f"{path.relative_to(root)}: {entry}")
+    elif a.cmd == "not-a-lead":
+        title = mark_own_work(root, a.title)
+        print(f"{OWN_WORK}: {title} is this wiki's own work, and will not be offered as a lead.")
     else:
         rows = leads(root, a.top)
         if a.json:
