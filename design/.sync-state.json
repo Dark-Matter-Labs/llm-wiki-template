@@ -65,7 +65,7 @@
     "tools/test_init_wiki.py": "170bf31a06d858c1a3d5605579d633a0491245064b1c3dc3dcbd3ebe2654a46b",
     ".github/workflows/sync-commons.yml": "a613ab2b4e7bd50980dd95606d3b7dc3650f6046aa102e823a4c945449c4fa49",
     ".claude/skills/onboard/SKILL.md": "6b4b464d3b2b92b13c379c78b1715fde78a65739eeb4eb5e11cc7c065fa009fd",
-    ".claude/skills/notion-sync/SKILL.md": "954056cb6924fe637293d3966126ebbde10ba4054b38fdd0e1ebc7a886c15f98",
+    ".claude/skills/notion-sync/SKILL.md": "3647cd82fe4f68027dbf4ed39162522e29c404bb92831b2ac82f8a3f982cd52e",
     "tools/check_skill_links.py": "96025c8e3a96bafc7280fd326606166aba49d2b9a1a118686afd659580eddce0",
     "tools/test_check_skill_links.py": "2c24ed52585096ebb0d82a4e8d975f2f5f3bbcfdf475f336069c872665cef543",
     "tools/dependency_staleness.py": "be61d4c3104613876301daf5c3b9da9484277d10d9db7743dfe0a87b41d4790a",
