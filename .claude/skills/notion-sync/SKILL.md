@@ -44,10 +44,13 @@ link looks exactly like a right one.
 If a row has no `Wiki page`, leave it empty and say so. An empty join is a visible gap; a guessed
 one is a silent error.
 
-**The URL is `https://xco-team-wiki-lens.netlify.app/p/<slug>`.** Not Vercel — those deployments
-were removed on 2026-09-07 and all three links in the tracker pointed at them, dead, until they
-were repointed the same day. Verify the slug exists in the shared cut before writing a link;
-`private` pages are not in it and will 404 for everyone.
+**The URL is `https://dark-matter-labs.github.io/xco-team-wiki/lens/#w0.<slug>`**, the team lens on
+the xCO team wiki's own site (from 16 October 2026). Write new links in that form only. Links of the
+older form, `https://xco-team-wiki-lens.netlify.app/p/<slug>`, name the same page by the same slug:
+read them, and when you touch that row, rewrite them to the new form. That Netlify lens is being
+switched off. The Vercel addresses before it were removed on 2026-09-07, and all three tracker links
+that pointed at them were dead until they were repointed the same day. Verify the slug exists in the
+shared cut before writing a link. `private` pages are not in it, so a link to one opens nothing.
 
 ## Three vocabularies, one portfolio
 
