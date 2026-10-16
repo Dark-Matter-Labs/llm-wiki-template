@@ -34,6 +34,10 @@ and a person decides.
 2. **Inside out: what the wiki already knows.**
    - `python3 tools/crm.py leads --json` lists organisations the wiki has pages for but no card,
      most linked-to first. Keep those whose page fits the need.
+   - A suggestion that is the owner's own work (a project, a tool, a studio) is not a lead. Ask
+     once, then record it with `python3 tools/crm.py not-a-lead "Page title"`, which writes it to
+     `design/crm.json` so it is never offered again. A tag that marks all of the owner's work can go
+     in that file's `own_work_tags`.
    - Where it exists, `python3 tools/luck_candidates.py --json` lists goals nobody backs yet, which
      are needs worth a lead.
 3. **Outside in: public research, optional.** Search for organisations working on the need: funders,
