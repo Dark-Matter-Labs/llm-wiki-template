@@ -10,10 +10,13 @@ healthy. the owner's requirement (7 Aug 2026):
      is contradictory. But what it doesn't tell me is — are you superseding that
      contradiction? Are you devaluing it?"
 
-So a contradiction is **declared** on a page and must **close** one of two ways:
+So a contradiction is **declared** on a page and must **close** one of three ways:
 
     superseded  — the new position wins; the old page carries `superseded_by: <title>`
     devalued    — the new input loses; it carries `devalued_by: <title>`
+    both stand  — a person decides there is no single truth here; either page carries
+                  `stands_with: <title>`, and both stay as they are (Leon, 16 Oct 2026:
+                  "how do we deal with things where there is no clear single truth?")
 
 Both write frontmatter, so a resolution is versioned, diffable and reviewable like
 everything else. Neither deletes anything: the losing side stays readable, with a
@@ -24,6 +27,7 @@ Frontmatter grammar
     contradicts: "Title of the page this disagrees with"     # declares it
     superseded_by: "Title"    # this page lost; that one replaced it
     devalued_by:   "Title"    # this page lost; that one outranks it
+    stands_with:   "Title"    # neither lost; the two views both stand
 
 Usage:
   python3 tools/contradictions.py            # report open + closed
@@ -40,7 +44,7 @@ import export  # noqa: E402
 
 
 def load(wiki_dir):
-    """title -> {slug, contradicts, superseded_by, devalued_by}"""
+    """title -> {slug, contradicts, superseded_by, devalued_by, stands_with}"""
     by_title = {}
     for slug, _path, fm, _body in export.discover(wiki_dir):
         t = fm.get("title")
@@ -51,6 +55,7 @@ def load(wiki_dir):
             "contradicts": fm.get("contradicts"),
             "superseded_by": fm.get("superseded_by"),
             "devalued_by": fm.get("devalued_by"),
+            "stands_with": fm.get("stands_with"),
         }
     return by_title
 
@@ -76,7 +81,13 @@ def analyse(by_title):
         this_lost = p["superseded_by"] == other or p["devalued_by"] == other
         that_lost = o["superseded_by"] == title or o["devalued_by"] == title
 
-        if this_lost and that_lost:
+        stand = (p.get("stands_with") == other and other in by_title) or o.get("stands_with") == title
+        if stand and (this_lost or that_lost):
+            problems.append((title, f"recorded as both stand with {other!r} and as a loss to it "
+                                    "— choose one"))
+        elif stand:
+            closed.append((title, f"both stand with {other!r}"))
+        elif this_lost and that_lost:
             problems.append((title, f"both sides record a loss against the other ({other!r}) "
                                     "— a contradiction cannot be closed twice"))
         elif this_lost:
@@ -90,8 +101,8 @@ def analyse(by_title):
 
     # A resolution pointing nowhere is worse than none: it looks settled and isn't.
     for title, p in sorted(by_title.items()):
-        for field in ("superseded_by", "devalued_by"):
-            target = p[field]
+        for field in ("superseded_by", "devalued_by", "stands_with"):
+            target = p.get(field)
             if target and target not in by_title:
                 problems.append((title, f"{field} points at a page that does not exist: {target!r}"))
             elif target == title:
@@ -125,6 +136,8 @@ def main(argv=None):
             print(f"    close it by adding, to whichever page loses:")
             print(f"      superseded_by: \"<the winning title>\"   (the new position replaces it)")
             print(f"      devalued_by:   \"<the winning title>\"   (the input is downgraded)")
+            print(f"    or, if there is no single truth, to either page:")
+            print(f"      stands_with:   \"<the other title>\"    (both views stand)")
         print()
     elif not args.only_open:
         print("OPEN — none. Every declared contradiction has been resolved.\n")
