@@ -160,7 +160,9 @@
     "tools/templates/needs_you_page.html": "297fcd524cd8cf075ee4bba527bcdf37ad3529b0cc7f70127010a350a5daf0c8",
     "tools/crm.py": "d9d9e1291a6a9ea47b0faaf1b31b09f8c38aa997b5d3b6deee06def051f782e8",
     "tools/test_crm.py": "75073e8a19790e75308516bb0cbd5733638df1b8f5e390a9c6cf8561a9164b27",
-    ".claude/skills/leads/SKILL.md": "e90ca287a9aa8a8ab2d920f1e10396facae31f2c2b885f24ab6b6e384e65016e"
+    ".claude/skills/leads/SKILL.md": "e90ca287a9aa8a8ab2d920f1e10396facae31f2c2b885f24ab6b6e384e65016e",
+    "tools/add_analytics.py": "6c7ca42bb572bde96d280c72ca355761754cb09d04b8c31f440bf3569859a989",
+    "tools/test_add_analytics.py": "d0f2c8c9f3a5ab153ae2d31491b6d2efb0d97e4d058162098c976084bcf91f9b"
   },
   "adapted": {
     "design/xco.tokens.json": {
