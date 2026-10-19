@@ -99,6 +99,11 @@ jobs:
           echo "The site is optional. To publish pages, enable Pages under"
           echo "Settings > Pages, set the source to 'GitHub Actions', then re-run this workflow."
 
+      - name: Count public pages with SimpleAnalytics (only where this wiki opted in)
+        # Cookieless and aggregate. Locked pages are never counted. design/analytics.json turns it on; without it
+        # this does nothing. Changes only the copy being published, never the pages in the wiki.
+        run: python3 tools/add_analytics.py --write docs
+
       - name: Upload /docs as the Pages artifact
         if: steps.configure.outcome == 'success'
         uses: actions/upload-pages-artifact@v5
