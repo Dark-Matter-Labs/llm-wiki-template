@@ -108,6 +108,15 @@ def main():
         if not fix_ok:
             print(f"          got  {fixed!r}\n          want {want!r}")
 
+    from house_rules import is_locked
+    for text, want in (('var SALT = "q8+/AA==", IV = "x0", CT = "+XCO+", ROUNDS = 600000;', True),
+                       ('var SALT = "q8+/AA=="; var IV = "x0"; var CT = "+XCO+";', True),
+                       ("A page about xco, in prose.", False)):
+        if is_locked(text) == want:
+            print(f"  ok    locked page {want}: {text[:30]!r}")
+        else:
+            failed += 1
+            print(f"  FAIL  locked page should be {want}: {text[:30]!r}")
     print()
     if failed:
         print(f"{failed}/{len(CASES)} FAILED")

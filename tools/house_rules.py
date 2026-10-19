@@ -69,6 +69,15 @@ BAD_CASE = re.compile(
 
 URL = re.compile(r"https?://\S+")
 
+# A page the lens lock wrote (encrypt_lens.mjs, encrypt_page.mjs) is ciphertext in base64, and random letters spell
+# "XCO" sooner or later: on 19 October 2026 Prateek's locked lens failed this check and turned his wiki red. There is
+# no prose in it to check.
+LOCKED = re.compile(r'var SALT = "[A-Za-z0-9+/=]+"[,;] (?:var )?IV = "')
+
+
+def is_locked(text):
+    return bool(LOCKED.search(text))
+
 # A path INTO raw/ is a reference to an immutable file. `CLAUDE.md` already says this rule
 # "does not touch raw/, which is immutable: a source that says 'civilisation' said that, and
 # correcting it would falsify the record" — but until 2026-08-27 that exemption covered the
@@ -198,7 +207,7 @@ def main(argv=None):
             src = open(path, encoding="utf-8").read()
         except (UnicodeDecodeError, OSError):
             continue
-        if "house-rules: ignore-file" in src:
+        if "house-rules: ignore-file" in src or is_locked(src):
             continue
         new, hits = scan_text(src, fix=args.fix)
         if not hits:
