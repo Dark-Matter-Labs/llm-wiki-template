@@ -150,8 +150,8 @@
     "tools/test_check_sources.py": "eb7291bd7551b2ce1b50e154dff80218e603755949427fdb3617e954b39356f1",
     "tools/needs_you.py": "33bd52bf746f6f4eb4babc76b2a60f95a5a55d0fc88839c9a6c209d807402ad8",
     "tools/test_needs_you.py": "9554284cbccf4f40ec83a671496f7e4534a21676a12804eb2c2e0f5ad609cdac",
-    "tools/skill_menu.py": "3a04ae4a7d622c2473e9e71fb0782f7bc47353ef169d72c1a684cc3404e10d50",
-    "tools/test_skill_menu.py": "d584a09ba9c4551e41bfd20c41ed48ac27971adbd48b43a8cecdbf86fe6434b3",
+    "tools/skill_menu.py": "ac6daf93023b704d72c3c6bdf3503ea727dbc17285a212e9ef09b588074703e7",
+    "tools/test_skill_menu.py": "4f25e181827f2264abcacc3f2e1c14d97c30da0c4babae85c6ee3769f09f08b0",
     "tools/view_modules.py": "8d42eefdd55a24f50a9f7ba9025b9bd641e2e631ec946475b1cc1db3bb890dd0",
     "tools/test_view_modules.py": "a379dc5f4a9b630ac88558e737733cde55538e75112b274bfbb9634c8a1a6f70",
     "tools/build_needs_you_page.py": "f912c84dafc286957ae448f33e8d0b7a0518312632cf953029277d40bdc8c975",
@@ -168,7 +168,15 @@
     "guides/your-lens.md": "dc21d78dac1e243fa0f23e75f981c4c2936f16488582b9b116e3eb31c67d0d8b",
     "guides/calls-and-commitments.md": "c850f9d463a13104af22d21704c4a6b3b2bfc6aee6df3a080c894986abc8b526",
     "guides/asking-the-wiki.md": "e20c7128205395927a027c49832acec95e35ffb42b551596f75cf6af6a792c0c",
-    "guides/when-something-goes-wrong.md": "1e9129249aac2f470555395ba5b064f4ce235dc09c6ccc0cacdedbecd06cdb58"
+    "guides/when-something-goes-wrong.md": "1e9129249aac2f470555395ba5b064f4ce235dc09c6ccc0cacdedbecd06cdb58",
+    ".claude/skills/call-notes/SKILL.md": "5ecaa778e89ab4211102a987cd604bfd832b3acc37860d188e2dd51739aadcef",
+    ".claude/skills/overview-refresh/SKILL.md": "b31831e623e2eea4502387409baae948c07c8df5271929b5c6b5d7ae990a0206",
+    ".claude/skills/my-commitments/SKILL.md": "6b5bbde7bd27140c0eb9cc77e86470cbc9272a4e148fd51fb46c6ee3118e64de",
+    ".claude/skills/rulings/SKILL.md": "28d5e05f26b645e1c1b2357b5817a9510690265f35ca336887499a02719603fc",
+    ".claude/skills/rename/SKILL.md": "8b800353eab33e0988e310b7f74506442aad64aee2f0c0faef64f638a0f28bff",
+    ".claude/skills/live-page/SKILL.md": "45e4f7cf66f1d184ff7aac28676c709bc5af8790f89a0f05f3e8baad57614a24",
+    ".claude/skills/lens-refresh/SKILL.md": "f5f054a35e41cf7b0e6a3e038d22dbfdf07e53db23ff9a8cacae93e41069540a",
+    ".claude/skills/pre-read/SKILL.md": "567e8302cd58657592f1c67de61767e9a362669d3280a7ad3c9760b1ad57cad9"
   },
   "adapted": {
     "design/xco.tokens.json": {
