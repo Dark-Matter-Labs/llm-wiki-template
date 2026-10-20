@@ -139,3 +139,8 @@ Pages in a team wiki start as `internal`, not `private`, because a team wiki exi
 | New team wiki, or a page in an existing one? | A team wiki if several people will keep adding to it. A page if it's one topic in existing work. |
 
 For admins, and for how access is set up, see `SHARING-AND-ACCESS.md`.
+
+## More guides
+
+Short guides on one topic each are in [guides/](guides/README.md): adding to the wiki, your lens, calls and
+commitments, asking the wiki, and what to do when something goes wrong.
