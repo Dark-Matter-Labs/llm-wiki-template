@@ -1,4 +1,7 @@
 {
+  "env": {
+    "DISABLE_FEEDBACK_COMMAND": "1"
+  },
   "permissions": {
     "allow": [
       "WebFetch(domain:dark-matter-labs.github.io)"
