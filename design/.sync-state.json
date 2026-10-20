@@ -168,7 +168,15 @@
     "guides/your-lens.md": "dc21d78dac1e243fa0f23e75f981c4c2936f16488582b9b116e3eb31c67d0d8b",
     "guides/calls-and-commitments.md": "c850f9d463a13104af22d21704c4a6b3b2bfc6aee6df3a080c894986abc8b526",
     "guides/asking-the-wiki.md": "e20c7128205395927a027c49832acec95e35ffb42b551596f75cf6af6a792c0c",
-    "guides/when-something-goes-wrong.md": "1e9129249aac2f470555395ba5b064f4ce235dc09c6ccc0cacdedbecd06cdb58"
+    "guides/when-something-goes-wrong.md": "1e9129249aac2f470555395ba5b064f4ce235dc09c6ccc0cacdedbecd06cdb58",
+    ".claude/skills/call-notes/SKILL.md": "5ecaa778e89ab4211102a987cd604bfd832b3acc37860d188e2dd51739aadcef",
+    ".claude/skills/overview-refresh/SKILL.md": "b31831e623e2eea4502387409baae948c07c8df5271929b5c6b5d7ae990a0206",
+    ".claude/skills/my-commitments/SKILL.md": "6b5bbde7bd27140c0eb9cc77e86470cbc9272a4e148fd51fb46c6ee3118e64de",
+    ".claude/skills/rulings/SKILL.md": "28d5e05f26b645e1c1b2357b5817a9510690265f35ca336887499a02719603fc",
+    ".claude/skills/rename/SKILL.md": "8b800353eab33e0988e310b7f74506442aad64aee2f0c0faef64f638a0f28bff",
+    ".claude/skills/live-page/SKILL.md": "45e4f7cf66f1d184ff7aac28676c709bc5af8790f89a0f05f3e8baad57614a24",
+    ".claude/skills/lens-refresh/SKILL.md": "f5f054a35e41cf7b0e6a3e038d22dbfdf07e53db23ff9a8cacae93e41069540a",
+    ".claude/skills/pre-read/SKILL.md": "567e8302cd58657592f1c67de61767e9a362669d3280a7ad3c9760b1ad57cad9"
   },
   "adapted": {
     "design/xco.tokens.json": {
