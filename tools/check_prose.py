@@ -2,7 +2,7 @@
 """check_prose.py — the mechanical half of `ai-detox`, as a ratchet.
 
 The `ai-detox` skill is the judgement. This is the part a script can settle: the banned words,
-the X-not-Y construction, and the em dash. It exists because a rule nobody checks is a rule that
+the X-not-Y construction. (The em dash was checked too, until the rule was dropped on 20 October 2026 at Gurden's word: it caused more failed checks than it prevented.) It exists because a rule nobody checks is a rule that
 decays, and this house already learned that twice today, with the house spellings and with the
 onboarding docs.
 
@@ -90,7 +90,9 @@ XNOTY_RE = re.compile(
     r"(?:it'?s|it\s+(?:is|was)|they'?re|they\s+(?:are|were)|this\s+(?:is|was)|that'?s)\b",
     re.I)
 
-CATEGORIES = ("words", "phrases", "xnoty", "emdash")
+#: The em dash was a fourth category until 20 October 2026. Gurden dropped the rule: it failed far more
+#: changes than it improved. Old baselines still carry an "emdash" count, and nothing reads it.
+CATEGORIES = ("words", "phrases", "xnoty")
 
 #: `- [[Page Title]] — one line about it`, the house catalogue row. A separator, not a
 #: sentence. Anchored at the start so a bulleted sentence in ordinary prose still counts.
@@ -227,8 +229,7 @@ def count(text: str, router: bool = False) -> dict:
     s = sentences(text, router)
     return {"words": len(WORD_RE.findall(t)),
             "phrases": len(PHRASE_RE.findall(t)),
-            "xnoty": len(XNOTY_RE.findall(s)),
-            "emdash": s.count("—")}
+            "xnoty": len(XNOTY_RE.findall(s))}
 
 
 #: Catalogues, not prose. `ai-detox` names index shelves explicitly among the reference

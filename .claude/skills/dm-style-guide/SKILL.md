@@ -23,9 +23,8 @@ description: >-
 The four guides govern anything published under the Dark Matter Labs name. Three house rules of
 these wikis sit beside them, and win inside a wiki page:
 
-- **Dashes.** The guide asks for a spaced dash in a published piece. In a wiki page, and in
-  anything else these wikis write in their own voice, `ai-detox` and `tools/check_prose.py` refuse
-  em dashes: use a comma, a colon or a new sentence. Quoted words keep their dashes.
+- **Dashes.** The guide asks for a spaced dash in a published piece. Wiki pages may use dashes too,
+  in moderation: the wikis' own ban on em dashes was dropped on 20 October 2026.
 - **Quotation marks.** The guide's curly single quotes are for the published piece. Wiki pages use
   straight double quotes, which the citation checker (`tools/quote_check.py`) reads.
 - **House spellings.** Civilization takes a z and xCO keeps its lowercase x, checked by
