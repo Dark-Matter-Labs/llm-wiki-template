@@ -42,7 +42,18 @@ def main():
     text = " ".join(f" {s['label']} {s['what']} {s['ask'] or ''} ".lower() for s in every)
     hits = [j for j in JARGON if re.search(r"(?<![a-z])" + re.escape(j) + r"(?![a-z])", text)]
     check("nothing on the menu needs a technical background to read", not hits, str(hits))
-    check("the menu only lists skills saved in the wiki, not notes a plugin left", "overview-refresh" not in listed)
+    # A plugin can leave a skill note in .claude/skills/ without saving it. Make one, and check the menu ignores it.
+    # (It used to name "overview-refresh", a note on one machine, which became a real skill on 20 October 2026.)
+    root = pathlib.Path(__file__).resolve().parent.parent
+    note = root / ".claude" / "skills" / "zz-note-a-plugin-left" / "SKILL.md"
+    note.parent.mkdir(parents=True, exist_ok=True)
+    note.write_text("---\nname: zz-note-a-plugin-left\ndescription: test\n---\n")
+    try:
+        check("the menu only lists skills saved in the wiki, not notes a plugin left",
+              "zz-note-a-plugin-left" not in M.skills_held(root))
+    finally:
+        note.unlink()
+        note.parent.rmdir()
 
     print()
     if FAILED:
