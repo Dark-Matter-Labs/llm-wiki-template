@@ -176,7 +176,10 @@
     ".claude/skills/rename/SKILL.md": "8b800353eab33e0988e310b7f74506442aad64aee2f0c0faef64f638a0f28bff",
     ".claude/skills/live-page/SKILL.md": "45e4f7cf66f1d184ff7aac28676c709bc5af8790f89a0f05f3e8baad57614a24",
     ".claude/skills/lens-refresh/SKILL.md": "f5f054a35e41cf7b0e6a3e038d22dbfdf07e53db23ff9a8cacae93e41069540a",
-    ".claude/skills/pre-read/SKILL.md": "567e8302cd58657592f1c67de61767e9a362669d3280a7ad3c9760b1ad57cad9"
+    ".claude/skills/pre-read/SKILL.md": "567e8302cd58657592f1c67de61767e9a362669d3280a7ad3c9760b1ad57cad9",
+    "AGENTS.md": "a454c2e303ef1080f215ed6f59a2ff4274ac2c72266b6f8368b652d29be4f5da",
+    "tools/check_agents.py": "ba700a397accb4599f04b6e76ef5914b79ab10e70c51d866682a716d603a2d35",
+    "tools/test_check_agents.py": "24af71851b21e6a08ef696bf4fe8cbe5717534f1539208f613dbf536266e8a0a"
   },
   "adapted": {
     "design/xco.tokens.json": {

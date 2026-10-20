@@ -88,6 +88,12 @@ jobs:
       - name: The same_as gate's own cases
         run: python3 tools/test_check_same_as.py
 
+      - name: Any coding agent can read this wiki — AGENTS.md and skills in the shared format
+        run: python3 tools/check_agents.py --check
+
+      - name: The any-agent check's own cases
+        run: python3 tools/test_check_agents.py
+
       - name: Schema — frontmatter, types, commitment states
         # Renamed 2026-08-31. This step was called "Schema + link integrity" and did not check
         # link integrity: it catches a link wrapped across a newline and nothing else. A broken
