@@ -110,7 +110,7 @@
     "tools/test_check_noindex.py": "419427f90108f30c0736f7bc20d94e92d73626b1f1682882ea77a80d254c0149",
     ".claude/rules/finishing.md": "4c074772199f292a938a74982cbf101581fc6a72308a61541f6230f5fc683ee1",
     "tools/test_search.py": "df60ca7bc206e2cc56e285bae67e1828c578833098f94da2fa4cd0997b312113",
-    "HOW-IT-WORKS.md": "cd9d83247df5cac64c1f97736536056bd575d040e7d854b159b68765d7b242c4",
+    "HOW-IT-WORKS.md": "38d13f5707de19822ee7acbc0d74c2c5760c4ce42a3fd81fb69f2e54a8036af9",
     "TECHNICAL.md": "60c5ce3776ad512277bf01928edd8f7b1c8083c10146c59fddf1fe444740a31e",
     "tools/test_commons_report.py": "b844583ecc2293ace03b7f0eebcc412053245662b28daec3897d25267ade6038",
     "tools/commons_report.py": "ebba8db5690e7be91f5d0d70d2d421c39090386a982de2f8a7fe3eed23eb5d1d",
@@ -162,7 +162,13 @@
     "tools/test_crm.py": "75073e8a19790e75308516bb0cbd5733638df1b8f5e390a9c6cf8561a9164b27",
     ".claude/skills/leads/SKILL.md": "e90ca287a9aa8a8ab2d920f1e10396facae31f2c2b885f24ab6b6e384e65016e",
     "tools/add_analytics.py": "6c7ca42bb572bde96d280c72ca355761754cb09d04b8c31f440bf3569859a989",
-    "tools/test_add_analytics.py": "d0f2c8c9f3a5ab153ae2d31491b6d2efb0d97e4d058162098c976084bcf91f9b"
+    "tools/test_add_analytics.py": "d0f2c8c9f3a5ab153ae2d31491b6d2efb0d97e4d058162098c976084bcf91f9b",
+    "guides/README.md": "9030e85e3046d76b157b34a59c00d5345054bdc74106824166b78303eaebff9c",
+    "guides/adding-to-the-wiki.md": "f146e183971372d8885039d3d48d3335a4c04687a2739a952a0de2e13c9703e0",
+    "guides/your-lens.md": "dc21d78dac1e243fa0f23e75f981c4c2936f16488582b9b116e3eb31c67d0d8b",
+    "guides/calls-and-commitments.md": "c850f9d463a13104af22d21704c4a6b3b2bfc6aee6df3a080c894986abc8b526",
+    "guides/asking-the-wiki.md": "e20c7128205395927a027c49832acec95e35ffb42b551596f75cf6af6a792c0c",
+    "guides/when-something-goes-wrong.md": "1e9129249aac2f470555395ba5b064f4ce235dc09c6ccc0cacdedbecd06cdb58"
   },
   "adapted": {
     "design/xco.tokens.json": {
