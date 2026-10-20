@@ -85,7 +85,7 @@ def main():
     check("...nor when the quote wraps onto the next line",
           C.count('The pack is titled "Legal Risk vs\nEcosystem Harm" in full.')["words"] == 0)
     check("a dash inside a quotation is the speaker's",
-          C.count('He said "now \u2014 or later" and left.')["emdash"] == 0)
+          C.sentences('He said "now \u2014 or later" and left.').count("\u2014") == 0)
     check("words just outside a quotation still count",
           C.count('A robust plan sits beside "a quoted line".')["words"] == 1)
     check("an apostrophe does not open a quotation",
@@ -100,36 +100,36 @@ def main():
     # a format the rest of the corpus does not use. The file-level skip caught the shelves
     # under `wiki/index/` and missed `wiki/index.md`, which is the same object one level up.
     check("a catalogue row is not prose",
-          C.count("- [[Some Page]] — one line about it\n")["emdash"] == 0)
+          C.sentences("- [[Some Page]] — one line about it\n").count("\u2014") == 0)
     check("...and neither is an indented one",
-          C.count("  - [[Some Page]] — one line about it\n")["emdash"] == 0)
+          C.sentences("  - [[Some Page]] — one line about it\n").count("\u2014") == 0)
     # The guard: an ordinary bulleted sentence is still prose, or this is a hole big enough
     # to hide a document in.
     check("an ordinary bullet is still prose",
-          C.count("- This is a robust sentence — with an em dash.\n")["emdash"] == 1)
+          C.sentences("- This is a robust sentence — with an em dash.\n").count("\u2014") == 1)
     check("...and its banned words still count",
           C.count("- This is a robust sentence.\n")["words"] == 1)
     check("a link row that is not a page title is still prose",
-          C.count("- [a thing](https://x.test) — robust and comprehensive\n")["emdash"] == 1)
+          C.sentences("- [a thing](https://x.test) — robust and comprehensive\n").count("\u2014") == 1)
 
     # Added 2026-09-22. The same row written as a markdown link rather than a wiki-link was not
     # matched, so filing a page into an index that uses that form raised the ratchet on the act
     # of filing. It moved three times in one day in learning-system-wiki before this was fixed.
     check("a catalogue row written as a markdown link is not prose",
-          C.count("- **[A Title](a-title.md)** — one line about it\n")["emdash"] == 0)
+          C.sentences("- **[A Title](a-title.md)** — one line about it\n").count("\u2014") == 0)
     check("...bold or not",
-          C.count("- [A Title](a-title.md) — one line about it\n")["emdash"] == 0)
+          C.sentences("- [A Title](a-title.md) — one line about it\n").count("\u2014") == 0)
     check("...and indented",
-          C.count("  - **[A Title](a-title.md)** — one line about it\n")["emdash"] == 0)
+          C.sentences("  - **[A Title](a-title.md)** — one line about it\n").count("\u2014") == 0)
     # The two guards. The target decides, not the syntax: a row naming a page in this wiki is a
     # name, a row citing something outside it is a sentence. And the separator has to be there,
     # or every bulleted sentence that happens to start with a link escapes the gate.
     check("a row pointing outside the wiki is still prose",
-          C.count("- [a thing](https://x.test) — robust and comprehensive\n")["emdash"] == 1)
+          C.sentences("- [a thing](https://x.test) — robust and comprehensive\n").count("\u2014") == 1)
     check("...including a bold one",
-          C.count("- **[a thing](https://x.test)** — robust and comprehensive\n")["emdash"] == 1)
+          C.sentences("- **[a thing](https://x.test)** — robust and comprehensive\n").count("\u2014") == 1)
     check("a bulleted sentence that merely begins with a link is still prose",
-          C.count("- **[A Title](a-title.md)** is a robust thing — really\n")["emdash"] == 1)
+          C.sentences("- **[A Title](a-title.md)** is a robust thing — really\n").count("\u2014") == 1)
     check("...and its banned words still count",
           C.count("- [A Title](a-title.md) is robust and comprehensive.\n")["words"] == 2)
 
@@ -139,53 +139,53 @@ def main():
     try:
         C.CATALOGUE_ROW = re.compile(r"\s*[-*]\s*\[\[")
         check("mutant (wiki-link form only) counts the markdown row again",
-              C.count("- **[A Title](a-title.md)** — one line about it\n")["emdash"] == 1)
+              C.sentences("- **[A Title](a-title.md)** — one line about it\n").count("\u2014") == 1)
         check("...while the wiki-link row is unaffected by the mutation",
-              C.count("- [[Some Page]] — one line about it\n")["emdash"] == 0)
+              C.sentences("- [[Some Page]] — one line about it\n").count("\u2014") == 0)
     finally:
         C.CATALOGUE_ROW = _saved
     check("the real pattern is restored after the mutation",
-          C.count("- **[A Title](a-title.md)** — one line about it\n")["emdash"] == 0)
+          C.sentences("- **[A Title](a-title.md)** — one line about it\n").count("\u2014") == 0)
 
     # Added 2026-10-06. A row wrapped onto a second line was matched on its first line only, so
     # the continuation counted as prose. robyn-llm-wiki's router wraps most of its rows, and the
     # shared check would have counted 78 separators there; her copy skipped the whole file
     # instead, which also hid the router's real sentences. The row is the item, not the line.
     check("a catalogue row wrapped onto a second line is not prose",
-          C.count("- **[A Title](a-title.md)** —\n  `concept` — the list — and more\n", router=True)["emdash"] == 0)
+          C.sentences("- **[A Title](a-title.md)** —\n  `concept` — the list — and more\n", router=True).count("\u2014") == 0)
     check("...nor one whose separator starts the next line",
-          C.count("- **[A Long Title](a.md)**\n  — `summary` — what it is\n", router=True)["emdash"] == 0)
+          C.sentences("- **[A Long Title](a.md)**\n  — `summary` — what it is\n", router=True).count("\u2014") == 0)
     check("...nor a wrapped wiki-link row",
-          C.count("- [[Some Page]] — one line\n  that wraps — onto two\n", router=True)["emdash"] == 0)
+          C.sentences("- [[Some Page]] — one line\n  that wraps — onto two\n", router=True).count("\u2014") == 0)
     # The guards. A row ends where the item ends, and a wrapped sentence is still a sentence.
     check("a wrapped sentence that merely begins with a link is still prose",
-          C.count("- **[A Title](a.md)** is a robust thing\n  — really\n", router=True)["emdash"] == 1)
+          C.sentences("- **[A Title](a.md)** is a robust thing\n  — really\n", router=True).count("\u2014") == 1)
     check("...and its banned words still count",
           C.count("- **[A Title](a.md)** is a robust thing\n  — really\n", router=True)["words"] == 1)
     check("the next bullet after a wrapped row is read again",
-          C.count("- [[P]] — row\n  continues\n- A robust sentence — here.\n", router=True)["emdash"] == 1)
+          C.sentences("- [[P]] — row\n  continues\n- A robust sentence — here.\n", router=True).count("\u2014") == 1)
     check("...and so is the next unindented line",
-          C.count("- [[P]] — row\n  continues\nA sentence — here.\n", router=True)["emdash"] == 1)
+          C.sentences("- [[P]] — row\n  continues\nA sentence — here.\n", router=True).count("\u2014") == 1)
     check("...and a nested bullet under a row",
-          C.count("- [[P]] — row\n  - a nested sentence — here\n", router=True)["emdash"] == 1)
+          C.sentences("- [[P]] — row\n  - a nested sentence — here\n", router=True).count("\u2014") == 1)
     check("a wrapped bullet that opens with a page link but has no separator stays prose",
-          C.count("- [[P]] is about\n  a robust landscape — here\n", router=True)["emdash"] == 1)
+          C.sentences("- [[P]] is about\n  a robust landscape — here\n", router=True).count("\u2014") == 1)
     check("...and its banned words still count",
           C.count("- [[P]] is about\n  a robust landscape — here\n", router=True)["words"] == 2)
     check("a wrapped row pointing outside the wiki is still prose",
-          C.count("- [a thing](https://x.test) —\n  robust — and more\n", router=True)["emdash"] == 2)
+          C.sentences("- [a thing](https://x.test) —\n  robust — and more\n", router=True).count("\u2014") == 2)
     # Only in the router. Elsewhere a page-link bullet is usually a see-also list, and the lines
     # it wraps onto are sentences: applied everywhere, this rule hid 156 lines of prose.
     check("outside the router, a wrapped row's continuation is still prose",
-          C.count("- [[Some Page]] — one line\n  that wraps — onto two\n")["emdash"] == 1)
+          C.sentences("- [[Some Page]] — one line\n  that wraps — onto two\n").count("\u2014") == 1)
 
     # A heading is a label, not a sentence. The house log header is `# Log — 2026-09-16`, so
     # under the old counting EVERY new day file failed the ratchet on its own template, one
     # em dash, forever. A gate that fires on the act of starting a page teaches people to
     # baseline. Added 2026-09-16, the first day a new log file tripped it.
     check("a heading's em dash is not counted",
-          C.count("# Log — 2026-09-16\n")["emdash"] == 0)
-    check("...at any depth", C.count("#### A Section — and its label\n")["emdash"] == 0)
+          C.sentences("# Log — 2026-09-16\n").count("\u2014") == 0)
+    check("...at any depth", C.sentences("#### A Section — and its label\n").count("\u2014") == 0)
     check("...and an X-not-Y shape in a heading is not counted either",
           C.count("## This isn't just a rule, it's a paradigm\n")["xnoty"] == 0)
     # The guards. Headings are exempt from the SENTENCE rules only.
@@ -193,14 +193,14 @@ def main():
           C.count("## Leveraging Robust Synergy\n")["words"] == 3,
           "bad writing is bad wherever it sits")
     check("an em dash in the body is still counted",
-          C.count("# A heading\n\nA sentence — with a dash.\n")["emdash"] == 1)
+          C.sentences("# A heading\n\nA sentence — with a dash.\n").count("\u2014") == 1)
     check("a hash inside a line is not a heading",
-          C.count("The tag #hashtag — in prose.\n")["emdash"] == 1)
+          C.sentences("The tag #hashtag — in prose.\n").count("\u2014") == 1)
     # ...but the same words in the body ARE counted, or the exclusions above would be a hole.
     check("the same words in the body are counted",
           C.count("This is a robust and comprehensive tapestry.")["words"] == 3)
     check("an em dash in the body is counted",
-          C.count("a sentence — with a dash")["emdash"] == 1)
+          C.sentences("a sentence — with a dash").count("\u2014") == 1)
 
     # --- the ratchet ---------------------------------------------------------------------
     base = {"wiki/a.md": {"words": 3, "phrases": 0, "xnoty": 1, "emdash": 10}}
@@ -256,7 +256,8 @@ def main():
     # The baseline must be readable and must carry its reason, or it is an exemption list.
     d = json.loads((HERE / "prose-baseline.json").read_text(encoding="utf-8"))
     check("the baseline records why it was set", bool(d.get("reason")))
-    check("the baseline carries totals", set(d.get("totals", {})) == set(C.CATEGORIES))
+    # superset: baselines written before 20 Oct 2026 still carry an "emdash" total, which nothing reads
+    check("the baseline carries totals", set(d.get("totals", {})) >= set(C.CATEGORIES))
 
     print()
     if fails:

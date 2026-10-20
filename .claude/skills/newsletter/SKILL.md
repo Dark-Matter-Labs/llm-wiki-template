@@ -70,7 +70,7 @@ reading is where that went — the writing is a few hundred words.
 **Run two skills before you write a word, and again over the draft.**
 
 - **`ai-detox`** governs the sentences. Plain prose, short sentences, no bullet lists, no bold in
-  prose, no em dashes, no closing offer, no recap paragraph, and a list of banned words and
+  prose, no closing offer, no recap paragraph, and a list of banned words and
   phrases. A newsletter that reads as machine-written undoes the thing it is reporting.
 - **`dm-style-guide`** governs the stance: Dark Matter Labs' four publishing guides, read for
   audience, complexity kept rather than flattened, and nothing tidier than the reality. It also
@@ -194,7 +194,7 @@ last, briefly.
    `python3 tools/sync_log_index.py`.
 9. **Run `python3 tools/gates.py` last, and fix what it reports** in the issue or the log entry,
    then run it again. On 2 October eight of nine drafts failed their wiki's checks after the
-   writing was done: em dashes in the log entry more often than in the issue, a missing frontmatter
+   writing was done: banned words in the log entry more often than in the issue, a missing frontmatter
    field, a stale page count. Fix only what you wrote. A banned phrase inside someone's quoted
    words stays as they said it; say so in the log entry and leave that one failure for a person.
 

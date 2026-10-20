@@ -31,6 +31,8 @@ No bullet lists unless asked. No bold words in prose. No headers in anything und
 
 No em dashes. No arrows. No rhetorical questions you then answer yourself.
 
+*Amended 20 October 2026 by Gurden: the em dash ban is dropped. The rest stands.*
+
 No "it's not X, it's Y" contrasts. Just say Y.
 
 No rule of three ("fast, simple, effective") where two or four would be honest.
@@ -117,7 +119,9 @@ From `ai-writing-detox`, and it is the fastest pass to run:
 ## Where the two sources disagree
 
 **Em dashes.** `ai-writing-detox` says they are "fine in moderation" and only reflexive use is a
-tell. The house rule bans them. **The house rule wins**, here and in every other disagreement.
+tell. The house rule banned them until 20 October 2026, when Gurden dropped the ban: it caused more
+failed checks than it prevented. They are allowed again. Use them in moderation, as
+`ai-writing-detox` says. In every other disagreement, **the house rule wins**.
 
 **"Landscape".** `ai-writing-detox` bans it outright as corporate speak, and the house rule lists
 it too. Both mean the abstract usage. The word survives where it means land: this corpus holds a
@@ -144,8 +148,8 @@ information, or only sound impressive?
 ## The automated half
 
 `python3 tools/check_prose.py` settles what a script can settle: the banned words, the banned
-phrases, the X-not-Y construction and the em dash. It runs in CI as a **ratchet**, because 850
-files already carry findings and 20,559 of them are em dashes. A file's count may fall and may
+phrases and the X-not-Y construction. (It counted em dashes too, until 20 October 2026.) It runs in
+CI as a **ratchet**, because hundreds of files already carry findings. A file's count may fall and may
 never rise, and a new file starts at zero. Recovered or imported work is recorded deliberately
 with `--update-baseline --reason '...'`.
 

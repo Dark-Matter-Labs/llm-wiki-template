@@ -181,8 +181,7 @@ jobs:
             LAST, after both files are written: run `python3 tools/gates.py` and fix every
             failure in the issue or the log entry, then run it again, until it passes or
             the only failures left are ones you did not cause. The prose check reads the
-            log entry as closely as the issue: no em dashes in a sentence, none of its
-            banned words. The issue's frontmatter needs `sources: []` like any synthesis
+            log entry as closely as the issue: none of its banned words. The issue's frontmatter needs `sources: []` like any synthesis
             page. Do not edit other files to make a check pass; the next step regenerates
             the page counts and the month's log index itself.
 
