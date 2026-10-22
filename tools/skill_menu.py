@@ -48,6 +48,8 @@ MENU = {
                 "What's the gravity of the wiki right now?", None),
     "lint": ("Check", "Health check", "Finds stale pages, gaps, duplicates and quotes that don't match their source.",
              "Check the wiki.", None),
+    "ino-check": ("Check", "Is it inquiry-native?", "Asks whether a piece of work knows which question it serves and what would change its mind.",
+                  "Run the INO check on {x}.", "Which page or draft?"),
     "publish-check": ("Check", "Is it ready to share?", "Checks a page's sources and claims before it leaves the wiki.",
                       "Is {x} ready to publish?", "Which page?"),
     "overview-refresh": ("Check", "Refresh the overview", "Rewrites the overview around what has arrived since it was last written.",
