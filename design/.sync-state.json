@@ -150,7 +150,7 @@
     "tools/test_check_sources.py": "eb7291bd7551b2ce1b50e154dff80218e603755949427fdb3617e954b39356f1",
     "tools/needs_you.py": "33bd52bf746f6f4eb4babc76b2a60f95a5a55d0fc88839c9a6c209d807402ad8",
     "tools/test_needs_you.py": "9554284cbccf4f40ec83a671496f7e4534a21676a12804eb2c2e0f5ad609cdac",
-    "tools/skill_menu.py": "ac6daf93023b704d72c3c6bdf3503ea727dbc17285a212e9ef09b588074703e7",
+    "tools/skill_menu.py": "246abecad82aa6e50bfcd9fbc86d68999d5c21a41c67e7fc32ce5e78102ee9df",
     "tools/test_skill_menu.py": "4f25e181827f2264abcacc3f2e1c14d97c30da0c4babae85c6ee3769f09f08b0",
     "tools/view_modules.py": "8d42eefdd55a24f50a9f7ba9025b9bd641e2e631ec946475b1cc1db3bb890dd0",
     "tools/test_view_modules.py": "a379dc5f4a9b630ac88558e737733cde55538e75112b274bfbb9634c8a1a6f70",
@@ -179,7 +179,10 @@
     ".claude/skills/pre-read/SKILL.md": "567e8302cd58657592f1c67de61767e9a362669d3280a7ad3c9760b1ad57cad9",
     "AGENTS.md": "a454c2e303ef1080f215ed6f59a2ff4274ac2c72266b6f8368b652d29be4f5da",
     "tools/check_agents.py": "ba700a397accb4599f04b6e76ef5914b79ab10e70c51d866682a716d603a2d35",
-    "tools/test_check_agents.py": "24af71851b21e6a08ef696bf4fe8cbe5717534f1539208f613dbf536266e8a0a"
+    "tools/test_check_agents.py": "24af71851b21e6a08ef696bf4fe8cbe5717534f1539208f613dbf536266e8a0a",
+    ".claude/skills/ino-check/SKILL.md": "3077f6c7543f4ad767c958b153f040684cb3466bbf5091f4f4a4a195874822f8",
+    "tools/ino_check.py": "41084f3e5a50b33ae1e4f91b5f9a4bcb6f407343490eb5fc8e219bfef32d069b",
+    "tools/test_ino_check.py": "db7eeb89692e46862a5d1f6461f852ffa8178c536df7e749caab0a48a25060f3"
   },
   "adapted": {
     "design/xco.tokens.json": {
