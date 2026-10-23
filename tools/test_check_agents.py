@@ -28,6 +28,9 @@ def main() -> int:
         (root / ".agents" / "skills").symlink_to("../.claude/skills")
         if C.problems(root):
             fails.append(f"a good wiki passes: {C.problems(root)}")
+        (root / ".claude" / "skills" / ".archive").mkdir()
+        if C.problems(root):
+            fails.append(f"a hidden folder is ignored: {C.problems(root)}")
         skill(root, "Bad_Name", "---\nname: Bad_Name\ndescription: x\n---\n")
         skill(root, "wrong", "---\nname: other\ndescription: x\n---\n")
         skill(root, "no-desc", "---\nname: no-desc\n---\n")

@@ -48,7 +48,7 @@ def problems(root: pathlib.Path = ROOT) -> list[str]:
     out = [] if (root / "AGENTS.md").exists() else ["AGENTS.md is missing"]
     if not link.exists() or link.resolve() != skills.resolve():
         out.append(".agents/skills must link to .claude/skills (ln -s ../.claude/skills .agents/skills)")
-    for d in sorted(p for p in skills.iterdir() if p.is_dir()) if skills.exists() else []:
+    for d in sorted(p for p in skills.iterdir() if p.is_dir() and not p.name.startswith(".")) if skills.exists() else []:
         out += skill_problems(d)
     return out
 
@@ -56,7 +56,7 @@ def problems(root: pathlib.Path = ROOT) -> list[str]:
 def main() -> int:
     found = problems()
     if not found:
-        n = sum(1 for p in SKILLS.iterdir() if p.is_dir()) if SKILLS.exists() else 0
+        n = sum(1 for p in SKILLS.iterdir() if p.is_dir() and not p.name.startswith(".")) if SKILLS.exists() else 0
         print(f"agents OK — AGENTS.md present, {n} skill(s) load in any tool")
         return 0
     print("agents — other tools would miss part of this wiki:")

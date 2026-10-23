@@ -99,6 +99,16 @@ def main():
         finally:
             staleness.ROOT, staleness.WIKI, staleness.CACHE = old_root, old_wiki, old_cache
 
+    # Freshness (23 October 2026): a half-life by volatility, the page's own field first, then its type.
+    fm = lambda body: "---\n" + body + "title: x\n---\n\nText.\n"
+    check("freshness is 100 on the day of a change", staleness.freshness(0, "warm") == 100)
+    check("freshness halves at one half-life", staleness.freshness(90, "warm") == 50 and staleness.freshness(30, "hot") == 50)
+    check("a cold page stays fresh for months", staleness.freshness(180, "cold") > 70)
+    check("a commitment is hot by its type", staleness.volatility(fm("type: commitment\n")) == "hot")
+    check("a summary is cold by its type", staleness.volatility(fm("type: summary\n")) == "cold")
+    check("a concept is warm by default", staleness.volatility(fm("type: concept\n")) == "warm")
+    check("a page's own volatility wins over its type", staleness.volatility(fm("type: summary\nvolatility: hot\n")) == "hot")
+
     print()
     if FAILED:
         print(f"{len(FAILED)} failed: {', '.join(FAILED)}")

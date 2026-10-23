@@ -1,0 +1,5 @@
+{
+  "_comment": "Byte budgets for what every session loads (tools/check_budgets.py). Raise one on purpose, in a proposed change that says why.",
+  "always_loaded": 61000,
+  "skill_body_max": 30000
+}

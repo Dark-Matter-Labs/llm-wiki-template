@@ -94,6 +94,15 @@ jobs:
       - name: The any-agent check's own cases
         run: python3 tools/test_check_agents.py
 
+      - name: What every session loads stays within its budget
+        run: python3 tools/check_budgets.py --check
+
+      - name: The new tools' own cases (budgets, retraction, source re-check)
+        run: |
+          python3 tools/test_check_budgets.py
+          python3 tools/test_retract.py
+          python3 tools/test_source_refresh.py
+
       - name: Schema — frontmatter, types, commitment states
         # Renamed 2026-08-31. This step was called "Schema + link integrity" and did not check
         # link integrity: it catches a link wrapped across a newline and nothing else. A broken
