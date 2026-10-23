@@ -52,6 +52,11 @@ A document that fails 2, 3 and 5 is a plan. That is sometimes right, and it shou
    author's words where the page is theirs. On a page a person has stood behind (`validation: self` or
    above), show it as a provisional block, as `.claude/rules/plain-register.md` requires. On a
    `machine` page, add it and say so.
+   **The mark most often missing is "what would change our mind"** (5 of 81 pieces of work in the team wiki
+   on 22 October 2026). Draft it in this shape, adapted from nvk/llm-wiki's thesis mode: *What would change
+   our mind: <the evidence>, which <who> could bring, by <when>.* A question page also carries a `verdict:`
+   in its details: `open` until its recommit, then `supported`, `partly supported`, `contradicted`, `mixed`
+   or `not enough evidence`, set by the steward and never by the model.
 5. **Log it** as `## [YYYY-MM-DD] inquiry | INO check: <title>` in today's log file, with the verdict in
    one line. Skip the log entry when the check is part of a publish that already logs.
 

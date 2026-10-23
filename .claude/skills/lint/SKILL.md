@@ -25,6 +25,14 @@ MAY fix frontmatter metadata when the correct value is unambiguous.
    same age. Use `python3 tools/staleness.py`, which reports when a page's *body* last changed
    and ignores frontmatter-only commits. A signal a migration can reset measures migrations.
 
+   **Then read freshness, not just age** (23 October 2026, from nvk/llm-wiki). A month means different
+   things for a commitment and for a source summary. `python3 tools/staleness.py --freshness` lists pages
+   whose freshness has fallen below 50: each halves every 30, 90 or 365 days, by the page's
+   `volatility: hot | warm | cold`, or by its type when it states none (commitments and questions hot, source
+   summaries cold, everything else warm). Report the first few as a reading list. A page that changes fast
+   or slowly by nature may carry its own `volatility:`; propose that, never a fix to the page itself.
+   For sources taken from the web, the `source-refresh` skill checks whether the page behind them moved.
+
 2a. **Ground that moved underneath a page.** Run `python3 tools/dependency_staleness.py`. A
    synthesis, comparison or overview can go stale without being touched, because the pages it was
    built on were rewritten after it. The tool names those dependencies and the pages resting on
@@ -132,6 +140,7 @@ Overall: 🟢 healthy / 🟡 needs attention / 🔴 problems
 8. Dormancy — …
 9. Distance from sources — …
 10. Quotes against their sources — …
+11. What every session loads — `python3 tools/check_budgets.py`: always-loaded bytes and the largest skill, against their budget
 
 Suggested next steps (which need your approval):
 1. …

@@ -32,11 +32,19 @@ Usage:
   python3 tools/staleness.py                 # table, oldest first
   python3 tools/staleness.py --json          # machine-readable
   python3 tools/staleness.py --older-than 28 # only pages untouched that long
+  python3 tools/staleness.py --freshness     # pages whose freshness has fallen below 50
+
+Freshness (23 October 2026, adapted from nvk/llm-wiki): a fixed age means different things for different
+pages. A commitment untouched for a month may be stale; a source summary untouched for a year is fine.
+A page may say how fast it goes stale with `volatility: hot | warm | cold`, whose half-lives are 30, 90 and
+365 days. Without the field, its type decides (HOT_TYPES, COLD_TYPES, otherwise warm). Freshness is
+100 at a body change and halves every half-life. It is a reading list, never a gate and never a fix.
 """
 
 from __future__ import annotations
 
 import argparse
+import re
 import hashlib
 import json
 import os
@@ -52,6 +60,27 @@ CACHE = ROOT / ".staleness-cache.json"
 # Catalogues and logs are navigation, not content — they have no meaningful body age.
 SKIP_DIRS = {"log", "index"}
 SKIP_FILES = {"index.md", "log.md"}
+
+
+HALF_LIFE = {"hot": 30, "warm": 90, "cold": 365}
+HOT_TYPES = ("commitment", "question")
+COLD_TYPES = ("summary",)
+
+
+def volatility(text: str) -> str:
+    """The page's own `volatility:` if it states one, else a default from its type."""
+    head = text.split("---", 2)[1] if text.startswith("---") and text.count("---") >= 2 else ""
+    m = re.search(r"^volatility:\s*(hot|warm|cold)\b", head, re.M)
+    if m:
+        return m.group(1)
+    t = re.search(r"^type:\s*([\w-]+)", head, re.M)
+    t = t.group(1) if t else ""
+    return "hot" if t in HOT_TYPES else "cold" if t in COLD_TYPES else "warm"
+
+
+def freshness(days: int, vol: str) -> int:
+    """100 at a body change, halving every half-life of the page's volatility."""
+    return round(100 * 0.5 ** (max(days, 0) / HALF_LIFE[vol]))
 
 
 def git(*args: str) -> str:
@@ -133,11 +162,32 @@ def main(argv=None) -> int:
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--older-than", type=int, default=0, metavar="DAYS")
     ap.add_argument("--force", action="store_true", help="ignore the cache")
+    ap.add_argument("--freshness", nargs="?", const=50, type=int, metavar="BELOW",
+                    help="list pages whose freshness is below this (default 50), by volatility")
     args = ap.parse_args(argv)
 
     now = time.time()
     ages = {rel: int((now - ts) / 86400) for rel, ts in compute(args.force).items()}
     keep = {k: v for k, v in ages.items() if v >= args.older_than}
+
+    if args.freshness is not None:
+        rows = []
+        for rel, days in keep.items():
+            vol = volatility((ROOT / rel).read_text(encoding="utf-8", errors="replace"))
+            score = freshness(days, vol)
+            if score < args.freshness:
+                rows.append((score, rel, vol, days))
+        rows.sort()
+        if args.json:
+            print(json.dumps([{"page": r, "freshness": f, "volatility": v, "days": d} for f, r, v, d in rows], indent=2))
+            return 0
+        print(f"freshness below {args.freshness} — {len(rows)} page(s), least fresh first\n")
+        for f, r, v, d in rows[:40]:
+            print(f"  {f:>3}  {v:<4} {d:>4}d  {r}")
+        if len(rows) > 40:
+            print(f"  … and {len(rows) - 40} more")
+        print("\n  A reading list, not a fault list. A person decides whether a page needs work.")
+        return 0
 
     if args.json:
         print(json.dumps(keep, indent=2, sort_keys=True))
