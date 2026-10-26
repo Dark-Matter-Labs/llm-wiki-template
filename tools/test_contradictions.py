@@ -25,7 +25,7 @@ def page(title, **fields):
             fm.append(f'{k}: "{v}"')
     return {"slug": title.lower().replace(" ", "-"), "contradicts": fields.get("contradicts"),
             "superseded_by": fields.get("superseded_by"),
-            "devalued_by": fields.get("devalued_by")}
+            "devalued_by": fields.get("devalued_by"), "stands_with": fields.get("stands_with")}
 
 
 def corpus(*pages):
@@ -71,6 +71,24 @@ def main():
     op, cl, pr = C.analyse(c)
     check("a resolution pointing at a missing page is caught",
           any("does not exist" in m for _, m in pr), f"problems={pr}")
+
+    # Both stand (Leon, 16 October 2026: "how do we deal with things where there is no clear single truth?").
+    c = corpus(("A", {"contradicts": "B", "stands_with": "B"}), ("B", {}))
+    op, cl, pr = C.analyse(c)
+    check("stands_with closes it as both standing",
+          not op and len(cl) == 1 and "both stand" in cl[0][1] and not pr, f"closed={cl} problems={pr}")
+    c = corpus(("A", {"contradicts": "B"}), ("B", {"stands_with": "A"}))
+    op, cl, pr = C.analyse(c)
+    check("stands_with on the other page closes it too",
+          not op and len(cl) == 1 and not pr, f"closed={cl} problems={pr}")
+    c = corpus(("A", {"contradicts": "B", "stands_with": "B", "superseded_by": "B"}), ("B", {}))
+    op, cl, pr = C.analyse(c)
+    check("both standing and a winner at once is incoherent",
+          any("both stand" in m for _, m in pr), f"problems={pr}")
+    c = corpus(("A", {"contradicts": "B", "stands_with": "Ghost"}), ("B", {}))
+    op, cl, pr = C.analyse(c)
+    check("stands_with pointing at a missing page is caught, and the pair stays open",
+          len(op) == 1 and any("stands_with" in m and "does not exist" in m for _, m in pr), f"open={op} problems={pr}")
 
     # 6. Contradicting a page that does not exist.
     c = corpus(("A", {"contradicts": "Nowhere"}),)
