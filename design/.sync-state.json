@@ -190,7 +190,8 @@
     "tools/source_refresh.py": "b4535746715227b43793e3014074792f0818811c0e7e1aa836fcbb10c16bd278",
     "tools/test_source_refresh.py": "6fc6016deaf2b05f8939b5b474ef0db827e93c41da77cbb5d2521652bd5fab87",
     ".claude/skills/retract/SKILL.md": "5f059d26f9094eefb6cbc4d925727ae9c947949565f1e94dde04868326d7854b",
-    ".claude/skills/source-refresh/SKILL.md": "65637e4797091ccffc6b8eafccf48f2e481064535c965bb415b88657ffd95bc9"
+    ".claude/skills/source-refresh/SKILL.md": "65637e4797091ccffc6b8eafccf48f2e481064535c965bb415b88657ffd95bc9",
+    ".claude/rules/pushing.md": "82426131ad7b44262dbe131888760cb90fb02e5057d46448d528b88acd80862c"
   },
   "adapted": {
     "design/xco.tokens.json": {
