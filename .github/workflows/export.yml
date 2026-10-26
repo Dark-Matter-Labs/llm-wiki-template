@@ -6,12 +6,8 @@ name: Export wiki graph
 # contains nothing else — then optionally ping the lens to rebuild. The full graph
 # (wiki.json, which includes private pages) is built for local use but never pushed.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "wiki/**"
-      - "tools/export.py"
-      - ".github/workflows/export.yml"
+  # In this wiki the export runs as the first steps of deploy-pages.yml, so a merge pays for one job, not two
+  # (26 Oct 2026). Start this one by hand if the export branch ever needs publishing on its own.
   workflow_dispatch:
 
 permissions:

@@ -8,6 +8,8 @@ on:
     branches: [main]
     paths:
       - "docs/**"
+      - "tools/export.py"
+      - ".github/workflows/export.yml"
       - "wiki/**"
       - "tools/needs_you.py"
       - "tools/build_needs_you_page.py"
@@ -19,7 +21,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write   # it also publishes the export branch (26 Oct 2026)
   pages: write
   id-token: write
   # For the Needs-you page: which proposals are waiting, and whether their checks passed.
@@ -44,6 +46,36 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 0     # the Needs-you page reads the history (growth, overview age, unsaved work)
+
+      # The export, folded in on 26 Oct 2026: it was its own job in export.yml, a second billed job on every merge
+      # (about 2,500 Actions minutes a month across the wikis). These are export.yml's own steps, run first so
+      # the export branch is published even if a site check below stops the site. export.yml stays, by hand only.
+      - name: Validate frontmatter (schema check)
+        run: python3 tools/export.py --check
+
+      - name: Build the export graph
+        run: python3 tools/export.py
+
+      - name: Publish ONLY the public graph to an orphan export branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # SECURITY: the export branch must contain NOTHING but the private-stripped
+          # public graph — never the repo tree, never the full (private) wiki.json.
+          # (A previous version did `git checkout -B export` from main, which mirrored
+          # the entire private repo + all private page bodies to a branch any colleague
+          # with repo access could read.) We build a clean, single-file orphan branch.
+          mkdir -p _publish
+          cp export/wiki.public.json _publish/wiki.public.json
+          cd _publish
+          git init -q
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add wiki.public.json
+          git commit -q -m "chore(export): public graph [skip ci]"
+          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/export
+          echo "Published wiki.public.json to the export branch (public graph only)."
 
       - name: Block deploy if sensitive material is on a public surface
         # Tripwire: fails (and stops the deploy) if any never-public term from
