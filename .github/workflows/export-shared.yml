@@ -34,6 +34,9 @@ concurrency:
 jobs:
   export-shared:
     runs-on: ubuntu-latest
+    # Runs only where a shared mirror is set up (the SHARED_REPO variable): elsewhere it built the cut and then
+    # skipped publishing, a billed job for nothing. Its leak tests run in checks.yml regardless. 26 Oct 2026.
+    if: vars.SHARED_REPO != ''
     steps:
       - name: Checkout source wiki
         uses: actions/checkout@v7
