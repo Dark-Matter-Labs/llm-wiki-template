@@ -307,6 +307,26 @@ def main():
     check("with no graph built it offers nothing rather than guessing",
           sb["available"] is False and sb["pages"] == [])
 
+    # Customisations asked for in INO Home: only the ones still wanted, and a broken file is not a crash.
+    with tempfile.TemporaryDirectory() as tmp:
+        old_root = W.ROOT_P
+        W.ROOT_P = pathlib.Path(tmp)
+        try:
+            none_yet = W.customisations_asked()
+            (pathlib.Path(tmp) / "design").mkdir()
+            f = pathlib.Path(tmp) / "design" / "customisations.json"
+            f.write_text(json.dumps({"wanted": [{"id": "rooms", "name": "Rooms", "state": "wanted"},
+                                                {"id": "hunches", "name": "Hunches", "state": "done"}]}))
+            asked = W.customisations_asked()
+            f.write_text("{broken")
+            broken = W.customisations_asked()
+        finally:
+            W.ROOT_P = old_root
+    check("customisations: only those still wanted are named", asked == ["Rooms"], str(asked))
+    check("customisations: no file or a broken file names none", none_yet == [] and broken == [])
+    check("customisations: the report names them",
+          "Rooms" in W.render({"repo": "x", "proposals": [], "never_proposed": [], "customise": ["Rooms"]}))
+
     # And the date, which is the whole reason this exists.
     m = {"repo": "owner/repo", "proposals": [], "never_proposed": [], "decided": [],
          "unavailable": None,
