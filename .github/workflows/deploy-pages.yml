@@ -15,7 +15,7 @@ on:
       - "tools/templates/**"
       - ".github/workflows/deploy-pages.yml"
   schedule:
-    - cron: "20 5 * * *"   # daily, so the Needs-you page stays fresh on quiet days
+    - cron: "20 5 * * 1" # Mondays. The site is published on every merge anyway; the daily run kept the Needs-you page fresh on quiet days and cost about 460 Actions minutes a month (26 Oct 2026)
   workflow_dispatch:
 
 permissions:
