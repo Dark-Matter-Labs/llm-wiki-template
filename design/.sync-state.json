@@ -28,7 +28,7 @@
     "tools/test_validation_weighting.py": "073d1153c1ca45b899ba5d6d0fb2fdf67003816640b950e9cf33153f365740d2",
     "tools/sync_commons.py": "1caa1a56d1c1d1a678e11d5f32ed3db26ceca59862e74c6651f6197a2cda9e1d",
     "tools/test_sync_commons.py": "39fb5e7f459132381c2ce0fda3087df443873cb98a55c2fd8253c466e8fd9a94",
-    "design/shared-layer.json": "ba30d731f8cb7e9212a7e8379f5934f0d201277617d4c6cdf0e3e2a9c378cdaf",
+    "design/shared-layer.json": "0f2546bb62589848c31e9a9a1f03bb6c0f9098518288321f7fe426bcfc7e1f8b",
     "tools/drift-baseline.json": "ba4bbdf1dbb23d3d3d147f7918beead2a4f7866d494903c1c6248195dbb7742f",
     "tools/check_drift.py": "3f1e4693b9e69f001e6b17ade2268fcfbe841079523f3786327d3a5a04ccf23c",
     "tools/test_check_drift.py": "5c7dd9e481d72d0ad89bccc547014254355f4f009d730fe2fef020768721e9f2",
@@ -82,8 +82,8 @@
     ".claude/skills/dm-style-guide/SKILL.md": "10336e8ba70b04fb08fd8a5dbe981acfb6d1ba0859b2e6cc4d69ab937c3cb754",
     "tools/check_prose.py": "9f792d8788c0a4dbd35c07967b5415382548ad036753d4d68d7c43ce3183a486",
     "tools/test_check_prose.py": "b8cb02aa91c875305184650dab22c1054eea65f9dce76aaca03b6db54ec77918",
-    "tools/waiting.py": "7e69bd88f5d1b6e427feb4ebb3631341802a7e9d460ea82a25bee89dc6f8b875",
-    "tools/test_waiting.py": "5212aea15305e19b21c9258a04245dcf2daaddcd739a98531a65e6bed08d8535",
+    "tools/waiting.py": "bc8acd35c10e7b43f120f6b8a813a9ec210df645c9d08f243d1c4da7236be008",
+    "tools/test_waiting.py": "bff5f1ce740549989a90ba670ea373f5b8cf0ca695d04ba9e2cf5d144440f513",
     ".github/workflows/waiting.yml": "8958077013f005fcb854f75e92e70fe39d513efe0adb7ab9cc5567709d569764",
     ".claude/skills/waiting/SKILL.md": "40bed41c0c628aa374879ce27bc5dc38f0cf00f6a2e7eaf113b3932e56780154",
     "tools/newsletter.py": "6411ad1d54f2c8d133f2c9e6a43b386d2acd7ac6b3cb93a204985a6d8394470e",
@@ -191,7 +191,16 @@
     "tools/test_source_refresh.py": "6fc6016deaf2b05f8939b5b474ef0db827e93c41da77cbb5d2521652bd5fab87",
     ".claude/skills/retract/SKILL.md": "5f059d26f9094eefb6cbc4d925727ae9c947949565f1e94dde04868326d7854b",
     ".claude/skills/source-refresh/SKILL.md": "65637e4797091ccffc6b8eafccf48f2e481064535c965bb415b88657ffd95bc9",
-    ".claude/rules/pushing.md": "82426131ad7b44262dbe131888760cb90fb02e5057d46448d528b88acd80862c"
+    ".claude/rules/pushing.md": "82426131ad7b44262dbe131888760cb90fb02e5057d46448d528b88acd80862c",
+    ".claude/skills/customise/SKILL.md": "423b37bd31e4c418926a7658e54ed1b4fff69a5b61a0aa6b757be8b7c54d71ee",
+    ".claude/reference/house-rules.md": "9756741e1f3d8aadf7f8bf2c36b3e5488ed1bdaa014b108d4d588730f3d33a27",
+    ".claude/reference/navigation-and-log.md": "23cc22dc72ef4a29702f4ec0d32b869768dae69297be4d7e365a20a4de459779",
+    ".claude/reference/operations.md": "9fdc464c08cef40fb0d76804823e4f96fff6fe9b7da403cf5e214fbca702a82c",
+    ".claude/reference/page-fields.md": "447c3bd6d527bd131692e35b0e702fa18419cf0a684448e7802bee2bf4c65369",
+    ".claude/reference/rules-in-full.md": "bae3d43417a3f0545630fddcaeebdcf90ca1930ff753728af560b68d64ce65b6",
+    "design/claude-md-compact.md": "0c8d8f98ecf9b05737eadef70f06588a8fff6cdc2fa35feaee4d52fc2b735975",
+    "tools/slim_claude_md.py": "d3be6e8103286369e08f3bd6bb587dcd2c5d51cb60e361fa309eb2cb054b9a0d",
+    "tools/test_slim_claude_md.py": "93802afc4fe0f3e3d10ed58b007174711addc69c99b5bce9ae6463bb3f3bf42e"
   },
   "adapted": {
     "design/xco.tokens.json": {

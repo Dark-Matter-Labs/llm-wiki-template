@@ -542,10 +542,22 @@ def held_here():
             "shared_total": len(shared)}
 
 
+def customisations_asked():
+    """Customisations asked for in INO Home and not set up yet: their names, from design/customisations.json.
+
+    INO Home's "Use this in my wiki" only records the request; the customise skill sets it up. Without this line a
+    request sat in the file and nothing ever mentioned it (26 Oct 2026)."""
+    try:
+        doc = json.loads((ROOT_P / "design" / "customisations.json").read_text(encoding="utf-8"))
+        return [w.get("name") or w.get("id") for w in doc.get("wanted") or [] if w.get("state") == "wanted"]
+    except (OSError, ValueError, AttributeError):
+        return []
+
+
 def gather(slug):
     m = {"repo": slug, "proposals": open_proposals(slug), "never_proposed": [],
          "decided": [], "unavailable": None, "stand_behind": nothing_stands_behind(),
-         "held": held_here(),
+         "held": held_here(), "customise": customisations_asked(),
          "gone": contributed_but_gone(),
          "up": could_go_up()}
     try:
@@ -670,6 +682,12 @@ def render(m) -> str:
                    f"corrections for ({len(accidental)} not declared deliberate)")
         for r in h["files"][:5]:
             out.append(f"     {r['path']}  ({r['why']})")
+        out.append("")
+
+    if m.get("customise"):
+        out.append(f"  {len(m['customise'])} customisation(s) asked for in INO Home, not set up yet: "
+                   + ", ".join(m["customise"]))
+        out.append("     Say \"set up my customisations\" and Claude sets each one up with this wiki's own content.")
         out.append("")
 
     u = m.get("up") or {}

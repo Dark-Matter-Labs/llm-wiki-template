@@ -67,17 +67,20 @@ preferences they've stated more than once.
 
 ## The three layers (never blur them)
 
-1. **`raw/`** — source documents the owner curates. PDFs, markdown, text, images, data.
-   These are **immutable**. You read from them; you NEVER edit or delete them.
-   This is the source of truth. Assets (images) live in `raw/assets/`.
+1. **`raw/`**: the sources the owner curates. **Immutable**: read them, never edit or delete them. Images in `raw/assets/`.
+2. **`wiki/`**: the pages you own and write. Summaries, entities, concepts, comparisons, the overview, syntheses.
+3. **`CLAUDE.md`, `.claude/skills/` and `.claude/reference/`**: the rules and workflows, co-evolved with the owner. If a
+   workflow keeps needing the same correction, propose an edit to the skill or to this file.
 
-2. **`wiki/`** — the markdown pages you own entirely. Summaries, entity pages, concept
-   pages, comparisons, the overview, the synthesis. You create and maintain all of it.
-   The owner reads it; you write it.
+**Detail lives in `.claude/reference/`, read only when the work needs it** (moved there 2026-10-13 to save tokens on
+every turn; nothing was removed). Read the named file *before* doing that kind of work:
 
-3. **This schema (`CLAUDE.md`) + the skills in `.claude/skills/`** — the rules and
-   workflows. You and the owner co-evolve these over time. If a workflow keeps needing the
-   same correction, propose an edit to the relevant skill or to this file.
+| Before you… | read |
+|---|---|
+| set `visibility`, `validation`, `machine_checks`, dormancy, `decides:`, `same_as:`, `contradicts:`, `derivation:`, or a verification mark | `.claude/reference/page-fields.md` |
+| edit `wiki/index.md`, a shelf, or the log | `.claude/reference/navigation-and-log.md` |
+| decide which skill or tool fits a request not in the list below | `.claude/reference/operations.md` |
+| touch the house rules or any hard rule's edge case | `.claude/reference/house-rules.md` |
 
 ---
 
@@ -104,316 +107,92 @@ horizon: near | mid | far                         # for sequence views
 ---
 ```
 
-### Publication tiers — `visibility` (required)
-
-Every page carries a `visibility` tier. **Default is `private`.** The owner opts a page up
-themselves, or tells you in-session; never guess a page into `public`.
-
-- **`public`** — publishable to the open web (site + public export + external channels).
-- **`unlisted`** — rendered on the site but not indexed and not linked from public
-  navigation. Reachable only by direct link. Good for works-in-progress and anything
-  shared with one person by link.
-- **`internal`** — shared with **trusted colleagues** via the shared mirror repo, but
-  **never on the open web** (not the Pages site, not the public JSON graph). This is the
-  tier for ordinary working knowledge — concepts, entities, source summaries — that a
-  colleague needs to be useful but that isn't for publication.
-- **`private`** — never leaves the repo. Excluded from every export and every external
-  channel (including the colleague mirror) — not just the body, but the page's title and
-  any links pointing to it. Keep CRM, capital/deal specifics, contracts, meeting
-  transcripts and unpublished positions here.
-
-When you ingest new pages, ask the owner **once per ingest** which tier applies; if they
-don't say, file everything `private`. The `publish-check` skill verifies a page's tier is
-consistent with its content before anything ships.
-
-### Viz-layer fields (optional — light ontology for the frontend)
-
-These help a frontend "lens" place a page in the right view. Set them only when a page
-*clearly* belongs to a layer; leave them off otherwise (an accurate blank beats a wrong tag).
-
-- **`layer`** — `goal` (a goal space / horizon), `portfolio` (a set of options/positions),
-  `mechanism` (how something works), or `sequence` (a staged/temporal view).
-- **`parent`** — the exact title of the parent page, for nesting.
-- **`horizon`** — `near` | `mid` | `far`, for sequence/timeline views.
-
-### Validation — who has stood behind a page (required)
-
-`validation` is **not** `confidence`. Confidence is what the page claims about its own
-evidence; validation records **who has stood behind it**. A well-sourced page nobody has
-confirmed is a different object from a hunch the group has endorsed.
-
-- **`machine`** — you wrote or filed it; nobody has confirmed it. This is the default and
-  the honest state for anything new.
-- **`self`** — the owner confirmed it. Requires `validated_by`.
-- **`peer`** — another member confirmed it. Requires `validated_by`.
-- **`collective`** — reviewed together. Requires `validated_by`.
-
-**You may set `machine`, and propose `self`. You may never award `peer` or `collective`** —
-those need a second person, and a model granting them would make the hierarchy meaningless.
-
-A **second frontier model** reading a page is a real signal and is recorded separately, in
-`machine_checks:` — never in `validation`:
-
-```yaml
-machine_checks:
-  - model: gpt-5.2
-    date: 2026-08-25
-    verdict: agrees | disputes | unsure
-    note: one line on what it actually said
-```
-
-**A machine check may move `confidence`. It may never move `validation`.** Two models
-agreeing is weaker evidence than it feels like — they were trained on overlapping corpora
-and fail in correlated ways, and neither has a stake in being wrong. A `disputes` entry is
-a **declaration, not a resolution**, exactly like `contradicts:`: it stands until a person
-decides, and may not be deleted by the model that disagrees with it. Run the `cross-check`
-skill; `python3 tools/cross_check.py --check` gates it, and refuses any `validated_by`
-that names something model-shaped.
-
-Validation feeds the gravity weighting: unvalidated material is admitted, indexed and
-searchable, but does not yet move the corpus's centre. That is the protection against a
-large body of well-formed but out-of-date thinking dragging the whole model backwards.
-
-### Dormancy — pages retire, they do not die
-
-`status: dormant` marks a page nobody stands behind and nothing references any more. It is a
-**weight-and-visibility** change, not a deletion: the file stays and stays readable, its
-catalogue row moves to an attic shelf, and `compute_gravity.py` stops counting it so retired
-thinking cannot keep pulling the corpus's centre. Waking it is symmetrical.
-
-**Only a human sets it.** `lint` proposes candidates and never applies them — deciding that a
-line of thinking is finished is a judgement, and a model making it silently would quietly narrow
-the corpus.
-
-The signal is `tools/staleness.py`, which reports when a page's **body** last changed, ignoring
-frontmatter-only commits. Git mtime cannot be used: one schema backfill rewrites every page's
-frontmatter and resets every clock at once. A signal a migration can reset measures migrations.
-
-### Recording a decision about unmerged work — `decides:`
-
-A page that settles what happens to work sitting on branches lists those branches in its
-frontmatter, so a tool can tell a closed question from an open one:
-
-```yaml
-decides:
-  - claude/some-branch-name
-```
-
-`tools/waiting.py` reads it and moves those branches out of the waiting list. **The page's own
-`validation` decides how they are reported.** A ruling at `machine` is shown as decided *and*
-flagged — "nobody has stood behind that decision" — because a model closing a question is a
-proposal that has been treated as settled, not a decision. A ruling carrying `validation: self`
-or above with a `validated_by` is reported without the flag.
-
-This exists because a ruling in another wiki closed a question in September 2026, said in terms
-that it existed so nobody would re-derive it, and was re-derived twelve days later by a tool that
-could not see decisions. An inbox that keeps re-raising settled matters trains people to stop
-opening it.
-
-### The same subject, in more than one wiki — `same_as:`
-
-Measured across the federation on 18 September 2026: of 172 entity and concept titles held by
-more than one wiki, 165 already carry `origin` — they are copies contributed up to a commons,
-and the edge exists. Seven do not. They are pages different people wrote independently about
-the same thing, with nothing joining them.
-
-```yaml
-same_as: [michelle-llm-wiki/muga-valley, power-project-wiki/dark-matter-labs]
-```
-
-It records that two pages are about one subject, and nothing else. It does not merge, supersede
-or rank, and it is **a person's judgement** — a model may propose one, the way it may declare a
-`contradicts:`, and may not decide that two bodies of thinking are the same thing.
-
-**Identity is symmetric; recording it is not.** A `private` page's title never leaves its repo,
-so a more visible page naming one would publish that it exists. A page may therefore only point
-at a target at least as open as itself:
-
-| carrier | may name |
-|---|---|
-| `private` | anything — it never exports, so it can leak nothing |
-| `internal` | `internal`, `public`, and the target must be visible in a commons cut read here |
-| `unlisted` | `unlisted`, `public` — unlisted is reachable on the web by direct link |
-| `public` | `public` |
-
-Of the 22 possible edges among those seven subjects, 17 are legal and five are refused; every
-refusal is an internal or unlisted page reaching for a private one. A non-private page must also
-be able to *see* its target, because asserting that a page exists in a repository you cannot read
-is not a claim this wiki can stand behind.
-
-Gated by `python3 tools/check_same_as.py --check`, and carried into the export so the reading
-interfaces can traverse it — safe by construction, since a node that survives a cut can only name
-pages at least as open as itself.
-
-### Contradictions must resolve, never sit silent
-
-When two pages genuinely disagree, declare it on the newer page:
-
-```yaml
-contradicts: "Title of the page this disagrees with"
-```
-
-Declaring is your job; **resolving is not**. A contradiction closes only when a human adds,
-to whichever page loses, either `superseded_by: "Title"` (the new position replaces it) or
-`devalued_by: "Title"` (the input is downgraded). Nothing is deleted either way — the losing
-page stays readable with a pointer, so plurality is preserved and only the silence is removed.
-Run `python3 tools/contradictions.py` to see what is open.
-
-- **`confidence`** reflects how well-supported the page is. A page built from one source is
-  `low`; a synthesis confirmed across several sources is `high`. This lets the lint pass
-  find pages that need re-examination when new sources arrive.
-- **Cross-links** use `[[Page Title]]` wiki-link style so the graph stays navigable.
-- **Every factual claim cites its source** inline, e.g. `(raw/some-report-2026.pdf)`.
-  If a claim comes from your own synthesis rather than a source, mark it clearly as
-  synthesis so the owner can tell what is grounded vs. inferred.
-- Keep pages **small and focused**. One entity or concept per page. Prefer merging a new
-  idea into an existing page over creating a near-duplicate.
-
-### New page vs. edit-in-place
-- **New page** when it is a distinct entity or concept you would link to from elsewhere.
-- **Edit in place** when it is an attribute or update of something that already exists.
+- **`visibility`** (required, default `private`): `public` (open web) · `unlisted` (on the site, not indexed) ·
+  `internal` (colleagues via the shared mirror, never the open web) · `private` (never leaves the repo: not its
+  body, title or links to it). The owner opts a page up; never guess a page into `public`. Ask the tier **once per
+  ingest**; with no answer, file `private` (or the default this file's own rules set, as a
+  commons does). Keep the CRM, capital and deal specifics, term sheets, meeting transcripts and unpublished
+  positions `private`. The `publish-check` skill verifies a tier before anything ships.
+- **`validation`** (required, default `machine`) records who stood behind a page; `confidence` is the evidence.
+  You may set `machine` and propose `self`; **never award `peer` or `collective`**. `self`/`peer`/`collective`
+  need `validated_by`. A second model's reading goes in `machine_checks:` and may move `confidence`, never
+  `validation`; a second model's reading of a citation goes there too. A `disputes` entry stands until a person
+  decides. Run the `cross-check` skill for it.
+- **Viz-layer fields** (`layer`, `parent`, `horizon`): only when a page clearly belongs to a layer.
+- **`status: dormant`** retires a page without deleting it. **Only a human sets it**; `lint` proposes candidates.
+- **`decides:`** lists the branches a page settles; `tools/waiting.py` reads it.
+- **`same_as:`** records two pages are one subject. A person's judgement; you may propose. A page may only name a
+  target at least as open as itself, and a non-private page only one it can see (`tools/check_same_as.py --check`).
+- **`contradicts: "Title"`** goes on the newer page when two pages disagree. Declaring is your job, resolving is
+  not: a human adds `superseded_by` or `devalued_by`, or `stands_with` when both stand. Nothing is deleted. `python3 tools/contradictions.py`.
+- **`confidence`**: one source is `low`; confirmed across several is `high`.
+- **Links** are `[[Page Title]]`. Never split one across a newline; in a table use the plain `[[Full Title]]` form.
+- **Every factual claim cites its source** inline, e.g. `(raw/ccc-report-2025.pdf)`; mark your own synthesis as such.
+- **Verification is per claim.** A person's mark after a citation reads `{✓ Name YYYY-MM-DD}`. **You may never write
+  this mark.** `python3 tools/verification.py --sample 3` names the claims worth a person's reading.
+- **`derivation:`** (`source` | `synthesis` | `derivative`): set it on every page you write.
+- Keep pages **small and focused**: one entity or concept each. A distinct thing you would link to gets a new page;
+  an attribute or update of an existing one is edited in place. Prefer merging over near-duplicates.
 
 ---
 
 ## Page types
 
-- **summary** — one per ingested source. What it says, key takeaways, who/what it names.
-- **entity** — a person, org, place, project, tool, programme. Facts + links to sources.
-- **concept** — an idea, framework, method, or theme that spans multiple sources.
-- **comparison** — a deliberate side-by-side (e.g. two approaches, two cities).
-- **overview** — `wiki/overview.md`, the top-level map of the whole wiki. Kept current.
-- **goal** — a destination the work is aimed at. Explicit and formal, because it carries a
-  contractual layer: `horizon`, and `parent` when goals nest. This is the one place the
-  system asks for structure up front; everything else stays tacit.
-- **commitment** — resources actually committed against a goal. Requires `commits_to`
-  (the goal's exact title), `resources`, `until`, and a `state`:
-  `proposed | held | honoured | revised | lapsed | exited | declined`.
-  **`declined` and `exited` are non-penalised** — refusing, or leaving deliberately, is a
-  valid outcome and must never be rendered as failure. Only `lapsed` (fell over without a
-  decision) counts against a goal. Run `python3 tools/goals.py` for the computed view;
-  **progress is never typed by hand.**
-- **synthesis** — the evolving thesis / "what it all means so far" for a topic.
+`summary` (one per source) · `entity` (person, org, place, project, tool, programme) · `concept` (an idea spanning
+sources) · `comparison` · `overview` (`wiki/overview.md`, kept current) · `synthesis` (the evolving thesis) ·
+`goal` (a destination; carries `horizon`, and `parent` when goals nest) · `commitment` (resources against a goal:
+needs `commits_to`, `resources`, `until`, `state`: `proposed | held | honoured | revised | lapsed | exited | declined`;
+`declined` and `exited` are never failures, only `lapsed` counts against a goal). Progress is computed by
+`python3 tools/goals.py`, never typed.
 
 ---
 
-## The two navigation files
+## The index and the log
 
-**`wiki/index.md`** — content catalogue. Every page listed with a link, a one-line summary,
-and its type, organised by category. **You update it on every ingest.** It is a routing
-file: read it to see the *shape* of the corpus, not to find a page. To find pages, follow the
-retrieval order in the generated block near the top of this file — `search.py` first, then the
-graph, then read. Do not scan the whole wiki.
-
-**`wiki/log.md`** — the log's **index**. The entries themselves live in **one file per day**
-at **`wiki/log/YYYY-MM-DD.md`** (e.g. `wiki/log/2026-08-19.md`). **Append every new entry to
-today's file**, creating it (with the same header as the others) if it is the day's first entry,
-then run `python3 tools/sync_log_index.py` — it regenerates the month index at
-`wiki/log/YYYY-MM.md` from the day files, so the row is never hand-typed and never forgotten.
-Never rewrite past days — corrections are appended as new entries. To read "the log", read
-today's file first, then walk back through the month index.
-
-Per-day, not per-month: a month file is one append point, so two sessions working the same day
-collide every time. This wiki was migrated on 2026-08-20, after that collision hit twice inside a
-single merge. `tools/check_log_shape.py` keeps entries out of the month index.
-
-Every ingest, query, and lint pass gets one entry. Start each entry with a consistent prefix so
-it stays greppable:
-
-```
-## [YYYY-MM-DD] ingest | Source Title
-## [YYYY-MM-DD] query  | The question asked
-## [YYYY-MM-DD] lint   | Health check
-## [YYYY-MM-DD] rebuild | Derived-artifact build/rebuild (e.g. a published page)
-```
+- `wiki/index.md` is the **router**; catalogues sit on shelves under `wiki/index/` where the wiki has them. Load a shelf
+  only when a question is squarely in it. Every ingest adds the new page's **one-line** row. Counts are computed by
+  `tools/sync_index_counts.py` where it exists, and never typed.
+- The log is **one file per day**, `wiki/log/YYYY-MM-DD.md`. Append to today's file (create it with the usual header),
+  then run `python3 tools/sync_log_index.py`. Never rewrite a past day; correct by appending. To read the log, read
+  today's file first, then walk back through the month index.
+- Every ingest, query and lint gets one entry, prefixed `## [YYYY-MM-DD] ingest | …` (or `query`, `lint`,
+  `rebuild` for an advance, `repair` for a defect fixed: a repair of your own error reads `repair | … (mine)`; work that does both is a `rebuild` naming what it repaired).
 
 ---
 
 ## The core operations
 
-You have skills in `.claude/skills/`. Read the relevant SKILL.md before running one.
-In plain-English terms, here is when each fires:
+Each skill in `.claude/skills/` says when it fires; read its SKILL.md before running it. The common ones:
+add a source, `ingest` · a question, `query` · "check the wiki", `lint` · "catch me up", `brief` · a new idea,
+`office-hours` · "share this with the team", `contribute` · contacts and meetings, `crm` · "what's waiting", `waiting`
+· "what don't we know", `open_questions.py` then `inquiry` · call notes, `call-notes` · "that's done", `my-commitments`
+· a brief for a meeting, `pre-read` · "is this inquiry-native", `ino-check` · "have my sources changed", `source-refresh` · "something leaked", `retract` · "refresh the lens", `lens-refresh` · "set up my customisations", `customise`. If unsure, see `.claude/reference/operations.md`.
+If intent is ambiguous, ask **one** short question, then proceed.
 
-| The owner says something like…                     | You run   |
-| -------------------------------------------------- | --------- |
-| "add this", "ingest", "here's a new report"        | `ingest`  |
-| "what does the wiki say about…", "find", "compare" | `query`   |
-| "check the wiki", "is it healthy", "clean up"      | `lint`    |
-| "catch me up", "what's new", "weekly summary"      | `brief`   |
-| "I have a new idea / project", "help me think"     | `office-hours` |
-| "is this ready to publish / share externally"      | `publish-check` |
-| "publish this as a web page", "make a shareable link", "put this on the site" | `publish-web` |
-| "challenge this", "run the joker", "what's the counterposition", "steelman the opposite" | `joker` |
-| "run the weekly reflection", "what deviated this week" (by hand — the Friday job was deleted 2026-09-18) | `reflect` |
-| "how am I using this", "metacognition", "usage patterns" | `metacognition` |
-| "what's the gravity / trajectory of the repo", "where does this sit relative to the repo" | `gravity` |
-| "make that a skill", "learn this pattern" (asks you to verify before creating) | `learn` |
-| "run a delta", "measure this against the wiki", "where does this sit / move us" | `delta` |
-| "share this with the team", "contribute this", "propose this to the commons" | `contribute` |
-| "add a contact", "log that meeting", "who do we know at…", "prep me for my meeting with…" | `crm` |
-| "what's waiting for me", "what needs me", "anything outstanding" | `waiting` |
-
-Published web pages live in `docs/` and are served by GitHub Pages.
-
-**The Axioms Register (`wiki/axioms.md`)** is the living register of the corpus's foundational
-assumptions — each with a claim, its logic chain, dependencies, and an honest evidence status
-(`evidenced | assumptive | contested`; `assumptive` is legitimate). The `joker` skill reads it to
-find the orthodoxy it challenges; the `reflect` skill checks whether the week's work moved an axiom.
-
-**The CRM (`wiki/crm/`)** is the relationship layer — contacts and accounts as private entity
-pages with a dated interaction log and the `[[link]]` graph as the relationship map;
-`wiki/crm/roster.md` is its catalogue. Run the `crm` skill for it. **It is the most sensitive data
-in the repo and is ALWAYS `visibility: private`** — never public/unlisted, never published or
-exported, never in the shared mirror. Calendar integration is **read-only** (log meetings,
-pre-meeting briefs) and excludes personal events; writing to the calendar needs the owner's
-explicit per-action approval. Never fabricate relationship state (`unset` when unknown).
-
-If intent is ambiguous, ask **one** short clarifying question, then proceed.
+- **The Axioms Register** (`wiki/axioms.md`) holds the corpus's foundational assumptions; `joker` and `reflect` read it.
+  Keep it in step with [[The Core Assumption Chain]] where the wiki has that page.
+- **The CRM** (`wiki/crm/`) is **always `private`**: never published, exported or mirrored. Calendar access is
+  read-only; writing to it needs the owner's yes each time. Never fabricate relationship state.
+- Published pages live in `docs/`, served at `https://dark-matter-labs.github.io/<this wiki's name>/`.
 
 ---
 
 ## Hard rules
 
-### The two house rules (xco-style-guide#11)
-
-These are orthographic and non-negotiable, so they come before everything else:
-
-1. **Always spell civilization with a z**, never an s.
-2. **Always write xCO** — lowercase x, uppercase CO.
-
-Rule 1 is a deliberate exception to the rest of the house's British spelling: *optionality*,
-*manoeuvre* and *organising* keep their s; *civilization* does not. That is precisely the kind
-of rule nobody remembers, so it is checked rather than trusted — run
-`python3 tools/house_rules.py` (or `--fix`). It runs in CI.
-
-Neither rule touches `raw/`, which is immutable: a source that says "civilisation" said that,
-and correcting it would falsify the record. Verbatim blockquotes are left alone for the same
-reason — they are someone else's words. Slugs, paths, domains, handles and CSS variables stay
-lowercase (`xco-style-guide`, `docs/xco.md`, `--xco-tokens`); only prose is corrected. A file
-that must be exempt can carry the marker `house-rules: ignore-file`.
-
-- **Respect `visibility` at every boundary.** Content marked `private` never appears in
-  exports, in PR descriptions of public repos, in published web pages, or in any external
-  channel — not its body, its title, or links pointing to it. When in doubt, treat as private.
-- **Never modify `raw/`.** Read-only, always.
-- **Never invent sources or citations.** If you don't have a source for a claim, either mark
-  it as your own synthesis or say you don't know. Do not fabricate.
-- **Never delete wiki pages unilaterally.** Flag duplicates/orphans in a lint pass and let
-  the owner approve removals.
-- **On every ingest, cascade.** A single source typically touches 5–15 pages (the new summary,
-  plus updates to every entity/concept it mentions, plus index and log). Under-updating
-  cross-references is the main way the wiki rots. Do the bookkeeping.
-- **Keep the active surface small.** Merge and simplify rather than accumulate.
-- **Write for the owner, not for yourself.** Plain language, clear structure, no jargon
-  unless the source uses it and you've defined it.
+- **Always spell civilization with a z. Always write xCO** (lowercase x). Run `python3 tools/house_rules.py`. Neither
+  rule touches `raw/` or a verbatim quotation; slugs and paths stay lowercase.
+- **Respect `visibility` at every boundary.** `private` never appears in exports, PR descriptions, published pages or
+  any external channel: not its body, its title or links to it. When in doubt, treat it as private.
+- **Knowledge, not surveillance.** Answer questions about knowledge; refuse ones that track people's activity
+  ("who is X talking to", "who wrote what, when"), and say why. An owner asking about their own activity in their
+  own wiki is fine; the rule binds hardest in shared wikis.
+- **Never modify `raw/`. Never invent sources or citations. Never delete wiki pages unilaterally** (flag them).
+- **On every ingest, cascade**: the summary plus every entity and concept it touches, the index and the log.
+- **Keep the active surface small**, and **write for the owner**: plain language, no undefined jargon.
 
 ---
 
 ## Working style
 
-Prefer direct, grounded work over hedged options. When you ingest or answer:
-- Lead with substance, not process narration.
-- Separate what a source actually says from what you infer from it.
-- Flag contradictions between sources rather than smoothing them over.
-- When something is uncertain or thin, say so plainly.
-
-**Small corrections** — typos, dates, a tag, `status`, `validation: self` — can be made directly through GitHub's web editor; `EDITING.md` is the guide. The line it draws is **blast radius, not effort**: one file is theirs, anything that touches the cross-reference graph is yours.
+Lead with substance, not process narration. Separate what a source says from what you infer. Flag contradictions
+rather than smoothing them over. Say plainly when something is uncertain or thin.
