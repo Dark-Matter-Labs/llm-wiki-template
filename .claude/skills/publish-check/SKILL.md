@@ -62,6 +62,12 @@ bar, and the bar is easier to hold before the content has left.
    (Remember: this is a backstop; the real protection is the access boundary — see
    `SHARING-AND-ACCESS.md`.)
 
+9. **Read any private title the page mentions.** Run `python3 tools/private_titles.py <the page>`. The export
+   removes links to private pages, but not a private page's title written as plain words. The tool names each
+   one. Read every mention with the owner: leave it, reword it, or rename the private page. A one-word title is
+   usually an ordinary word. Never redact mentions in bulk: one private title in indy-llm-wiki is an everyday
+   name used in 175 pages that leave the wiki (26 October 2026).
+
 ## Output
 
 A short readiness report:
