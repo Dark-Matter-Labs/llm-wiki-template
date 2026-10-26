@@ -77,6 +77,11 @@ jobs:
           git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/export
           echo "Published wiki.public.json to the export branch (public graph only)."
 
+      - name: Leave nothing of the export behind for the site checks
+        # The publish above builds the export branch in _publish/. The site checks below scan the working copy,
+        # and found the export's text there on the first run (26 Oct 2026), so it goes before they run.
+        run: rm -rf _publish
+
       - name: Block deploy if sensitive material is on a public surface
         # Tripwire: fails (and stops the deploy) if any never-public term from
         # tools/sensitive_terms.txt appears anywhere under docs/. No untrusted input.
