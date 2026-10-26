@@ -266,7 +266,8 @@ def build_bundle(wiki_dir, slugs, contributed_by, rev):
                 f"origin: {ORIGIN}",
                 f"origin_rev: {rev}"]
         lines = text.split("\n")
-        assert lines[-1] == "---"
+        if lines[-1] != "---":   # an assert vanishes under python -O, and a malformed bundle would be staged
+            raise ValueError(f"{slug}: frontmatter did not end where expected; nothing staged")
         text = "\n".join(lines[:-1] + prov + ["---"])
 
         body = public[slug]["body"].lstrip("\n")

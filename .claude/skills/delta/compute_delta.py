@@ -35,7 +35,7 @@ def parse_axioms(path="wiki/axioms.md"):
     text = open(path, encoding="utf-8", errors="replace").read()
     cards = {}
     # split on '## A<n> — <claim...>' headings
-    parts = re.split(r"(?m)^(## A\d+[^\n]*)$", text)
+    parts = re.split(r"(?m)^(#{2,3} A\d+[^\n]*)$", text)   # "###" too: from michelle-llm-wiki, 26 Oct 2026
     # parts = [pre, head1, body1, head2, body2, ...]
     for i in range(1, len(parts), 2):
         head = parts[i].lstrip("# ").strip()
