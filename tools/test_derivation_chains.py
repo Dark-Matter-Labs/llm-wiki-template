@@ -46,9 +46,12 @@ def main():
         page(root, "labelled", "Labelled Source", "concept", "[]", extra="derivation: source\n")
         page(root, "mixed", "Mostly Unsourced", body="[[Two Hops]], [[Three Hops]], [[Island]], [[Grounded]].")
         page(root, "alone", "Standing Alone", body="No links, no sources.")
+        page(root, "kept", "Kept Locally", "summary", "[]", body="No links.", extra="local_source: raw/clippings/call.md\n")
         (root / "wiki" / "challenges").mkdir()
         page(root, "challenges/joker", "Joker Brief", body="Against [[Three Hops]] and [[Island]].")
         r = rows(root)
+        check("a source kept on the owner's machine (local_source:) counts as a source",
+              "Kept Locally" not in r and all(x["title"] != "Kept Locally" for x in C.chains(root)["unlinked"]))
         check("a page that names a source is not reported", "Grounded" not in r and "Labelled Source" not in r, str(list(r)))
         check("a page one hop from a source, all of whose links are sourced, is not reported", "One Hop" not in r, str(r.get("One Hop")))
         check("a page with no source within two hops is reported with no distance",

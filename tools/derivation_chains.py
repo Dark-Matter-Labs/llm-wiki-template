@@ -44,7 +44,9 @@ BY_DESIGN_DIRS = ("challenges/", "newsletter/", "reflections/", "crm/", "deltas/
 
 
 def grounded(node):
-    return node.get("derivation") == "source" or any(
+    # local_source: a source kept on the owner's machine and never posted (eunsoo-llm-wiki's rule for meeting
+    # transcripts, 20 October 2026). It is a source all the same; counting it as none flagged 141 pages (26 Oct).
+    return node.get("derivation") == "source" or bool(node.get("local_source")) or any(
         str(s).strip().startswith("raw/") for s in (node.get("sources") or []))
 
 
@@ -68,6 +70,9 @@ def nearest(nodes, start, hops):
 
 def chains(root=ROOT, hops=2):
     nodes, _ = export.build_nodes(str(pathlib.Path(root) / "wiki"))
+    for slug, _path, fm, _body in export.discover(str(pathlib.Path(root) / "wiki")):
+        if slug in nodes and fm.get("local_source"):
+            nodes[slug]["local_source"] = fm["local_source"]   # read here only; the export never carries it
     rows = []
     for slug, n in nodes.items():
         if (grounded(n) or n.get("type") in BY_DESIGN or n.get("status") == "dormant"
