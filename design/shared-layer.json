@@ -208,6 +208,7 @@
     ".claude/skills/live-page/SKILL.md",
     ".claude/skills/lens-refresh/SKILL.md",
     ".claude/skills/customise/SKILL.md",
+    ".claude/skills/sharpen/SKILL.md",
     ".claude/skills/pre-read/SKILL.md",
     ".claude/skills/ino-check/SKILL.md",
     "tools/ino_check.py",

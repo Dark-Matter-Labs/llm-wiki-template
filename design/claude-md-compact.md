@@ -26,7 +26,7 @@ needs `commits_to`, `resources`, `until`, `state`: `proposed | held | honoured |
 
 Each skill in `.claude/skills/` says when it fires; read its SKILL.md before running it. The common ones:
 add a source, `ingest` · a question, `query` · "check the wiki", `lint` · "catch me up", `brief` · a new idea,
-`office-hours` · "share this with the team", `contribute` · contacts and meetings, `crm` · "what's waiting", `waiting`
+`office-hours` · "sharpen this", `sharpen` · "share this with the team", `contribute` · contacts and meetings, `crm` · "what's waiting", `waiting`
 · "what don't we know", `open_questions.py` then `inquiry` · call notes, `call-notes` · "that's done", `my-commitments`
 · a brief for a meeting, `pre-read` · "is this inquiry-native", `ino-check` · "have my sources changed", `source-refresh` · "something leaked", `retract` · "refresh the lens", `lens-refresh` · "set up my customisations", `customise`. If unsure, see `.claude/reference/operations.md`.
 If intent is ambiguous, ask **one** short question, then proceed.

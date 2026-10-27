@@ -17,6 +17,7 @@ In plain-English terms, here is when each fires:
 | "check the wiki", "is it healthy", "clean up"      | `lint`    |
 | "catch me up", "what's new", "weekly summary"      | `brief`   |
 | "I have a new idea / project", "help me think"     | `office-hours` |
+| "sharpen this", "test my idea", "make this defensible" (questions only, no answers) | `sharpen` |
 | "set up a wiki for X", "onboard a new option", "Santiago needs its own wiki" | `onboard` |
 | "is this ready to publish / share externally"      | `publish-check` |
 | "publish this as a web page", "make a shareable link", "put this on the site" | `publish-web` |
