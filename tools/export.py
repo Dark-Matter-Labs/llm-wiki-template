@@ -546,6 +546,11 @@ def run_export(wiki_dir, out_dir):
         json.dump(full, f, indent=2, ensure_ascii=False)
     with open(os.path.join(out_dir, "wiki.public.json"), "w", encoding="utf-8") as f:
         json.dump(pub, f, indent=2, ensure_ascii=False)
+    # The shared cut: private stripped, `internal` kept, for colleagues reading in INO Home (28 Oct 2026).
+    shared, _p2 = make_public(nodes, title_to_slug, hide=HIDE_FROM_SHARED)
+    with open(os.path.join(out_dir, "wiki.shared.json"), "w", encoding="utf-8") as f:
+        json.dump({"meta": build_meta(shared, "shared"), "nodes": [shared[s] for s in sorted(shared)]},
+                  f, indent=2, ensure_ascii=False)
     return full, pub
 
 
