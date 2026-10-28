@@ -11,9 +11,6 @@ on:
       - "tools/export.py"
       - ".github/workflows/export.yml"
       - "wiki/**"
-      - "tools/needs_you.py"
-      - "tools/build_needs_you_page.py"
-      - "tools/view_modules.py"
       - "tools/templates/**"
       - ".github/workflows/deploy-pages.yml"
   schedule:
@@ -96,22 +93,6 @@ jobs:
         # last manual sweep shipped without it. A standard nobody enforces is a
         # preference. No untrusted input.
         run: python3 tools/audit_design.py --check
-
-      - name: Build the Needs-you page, locked
-        # Added 2026-10-12. The page carries this wiki's private items, so it is only ever published
-        # locked: build_needs_you_page.py --lock encrypts it and refuses to leave anything readable.
-        # With no password set, nothing is built and nothing is published for it. Generated here,
-        # never saved in the wiki. The heading comes from design/federation.json.
-        env:
-          NEEDS_YOU_PASSWORD: ${{ secrets.NEEDS_YOU_PASSWORD }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if [ -z "$NEEDS_YOU_PASSWORD" ]; then
-            echo "::notice::No NEEDS_YOU_PASSWORD set, so no Needs-you page is published."
-            exit 0
-          fi
-          python3 tools/export.py >/dev/null
-          python3 tools/build_needs_you_page.py --lock docs/needs-you/index.html
 
       - name: Configure Pages
         # enablement: true switches the Pages source to "GitHub Actions" so this
