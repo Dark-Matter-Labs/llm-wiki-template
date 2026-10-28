@@ -1,0 +1,298 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "kind": "shared",
+    "exported_at": "2026-10-28T13:49:15.176379+00:00",
+    "node_count": 6,
+    "counts_by_type": {
+      "concept": 2,
+      "entity": 3,
+      "summary": 1
+    },
+    "counts_by_visibility": {
+      "internal": 6
+    }
+  },
+  "nodes": [
+    {
+      "id": "examples/citizens-as-monitoring-infrastructure",
+      "slug": "examples/citizens-as-monitoring-infrastructure",
+      "title": "Citizens as monitoring infrastructure",
+      "type": "concept",
+      "layer": null,
+      "parent": null,
+      "horizon": null,
+      "goal_layer": null,
+      "tags": [
+        "example",
+        "concept",
+        "monitoring"
+      ],
+      "confidence": "low",
+      "validation": "machine",
+      "validated_by": [],
+      "validated_at": null,
+      "contradicts": null,
+      "commits_to": null,
+      "from": null,
+      "resources": null,
+      "until": null,
+      "state": null,
+      "superseded_by": null,
+      "devalued_by": null,
+      "visibility": "internal",
+      "status": "reviewed",
+      "derivation": null,
+      "same_as": [],
+      "timestamp": "2026-07-03",
+      "description": "When residents' own reporting becomes a load-bearing part of a verification pipeline.",
+      "sources": [
+        "raw/EXAMPLE-sample-source.md"
+      ],
+      "body": "# Citizens as monitoring infrastructure\n\n> Example page. Delete once real sources are ingested.\n\nIn [[Greenline programme — briefing note (summary)|Greenline]], residents report tree health\nthrough an app, which makes them part of the **verification data pipeline** rather than an\naudience for it (raw/EXAMPLE-sample-source.md).\n\n## Observed tension\nPayment depends on verified outcomes, and verification depends in part on residents choosing to\nreport. _[synthesis]_ That makes participation a dependency of the financing model, not a\nnice-to-have: a neighbourhood that stops reporting does not merely go unmeasured, it goes unpaid.\nWhether that is a strength (local accountability) or a fragility (a funding gap that follows\ndisengagement) is the open question this page exists to hold.\n\n## Connects to\n- [[Outcomes-based financing]] — the model whose payment trigger depends on this.\n- [[Lisbon]], [[Tallinn]], [[Cork]] — the cities where it is in use.\n",
+      "outbound_links": [
+        "examples/greenline-summary",
+        "examples/outcomes-based-financing",
+        "examples/lisbon",
+        "examples/tallinn",
+        "examples/cork"
+      ],
+      "inbound_links": [
+        "examples/greenline-summary"
+      ]
+    },
+    {
+      "id": "examples/cork",
+      "slug": "examples/cork",
+      "title": "Cork",
+      "type": "entity",
+      "layer": null,
+      "parent": null,
+      "horizon": null,
+      "goal_layer": null,
+      "tags": [
+        "example",
+        "entity",
+        "city"
+      ],
+      "confidence": "low",
+      "validation": "machine",
+      "validated_by": [],
+      "validated_at": null,
+      "contradicts": null,
+      "commits_to": null,
+      "from": null,
+      "resources": null,
+      "until": null,
+      "state": null,
+      "superseded_by": null,
+      "devalued_by": null,
+      "visibility": "internal",
+      "status": "reviewed",
+      "derivation": null,
+      "same_as": [],
+      "timestamp": "2026-07-03",
+      "description": "A city taking part in the fictional Greenline urban-forestry programme.",
+      "sources": [
+        "raw/EXAMPLE-sample-source.md"
+      ],
+      "body": "# Cork\n\n> Example page. Delete once real sources are ingested.\n\nJoined Greenline in the **second wave**, alongside Tallinn (raw/EXAMPLE-sample-source.md).\n\n## In this wiki\n- [[Greenline programme — briefing note (summary)|Greenline]] — the programme it takes part in.\n- [[Outcomes-based financing]] — the model Greenline runs on.\n\n## Noted\nCork and Tallinn joined together, so their experiences are the closest thing this example has to a comparison — see [[Outcomes-based financing]] for the shared model. _[synthesis]_\n",
+      "outbound_links": [
+        "examples/greenline-summary",
+        "examples/outcomes-based-financing"
+      ],
+      "inbound_links": [
+        "examples/citizens-as-monitoring-infrastructure",
+        "examples/greenline-summary"
+      ]
+    },
+    {
+      "id": "examples/greenline-summary",
+      "slug": "examples/greenline-summary",
+      "title": "Greenline programme — briefing note (summary)",
+      "type": "summary",
+      "layer": null,
+      "parent": null,
+      "horizon": null,
+      "goal_layer": null,
+      "tags": [
+        "example",
+        "outcomes-based-financing",
+        "urban-forestry"
+      ],
+      "confidence": "low",
+      "validation": "machine",
+      "validated_by": [],
+      "validated_at": null,
+      "contradicts": null,
+      "commits_to": null,
+      "from": null,
+      "resources": null,
+      "until": null,
+      "state": null,
+      "superseded_by": null,
+      "devalued_by": null,
+      "visibility": "internal",
+      "status": "reviewed",
+      "derivation": null,
+      "same_as": [],
+      "timestamp": "2026-07-03",
+      "description": "Summary of a fictional outcomes-based financing programme for urban forests across three cities.",
+      "sources": [
+        "raw/EXAMPLE-sample-source.md"
+      ],
+      "body": "# Greenline programme — summary\n\n> Example page. Delete once real sources are ingested.\n\nA briefing note describing **Greenline**, a programme that finances street-tree planting\nby paying municipalities for **verified outcomes** — canopy cover, stormwater absorbed,\nheat reduction — rather than for trees planted (raw/EXAMPLE-sample-source.md).\n\n## Key takeaways\n- Payment is released only when independent monitoring confirms canopy and cooling\n  targets — activity alone doesn't trigger payment (raw/EXAMPLE-sample-source.md).\n- [[Lisbon]] is the lead pilot; [[Tallinn]] and [[Cork]] joined in a second wave.\n- Residents report tree health via an app, making citizens part of the verification\n  data pipeline — see [[Citizens as monitoring infrastructure]].\n- **Main unresolved risk:** outcome verification is slow and costly, delaying payments\n  and straining municipal cashflow (raw/EXAMPLE-sample-source.md).\n\n## Connects to\n- [[Outcomes-based financing]] — Greenline is one instance of this financing model.\n",
+      "outbound_links": [
+        "examples/lisbon",
+        "examples/tallinn",
+        "examples/cork",
+        "examples/citizens-as-monitoring-infrastructure",
+        "examples/outcomes-based-financing"
+      ],
+      "inbound_links": [
+        "examples/citizens-as-monitoring-infrastructure",
+        "examples/cork",
+        "examples/lisbon",
+        "examples/outcomes-based-financing",
+        "examples/tallinn"
+      ]
+    },
+    {
+      "id": "examples/lisbon",
+      "slug": "examples/lisbon",
+      "title": "Lisbon",
+      "type": "entity",
+      "layer": null,
+      "parent": null,
+      "horizon": null,
+      "goal_layer": null,
+      "tags": [
+        "example",
+        "entity",
+        "city"
+      ],
+      "confidence": "low",
+      "validation": "machine",
+      "validated_by": [],
+      "validated_at": null,
+      "contradicts": null,
+      "commits_to": null,
+      "from": null,
+      "resources": null,
+      "until": null,
+      "state": null,
+      "superseded_by": null,
+      "devalued_by": null,
+      "visibility": "internal",
+      "status": "reviewed",
+      "derivation": null,
+      "same_as": [],
+      "timestamp": "2026-07-03",
+      "description": "A city taking part in the fictional Greenline urban-forestry programme.",
+      "sources": [
+        "raw/EXAMPLE-sample-source.md"
+      ],
+      "body": "# Lisbon\n\n> Example page. Delete once real sources are ingested.\n\nThe **lead pilot** for Greenline. Payment is released against verified canopy cover and cooling, so Lisbon carried the cashflow gap between planting and verification first (raw/EXAMPLE-sample-source.md).\n\n## In this wiki\n- [[Greenline programme — briefing note (summary)|Greenline]] — the programme it takes part in.\n- [[Outcomes-based financing]] — the model Greenline runs on.\n\n## Noted\nAs the first city through the cycle, Lisbon is where the verification delay was observed before the second wave joined — which is why its experience is cited on the risk rather than the results. _[synthesis]_\n",
+      "outbound_links": [
+        "examples/greenline-summary",
+        "examples/outcomes-based-financing"
+      ],
+      "inbound_links": [
+        "examples/citizens-as-monitoring-infrastructure",
+        "examples/greenline-summary"
+      ]
+    },
+    {
+      "id": "examples/outcomes-based-financing",
+      "slug": "examples/outcomes-based-financing",
+      "title": "Outcomes-based financing",
+      "type": "concept",
+      "layer": null,
+      "parent": null,
+      "horizon": null,
+      "goal_layer": null,
+      "tags": [
+        "example",
+        "concept",
+        "financing"
+      ],
+      "confidence": "low",
+      "validation": "machine",
+      "validated_by": [],
+      "validated_at": null,
+      "contradicts": null,
+      "commits_to": null,
+      "from": null,
+      "resources": null,
+      "until": null,
+      "state": null,
+      "superseded_by": null,
+      "devalued_by": null,
+      "visibility": "internal",
+      "status": "reviewed",
+      "derivation": null,
+      "same_as": [],
+      "timestamp": "2026-07-03",
+      "description": "A financing model that pays for verified results rather than for activity or inputs.",
+      "sources": [
+        "raw/EXAMPLE-sample-source.md"
+      ],
+      "body": "# Outcomes-based financing\n\n> Example page. Delete once real sources are ingested.\n\nA model where funders pay against **measured, verified outcomes** rather than activity\nor inputs. In [[Greenline programme — briefing note (summary)|Greenline]], municipalities\nare paid for canopy cover and cooling actually achieved, not for trees planted\n(raw/EXAMPLE-sample-source.md).\n\n## Observed tension\nOutcome verification can be slow and expensive. In Greenline this delayed payments and\nstrained municipal cashflow — flagged as the main unresolved risk\n(raw/EXAMPLE-sample-source.md). _[synthesis]_ This suggests a general design question for\nthis model: who carries the cashflow gap between activity and verified payment?\n\n## Instances in the wiki\n- [[Greenline programme — briefing note (summary)|Greenline]] (urban forestry)\n",
+      "outbound_links": [
+        "examples/greenline-summary"
+      ],
+      "inbound_links": [
+        "examples/citizens-as-monitoring-infrastructure",
+        "examples/cork",
+        "examples/greenline-summary",
+        "examples/lisbon",
+        "examples/tallinn"
+      ]
+    },
+    {
+      "id": "examples/tallinn",
+      "slug": "examples/tallinn",
+      "title": "Tallinn",
+      "type": "entity",
+      "layer": null,
+      "parent": null,
+      "horizon": null,
+      "goal_layer": null,
+      "tags": [
+        "example",
+        "entity",
+        "city"
+      ],
+      "confidence": "low",
+      "validation": "machine",
+      "validated_by": [],
+      "validated_at": null,
+      "contradicts": null,
+      "commits_to": null,
+      "from": null,
+      "resources": null,
+      "until": null,
+      "state": null,
+      "superseded_by": null,
+      "devalued_by": null,
+      "visibility": "internal",
+      "status": "reviewed",
+      "derivation": null,
+      "same_as": [],
+      "timestamp": "2026-07-03",
+      "description": "A city taking part in the fictional Greenline urban-forestry programme.",
+      "sources": [
+        "raw/EXAMPLE-sample-source.md"
+      ],
+      "body": "# Tallinn\n\n> Example page. Delete once real sources are ingested.\n\nJoined Greenline in the **second wave**, after Lisbon's pilot (raw/EXAMPLE-sample-source.md).\n\n## In this wiki\n- [[Greenline programme — briefing note (summary)|Greenline]] — the programme it takes part in.\n- [[Outcomes-based financing]] — the model Greenline runs on.\n\n## Noted\nA second-wave city inherits the pilot's verification process without having shaped it; whether that helps or hurts is exactly the kind of question this page would record once real sources arrive. _[synthesis]_\n",
+      "outbound_links": [
+        "examples/greenline-summary",
+        "examples/outcomes-based-financing"
+      ],
+      "inbound_links": [
+        "examples/citizens-as-monitoring-infrastructure",
+        "examples/greenline-summary"
+      ]
+    }
+  ]
+}
