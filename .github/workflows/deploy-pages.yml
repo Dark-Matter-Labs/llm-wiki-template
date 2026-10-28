@@ -53,7 +53,7 @@ jobs:
       - name: Build the export graph
         run: python3 tools/export.py
 
-      - name: Publish ONLY the public graph to an orphan export branch
+      - name: Publish the public and shared graphs to an orphan export branch
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -65,14 +65,15 @@ jobs:
           # with repo access could read.) We build a clean, single-file orphan branch.
           mkdir -p _publish
           cp export/wiki.public.json _publish/wiki.public.json
+          cp export/wiki.shared.json _publish/wiki.shared.json
           cd _publish
           git init -q
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add wiki.public.json
-          git commit -q -m "chore(export): public graph [skip ci]"
+          git add wiki.public.json wiki.shared.json
+          git commit -q -m "chore(export): public + shared graphs [skip ci]"
           git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/export
-          echo "Published wiki.public.json to the export branch (public graph only)."
+          echo "Published wiki.public.json + wiki.shared.json to the export branch."
 
       - name: Leave nothing of the export behind for the site checks
         # The publish above builds the export branch in _publish/. The site checks below scan the working copy,
