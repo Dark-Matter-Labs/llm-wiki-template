@@ -51,6 +51,104 @@ import export_shared     # noqa: E402
 
 DEFAULT_OUT = "contrib"
 
+# ---------------------------------------------------------------------------
+# Source paths never travel.
+#
+# Added 2026-10-29 by Fang, after a page that had had a person's name carefully removed
+# from its body still named him three times in its citations, inside a source filename.
+# Every other guarantee in this file had held. The leak walked out through a file path,
+# which nothing was reading, because in most wikis a source path is a document and not an
+# event. (The filename itself is deliberately not quoted here: this file travels to every
+# wiki.)
+#
+# In a transcript-based wiki a filename IS a record: who met, when, and what about. And it
+# is worse than the same fact in prose, because a reader skims a path without registering
+# that they have just been told who was in a private room.
+#
+# So the rule is structural rather than detective. The tool does not try to recognise a
+# name — it cannot, and a list of names to watch for would be a second codebook. Instead
+# **no `raw/` path survives staging at all**, whatever it contains. Each becomes a dated
+# reference, which is the provenance that can actually be checked from the commons anyway:
+# the source file is not there to open.
+#
+# A label may be declared per source in design/source-labels.json, mapping a basename to a
+# short descriptor that is safe to say out loud ("fortnightly session"). With no label the
+# reference is bare and dated. Both forms are honest; the labelled one is kinder to read.
+#
+# Two additions for the shared copy, agreed with Gurden on 2026-10-29 (fang-llm-wiki#154 is
+# the original). Measured that day, refusing every source without a leading date would have
+# blocked sharing for half or more of the shareable pages in most wikis, because many
+# filenames carry their date at the end and `raw/` is never renamed. So:
+#   * a date anywhere in the filename counts, the first one found;
+#   * a source with no date and no label becomes "an undated source", rather than refusing
+#     the page. Nothing leaks either way; the citation is only vaguer.
+# And one tightening: a path written inside backticks may contain spaces (`raw/A Name.md`),
+# which the plain pattern would cut short and leave half a filename behind. Backticked paths
+# are replaced whole, first.
+SOURCE_LABELS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  "..", "design", "source-labels.json")
+
+RAW_PATH_RE = re.compile(r"raw/[^\s,\]\)\"'`]+")
+TICKED_RAW_RE = re.compile(r"`raw/[^`\n]+`")
+DATE_RE = re.compile(r"(?<!\d)(\d{4})-(\d{2})-(\d{2})(?!\d)")
+YAML_SEQ_RE = re.compile(r"^\s*[A-Za-z_][\w-]*:\s*\[")
+MONTHS = ("January", "February", "March", "April", "May", "June", "July",
+          "August", "September", "October", "November", "December")
+
+
+def source_labels():
+    try:
+        with open(SOURCE_LABELS_FILE, encoding="utf-8") as fh:
+            data = json.load(fh)
+    except (OSError, ValueError):
+        return {}
+    return {k: v for k, v in data.items() if isinstance(v, str) and not k.startswith("_")}
+
+
+def dated_reference(path, labels):
+    """`raw/2026-10-20-fortnightly-summary.md` -> `fortnightly session, 20 October 2026`."""
+    base = os.path.basename(path.rstrip("/"))
+    label = labels.get(base) or labels.get(path)
+    m = DATE_RE.search(base)
+    when = None
+    if m and 1 <= int(m.group(2)) <= 12 and 1 <= int(m.group(3)) <= 31:
+        when = f"{int(m.group(3))} {MONTHS[int(m.group(2)) - 1]} {m.group(1)}"
+    if label:
+        return f"{label}, {when}" if when else label
+    return f"source dated {when}" if when else "an undated source"
+
+
+def strip_source_paths(text, labels):
+    """Replace every raw/ path with a dated reference, and prove none survived.
+
+    A dated reference contains a comma, which is an item separator inside a YAML flow
+    sequence — so a reference substituted into `sources: [...]` unquoted would silently
+    split one source into two. Lines that carry YAML list items get quoted replacements;
+    prose gets bare ones. A path inside backticks is replaced whole, spaces and all.
+    """
+    in_frontmatter = text.startswith("---\n")
+    lines, out_lines = text.split("\n"), []
+    seen_close = False
+    for line in lines:
+        if in_frontmatter and not seen_close and out_lines and line.strip() == "---":
+            seen_close = True
+        quote = bool(in_frontmatter and not seen_close and (
+            YAML_SEQ_RE.match(line) or line.lstrip().startswith("- ")))
+
+        def ref(path):
+            r = dated_reference(path, labels)
+            return f'"{r}"' if quote else r
+
+        line = TICKED_RAW_RE.sub(lambda m: ref(m.group(0)[1:-1]), line)
+        out_lines.append(RAW_PATH_RE.sub(lambda m: ref(m.group(0)), line))
+    out = "\n".join(out_lines)
+    leftover = re.search(r"raw/[A-Za-z0-9]", out)
+    if leftover:
+        raise ValueError(f"a source path survived staging near "
+                         f"{out[leftover.start():leftover.start() + 40]!r}. Nothing staged.")
+    return out
+
+
 # Where this wiki sits in the federation. Declared in design/federation.json rather
 # than assumed, because a spoke no longer belongs to exactly one commons: with
 # learning-system-wiki alongside xco-team-wiki, a person can contribute to either, and
@@ -194,6 +292,19 @@ def commons_titles(name):
     return None
 
 
+def title_key(title):
+    """A title reduced to what two wikis would have to agree on to mean the same page.
+
+    Case and punctuation are dropped: a commons holding "Butterfly Institution" and a
+    spoke holding "Butterfly institution" are two names for one page, and treating them
+    as different is how a commons ends up with both. False matches fail safe — the tool
+    refuses and `--update` is the deliberate override.
+    """
+    if not isinstance(title, str):
+        return ""
+    return re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
+
+
 def check_collisions(wiki_dir, slugs, commons):
     """Titles among `slugs` that the commons already holds.
 
@@ -204,19 +315,31 @@ def check_collisions(wiki_dir, slugs, commons):
 
     Nearly every page in a seeded spoke collides, so this cannot be a warning nobody
     reads. It refuses, and --update is the deliberate override.
+
+    The comparison is case- and punctuation-insensitive. It was exact until 2026-10-29,
+    when "Butterfly institution" and "Mission equity" staged cleanly against a commons
+    already holding "Butterfly Institution" and "Mission Equity" — a one-character
+    difference, and the check that exists to stop two canons would have made two. A
+    collision detector that only finds identical strings finds the easy half.
     """
     theirs = commons_titles(commons)
     if theirs is None:
         return None, []            # no cache; cannot check, say so rather than assume
+    by_norm = {title_key(x): x for x in theirs if isinstance(x, str)}
     hits = []
     for slug, _p, fm, _b in export.discover(wiki_dir):
-        if slug in slugs and fm.get("title") in theirs:
-            hits.append((slug, fm.get("title")))
+        if slug not in slugs:
+            continue
+        title = fm.get("title")
+        match = by_norm.get(title_key(title))
+        if match:
+            hits.append((slug, match))
     return theirs, hits
 
 
 def build_bundle(wiki_dir, slugs, contributed_by, rev):
     """Return {relpath: text} for the staged contribution, or raise ValueError."""
+    labels = source_labels()
     nodes, title_to_slug = export.build_nodes(wiki_dir)
     public, private_slugs = export.make_public(
         nodes, title_to_slug, hide=export.HIDE_FROM_SHARED)
@@ -271,7 +394,12 @@ def build_bundle(wiki_dir, slugs, contributed_by, rev):
         text = "\n".join(lines[:-1] + prov + ["---"])
 
         body = public[slug]["body"].lstrip("\n")
-        out[os.path.join("wiki", slug + ".md")] = text + "\n\n" + body
+        staged = text + "\n\n" + body
+        try:
+            staged = strip_source_paths(staged, labels)
+        except ValueError as exc:
+            raise ValueError(f"{slug}: {exc}")
+        out[os.path.join("wiki", slug + ".md")] = staged
     return out
 
 

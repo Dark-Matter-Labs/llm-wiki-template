@@ -8,7 +8,7 @@
     "tools/house_rules.py": "52c7e88f11f139b1c5cc9a290779ac1bc985f78946c62dbf0d24b67df4af0b96",
     "tools/test_house_rules.py": "04bf777cbe77806f857cbd097b091c1d0f6cbbb6a132a85c99fa493028a97de6",
     "tools/build_social_card.py": "41343a09319313e37c514e5bb886937a0ac06fe0c66dbceada4d17ad8143a0b3",
-    "tools/contribute.py": "9ece6f2cd450a487f66fa5bbd56177d4736cc29c87089d8c72b6efa105dcd946",
+    "tools/contribute.py": "cd3104b96535d71ee1720e1b265fc432112a2cd979e78ce2d66d46280733eecc",
     "tools/test_contribute.py": "e37d647c9dbcb1f7604547af1dd6fd269cd126375b3e134f584eaeadf5870461",
     "tools/contribution_prompt.py": "0bf75fb51a622a911efa87ce975f279063cc3f400a3473f2b705de45312d01b5",
     "tools/test_contribution_prompt.py": "bad950bd988af4f07b3b636c8858cdcf40421a52e01bf489b657ebb061297c16",
@@ -197,7 +197,8 @@
     "tools/test_contradictions.py": "b98911d9c995965b611152c0002f2d01458bf15aca94238a3ced582fe0c77ad8",
     "tools/private_titles.py": "896330959560e045d109a8a6a1fa02086181b128b841be53b6ba7b4045b1357f",
     "tools/test_private_titles.py": "cdd5a64d2e1d5a0bb5a560c964e50c05c07be0fe8b9ad434b3b41ffd0fb04702",
-    ".claude/skills/sharpen/SKILL.md": "00f37d3e2c15becd9055a1e62b0c60fd8d955dff7b19961cd866f7e936e06bf1"
+    ".claude/skills/sharpen/SKILL.md": "00f37d3e2c15becd9055a1e62b0c60fd8d955dff7b19961cd866f7e936e06bf1",
+    "tools/test_contribute_boundary.py": "68263cd90d922d8631b9ef6b9cfccb16698493a383fb51ef3d22d9a2974f0ad8"
   },
   "adapted": {
     "design/xco.tokens.json": {
