@@ -44,6 +44,7 @@ import os
 import re
 import subprocess
 import sys
+import unicodedata
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import export            # noqa: E402
@@ -147,6 +148,28 @@ def strip_source_paths(text, labels):
         raise ValueError(f"a source path survived staging near "
                          f"{out[leftover.start():leftover.start() + 40]!r}. Nothing staged.")
     return out
+
+
+# ---------------------------------------------------------------------------
+# A shared page's filename is made from its title.
+#
+# Added 2026-10-29 at Fang's yes, extending the rule above. A page's own filename can say
+# what its title does not: a call summary kept under a working name, such as who met. The
+# commons used to receive the spoke's filename as it stood. Now the staged file is named
+# from the title, so the filename tells a reader nothing the title has not already told
+# them. A title that names a person is visible, and the author chose it.
+#
+# A page the commons already holds keeps the commons' own filename, so `--update` replaces
+# that file rather than staging a second copy beside it under a new name.
+SAFE_NAME_RE = re.compile(r"[A-Za-z0-9][\w-]*")
+
+
+def shared_name(title):
+    """`Oceans tooling call, 6 October 2026` -> `oceans-tooling-call-6-october-2026`."""
+    if not isinstance(title, str):
+        return ""
+    flat = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]+", "-", flat.lower()).strip("-")
 
 
 # Where this wiki sits in the federation. Declared in design/federation.json rather
@@ -281,14 +304,14 @@ def valid_by(name):
 
 
 def commons_titles(name):
-    """Titles already in `name`, from the cached export. None if no cache."""
+    """{title: slug} already in `name`, from the cached export. None if no cache."""
     for path in commons_cache_paths(name):
         if os.path.exists(path):
             with open(path, encoding="utf-8") as fh:
                 d = json.load(fh)
             nodes = d.get("nodes", {})
             nodes = list(nodes.values()) if isinstance(nodes, dict) else nodes
-            return {n.get("title") for n in nodes if isinstance(n.get("title"), str)}
+            return {n["title"]: n.get("slug") for n in nodes if isinstance(n.get("title"), str)}
     return None
 
 
@@ -337,8 +360,12 @@ def check_collisions(wiki_dir, slugs, commons):
     return theirs, hits
 
 
-def build_bundle(wiki_dir, slugs, contributed_by, rev):
-    """Return {relpath: text} for the staged contribution, or raise ValueError."""
+def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None):
+    """Return {relpath: text} for the staged contribution, or raise ValueError.
+
+    `existing` maps title_key -> the commons' own filename, for pages it already holds.
+    """
+    existing = existing or {}
     labels = source_labels()
     nodes, title_to_slug = export.build_nodes(wiki_dir)
     public, private_slugs = export.make_public(
@@ -399,7 +426,14 @@ def build_bundle(wiki_dir, slugs, contributed_by, rev):
             staged = strip_source_paths(staged, labels)
         except ValueError as exc:
             raise ValueError(f"{slug}: {exc}")
-        out[os.path.join("wiki", slug + ".md")] = staged
+        name = existing.get(title_key(fm.get("title"))) or shared_name(fm.get("title"))
+        if not name:
+            raise ValueError(f"{slug}: no title to name the shared file from; nothing staged")
+        rel = os.path.join("wiki", name + ".md")
+        if rel in out:
+            raise ValueError(f"{slug}: another page in this bundle has a title that makes the "
+                             f"same filename, {name}.md; nothing staged")
+        out[rel] = staged
     return out
 
 
@@ -476,8 +510,12 @@ def main(argv=None):
         print("warning: wiki/ has uncommitted changes — origin_rev will not describe "
               "exactly what you are contributing. Commit first.", file=sys.stderr)
 
+    # The commons' own filename for a page it holds, read from its cache. A slug is data from
+    # another repo, so only a plain name is used; anything else falls back to the title.
+    existing = {title_key(t): s for t, s in (theirs or {}).items()
+                if isinstance(s, str) and SAFE_NAME_RE.fullmatch(s)}
     try:
-        bundle = build_bundle(args.wiki, args.slugs, args.by, rev)
+        bundle = build_bundle(args.wiki, args.slugs, args.by, rev, existing)
     except ValueError as e:
         print(f"error: {e}", file=sys.stderr)
         return 1

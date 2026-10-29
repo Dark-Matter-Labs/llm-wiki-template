@@ -139,8 +139,8 @@ def main():
 
         # --- the happy path --------------------------------------------------
         b = build(["shareable"])
-        text = b["wiki/shareable.md"]
-        check("an internal page is staged", "wiki/shareable.md" in b)
+        text = b["wiki/a-shareable-concept.md"]
+        check("an internal page is staged", "wiki/a-shareable-concept.md" in b)
 
         # --- leaking ---------------------------------------------------------
         check("the private page's title never appears",
@@ -165,7 +165,7 @@ def main():
               f"origin resolved to {C.ORIGIN!r}")
 
         def val_of(slug, page_slug=None):
-            t = build([slug])["wiki/" + (page_slug or slug) + ".md"]
+            t = next(iter(build([slug]).values()))
             for line in t.split("\n"):
                 if line.startswith("validation:"):
                     return line.split(":", 1)[1].strip()
@@ -177,7 +177,7 @@ def main():
               val_of("coll-page") == "self", f"got {val_of('coll-page')}")
         check("self travels unchanged (the author still stands behind it)",
               val_of("self-page") == "self", f"got {val_of('self-page')}")
-        self_text = build(["self-page"])["wiki/self-page.md"]
+        self_text = build(["self-page"])["wiki/a-self-validated-page.md"]
         check("a validated page carries who stood behind it, so the commons schema accepts it",
               "validated_by: [Indy]" in self_text and "validated_at: 2026-09-01" in self_text,
               self_text.split("---")[1][-160:])
@@ -193,6 +193,27 @@ def main():
         check("--by accepts an ordinary name", C.valid_by("Gurden Batra") and C.valid_by("gurden") and C.valid_by("Jean-Luc O'Neil"))
         check("machine stays machine",
               val_of("another-shared") == "machine", f"got {val_of('another-shared')}")
+
+        # --- the shared filename comes from the title (Fang's rule, extended) ----
+        write(wiki, "call-with-jane-roe-2026-10-06", "Oceans tooling call, 6 October 2026",
+              vis="internal")
+        named = build(["call-with-jane-roe-2026-10-06"])
+        check("a shared file is named from the title, not the spoke's filename",
+              list(named) == ["wiki/oceans-tooling-call-6-october-2026.md"], f"got {list(named)}")
+        check("nothing of the spoke's filename travels in the bundle",
+              not any("jane" in k.lower() or "jane" in v.lower() for k, v in named.items()))
+        kept = C.build_bundle(wiki, ["shareable"], "tester", "abc1234",
+                              {C.title_key("A Shareable Concept"): "shareable-in-commons"})
+        check("a page the commons holds keeps the commons' filename, so --update replaces it",
+              list(kept) == ["wiki/shareable-in-commons.md"], f"got {list(kept)}")
+        write(wiki, "twin", "A shareable concept!", vis="internal")
+        try:
+            build(["shareable", "twin"]); ok = False; why = "no error raised"
+        except ValueError as e:
+            ok, why = "same filename" in str(e), str(e)
+        check("two pages whose titles make one filename are refused", ok, why)
+        check("accents survive as plain letters",
+              C.shared_name("Café Zürich, 2026") == "cafe-zurich-2026", C.shared_name("Café Zürich, 2026"))
 
         # --- collision with the commons ---------------------------------------
         # 577 of 595 contributable pages already existed in the commons when this was

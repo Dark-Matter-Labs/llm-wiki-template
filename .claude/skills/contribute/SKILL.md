@@ -61,13 +61,15 @@ whatever was exposed, on the assumption it has already been read.
    refuses private and CRM pages outright, rebuilds frontmatter from a whitelist, redacts
    links to private pages, stamps provenance, and runs the sensitive-term scan over the
    result. If it refuses, the refusal is the answer; do not work around it.
+   The staged file is named from the page's title, not its filename here, so a working name
+   (such as who met) never travels. Name the commons branch after the staged file too.
 4. **Read what was staged.** Open the files. The tool guarantees the boundary; it cannot
    judge whether the page reads sensibly out of its original context. Fix wording that only
    made sense next to a private page.
 5. **Open a PR against the commons** — never a direct push:
 
    ```
-   cd ../<commons> && git checkout main && git pull && git checkout -b contribute/<slug>
+   cd ../<commons> && git checkout main && git pull && git checkout -b contribute/<staged-name>
    cp -r ../<this-wiki>/contrib/wiki/. wiki/
    python3 tools/export.py --check && python3 tools/scan_public_leaks.py
    ```
