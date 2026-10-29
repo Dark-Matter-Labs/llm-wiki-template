@@ -468,6 +468,7 @@ def main():
     # origin are joined by path and nothing else. Two pages here were renamed by a lint
     # pass and the join broke in silence; the commons copies were still correct, and only
     # the pointer home was wrong. Four such cases existed in 638 contributed pages.
+    # Since 2026-10-29 the shared copy is named from its title, so a title match counts too.
 
     def gone_world(tmp, here, commons_nodes, name="a-wiki", commons="the-commons"):
         root = pathlib.Path(tmp) / name
@@ -494,6 +495,7 @@ def main():
             {"origin": "a-wiki", "slug": "kept", "title": "Kept"},
             {"origin": "a-wiki", "slug": "renamed-away", "title": "Renamed Away"},
             {"origin": "a-wiki", "slug": "deltas/nested", "title": "Nested"},
+            {"origin": "a-wiki", "slug": "named-from-its-title", "title": "X"},
             {"origin": "another-wiki", "slug": "not-mine", "title": "Someone Else's"},
             {"slug": "written-in-the-commons", "title": "No Origin"},
         ])
@@ -504,6 +506,8 @@ def main():
         check("a page still present is not reported", all(r["slug"] != "kept" for r in rows))
         check("a nested slug still present is not reported",
               all(r["slug"] != "deltas/nested" for r in rows))
+        check("a page shared under a name made from its title is not reported",
+              all(r["slug"] != "named-from-its-title" for r in rows))
         check("another wiki's page is not reported",
               all(r["slug"] != "not-mine" for r in rows))
         check("a page written in the commons is not reported",
@@ -546,7 +550,7 @@ def main():
 
     # MUTATION: stop comparing against what is here, and the rename stops being reported.
     src_g = (pathlib.Path(__file__).resolve().parent / "waiting.py").read_text()
-    needle = "            if slug and slug not in mine:"
+    needle = '            if slug and slug not in mine and key(n.get("title")) not in my_titles:'
     if needle not in src_g:
         check("mutation anchor present", False, "the comparison this tests is not there")
     else:

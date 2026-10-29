@@ -418,6 +418,16 @@ def contributed_but_gone():
     if not wiki.exists():
         return {"available": False, "rows": []}
     mine = {str(f.relative_to(wiki))[:-3] for f in wiki.rglob("*.md")}
+    # Since 2026-10-29 a shared copy is named from its title, not from this wiki's filename
+    # (contribute.py, Fang's rule extended), so a page is also found here by its title.
+    def key(t):
+        return "".join(c for c in str(t or "").lower() if c.isalnum())
+    my_titles = set()
+    for f in wiki.rglob("*.md"):
+        for line in f.read_text(encoding="utf-8", errors="ignore").split("\n")[1:40]:
+            if line.startswith("title:"):
+                my_titles.add(key(line[6:]))
+                break
     cuts = sorted((root / ".commons").rglob("wiki.shared.json")) if (root / ".commons").exists() else []
     if not cuts:
         return {"available": False, "rows": []}
@@ -432,7 +442,7 @@ def contributed_but_gone():
             if n.get("origin") != me:
                 continue
             slug = n.get("slug") or n.get("id")
-            if slug and slug not in mine:
+            if slug and slug not in mine and key(n.get("title")) not in my_titles:
                 rows.append({"commons": commons, "slug": slug,
                              "title": n.get("title") or slug,
                              "visibility": n.get("visibility") or "internal"})

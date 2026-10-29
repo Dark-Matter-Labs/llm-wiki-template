@@ -52,7 +52,8 @@ def candidates(pages, already, top=None):
     """Eligible pages the commons does not already hold, most-linked first.
 
     `pages`  — {slug: {"title", "visibility", "inbound"}}
-    `already`— set of titles the commons holds, or None when that cannot be checked.
+    `already`— the titles the commons holds (a set or a {title: slug} dict), or None when
+               that cannot be checked.
     """
     unknown = already is None
     held = set() if unknown else already
