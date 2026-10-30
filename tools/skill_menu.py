@@ -66,6 +66,8 @@ MENU = {
                           "Am I over-reading {x}?", "Which document?"),
     "contribute": ("Share", "Share with the team", "Proposes a page to the shared wiki, with personal details removed.",
                    "Share {x} with the team.", "Which page?"),
+    "visual-guide": ("Writing", "Add a style guide", "Files a project's visual style guide in one shape, every value cited.",
+                     "Add the style guide at {x}.", "Which guide, or where is it?"),
     "pre-read": ("Share", "Write a pre-read", "A short brief with its sources, for one meeting or audience.",
                  "Make a pre-read for {x}.", "Which meeting or audience?"),
     "live-page": ("Share", "Fix a page on the site", "Revises a published page, with a new version, checked on a phone and a laptop.",

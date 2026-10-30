@@ -29,6 +29,7 @@ In plain-English terms, here is when each fires:
 | "run a delta", "measure this against the wiki", "where does this sit / move us", "diff this paper against our position" | `delta` |
 | "share this with the team", "contribute this", "propose this to the commons" | `contribute` |
 | "add a contact", "log that meeting", "met X today", "what follow-ups are due", "who do we know at…", "who haven't we spoken to", "funder pipeline", "prep me for my meeting with…" | `crm` (with `tools/crm.py`) |
+| "check new requests", "assess this request", "what came in for Indy" | `inbound` (private; drafts only, never sends) |
 | "find leads", "lead generation", "who should we approach about…", "who funds…" | `leads` |
 | "cross-check this", "get a second opinion", "what would another model say" | `cross-check` |
 | "run the luck generator", "who should I talk to", "who's worth a conversation" | `luck` |
@@ -36,7 +37,7 @@ In plain-English terms, here is when each fires:
 | "what patterns are emerging", "meta patterns", "what haven't we named yet" | `patterns` |
 | "what's waiting for me", "what needs me", "anything outstanding" | `waiting` |
 | "ai detox", "make this sound human", "take the AI out of this" | `ai-detox` |
-| "dm style", "in our voice", "make this sound like DM" | `dm-style-guide` |
+| "dm style", "in our voice", "make this sound like DM" (Dm wikis only) | `dm-style-guide` |
 | "xCO voice", "in xCO's voice", "xCO tone" (and anything written for or as xCO) | `xco-voice` |
 | "did anything get lost", "check parity" — **and automatically on every rebuild** of an artifact with a countable record set | `rebuild-parity` |
 | "do the call notes", "file my call notes", "here are the notes from the call" | `call-notes` |
@@ -51,6 +52,7 @@ In plain-English terms, here is when each fires:
 | "refresh the lens", "the lens doesn't show my new page", "relock the lens" | `lens-refresh` |
 | "set up my customisations", "use Rooms in my wiki", and when `waiting.py` names a customisation | `customise` |
 | "make a pre-read for…", "a one-pager for…", "brief them before Thursday" | `pre-read` |
+| "add this style guide", "capture our visual guide", "which style guide do we use" | `visual-guide` |
 | "am I over-reading this", "is this extrapolation" — **and automatically whenever the wiki's analysis sits beside someone else's document** | `source-proportion` |
 
 Published web pages live in `docs/` and are served by GitHub Pages at

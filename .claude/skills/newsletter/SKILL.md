@@ -72,12 +72,12 @@ reading is where that went — the writing is a few hundred words.
 - **`ai-detox`** governs the sentences. Plain prose, short sentences, no bullet lists, no bold in
   prose, no closing offer, no recap paragraph, and a list of banned words and
   phrases. A newsletter that reads as machine-written undoes the thing it is reporting.
-- **`dm-style-guide`** governs the stance: Dark Matter Labs' four publishing guides, read for
-  audience, complexity kept rather than flattened, and nothing tidier than the reality. It also
-  carries the two house spellings, which are gated on deploy. Where a wiki carries a project's
-  own voice skill, that skill governs the stance instead.
+- **The wiki's own voice skill** governs the stance: `xco-voice` in xCO wikis, `dm-style-guide`
+  (Dark Matter Labs' four publishing guides) in Dm wikis, or a project's own voice skill where
+  the wiki carries one. Read it for audience, complexity kept rather than flattened, and nothing
+  tidier than the reality. The two house spellings are gated on deploy either way.
 
-Where they seem to conflict, `ai-detox` wins on sentence mechanics and `dm-style-guide` wins on
+Where they seem to conflict, `ai-detox` wins on sentence mechanics and the voice skill wins on
 stance. Both ban hype, so that overlap is not a conflict.
 
 Then the things particular to this artefact, which neither skill covers:
@@ -164,7 +164,7 @@ last, briefly.
 
 ## Method
 
-0. **Load `ai-detox` and `dm-style-guide`.** Before drafting, not after. Retro-fitting a voice
+0. **Load `ai-detox` and the wiki's voice skill.** Before drafting, not after. Retro-fitting a voice
    onto a finished draft produces a draft with a voice fitted onto it.
 1. **Gather.** `python3 tools/newsletter.py --json` for the last complete month. Read it fully
    before writing anything, and read `signals` first. A signal whose tool is missing from this
@@ -204,7 +204,7 @@ This skill does not send. When somebody does, the operational facts below are fr
 `newsletter-publishing` by Joe Amditis (`jamditis/claude-skills-journalism`), and they are the
 part of that skill worth having here. The rest of it — list segmentation, A/B testing subject
 lines, engagement dashboards — is for a publication chasing an audience, and importing it would
-invite exactly the marketing behaviour `dm-style-guide` bans.
+invite exactly the marketing behaviour the voice skills ban.
 
 - **Authenticate the domain.** SPF, DKIM and DMARC. Since February 2024 Gmail and Yahoo enforce
   bulk-sender requirements, and mail that fails them is filtered rather than bounced, which means
