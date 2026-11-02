@@ -227,6 +227,30 @@ def main():
         subprocess.run(["git", "add", "-A"], cwd=root, check=True)
         check("but a corpus a third larger DOES make it stale", wc.main(["--check"]) == 1)
 
+    # THE PHONE'S PROPOSAL, as it failed on gurden-llm-wiki #143 and #144 (2026-11-02): one
+    # transcript added to raw/, nothing else touched, and no way to run this tool.
+    with tempfile.TemporaryDirectory() as t:
+        root = repo(t, {"name": "w", "role": "spoke", "contributes_to": ["c"]},
+                    sources=(50_000, 60_000) + (1_000,) * 6)
+        wc.main([])
+        before = (root / "CLAUDE.md").read_text()
+        check("the fixture starts where gurden's wiki was", "(about 25% of them)" in before)
+        tdir = root / "raw" / "transcripts"
+        tdir.mkdir()
+        (tdir / "t0.md").write_text("x" * 2_000, encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+        check("one small transcript moves the share", "(about 25% of them)" not in wc.render())
+        check("...and --check still passes", wc.main(["--check"]) == 0)
+        (tdir / "t1.md").write_text("x" * 90_000, encoding="utf-8")
+        for i in range(2, 20):
+            (tdir / f"t{i}.md").write_text("x", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+        check("a long call and crossing 25 sources pass too", wc.main(["--check"]) == 0)
+        check("...without rewriting CLAUDE.md", (root / "CLAUDE.md").read_text() == before)
+        wc.main([])
+        check("and the next run of the tool refreshes the figures",
+              "about 30 source files" in (root / "CLAUDE.md").read_text())
+
     print()
     if FAILED:
         print(f"{len(FAILED)} failed: {', '.join(FAILED)}")

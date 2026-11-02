@@ -36,6 +36,14 @@ few times a year instead of on every ingest. Gating a byte-exact page count mean
 that added a page failed a check nobody had touched — see `band()` for why that is a defect
 in the gate rather than a cost of having one.
 
+Not at all: the figures that `raw/` alone decides (how many sources, how many are large, their
+share, the largest). The wiki-voice phone app opens a proposal that adds one transcript to
+`raw/transcripts/` and cannot run Python, so on 2026-11-02 every one of those proposals failed
+here (gurden-llm-wiki #143, #144): one more file moved "about 25% of them" to 20%. Skipping the
+check only when a proposal touches raw/ would not do — the drift lands on main and fails the
+next person's one-line edit instead. So those figures are refreshed whenever the tool runs,
+which every proposal Claude makes does, and never gated. See `gated()`.
+
 Usage:
   python3 tools/wiki_context.py            # rewrite the block in CLAUDE.md
   python3 tools/wiki_context.py --check    # exit 1 if the block is missing or stale
@@ -48,6 +56,7 @@ import argparse
 import json
 import os
 import pathlib
+import re
 import subprocess
 import sys
 
@@ -243,6 +252,15 @@ def render() -> str:
     return "\n".join(L)
 
 
+def gated(block: str) -> str:
+    """The part of the block --check holds to: all of it but the figures raw/ alone decides.
+
+    Everything from the corpus heading on is about raw/, except the page count."""
+    head, sep, tail = block.partition("### What this corpus is shaped like")
+    pages = re.search(r"\*\*(.+?)\*\* in `wiki/`", tail)
+    return head + sep + (pages.group(1) if pages else tail)
+
+
 def current(text: str) -> str | None:
     if START not in text or END not in text:
         return None
@@ -288,11 +306,14 @@ def main(argv=None) -> int:
             print("CLAUDE.md has no wiki-context block — run: python3 tools/wiki_context.py",
                   file=sys.stderr)
             return 1
-        if cur.strip() != render().strip():
+        new = render()
+        if gated(cur).strip() != gated(new).strip():
             print("CLAUDE.md's wiki-context block is STALE — run: python3 tools/wiki_context.py",
                   file=sys.stderr)
             return 1
-        print("wiki-context OK — CLAUDE.md matches this repo's federation and corpus.")
+        print("wiki-context OK — CLAUDE.md matches this repo's federation and corpus."
+              + ("" if cur.strip() == new.strip() else
+                 " (The raw/ figures are behind; they refresh the next time the tool runs.)"))
         return 0
 
     what = apply_to(path)
