@@ -1,13 +1,13 @@
 ---
 name: customise
-description: Set up the customisations this wiki asked for in INO Home, one at a time, with this wiki's own content. Use when the owner says "set up my customisations", "set up what I asked for in INO Home", "use Rooms in my wiki", "add hunches to my wiki", or when tools/waiting.py names a customisation not set up yet. Reads design/customisations.json. Never copies another wiki's content.
+description: Set up the customisations this wiki asked for in d.INO Home, one at a time, with this wiki's own content. Use when the owner says "set up my customisations", "set up what I asked for in d.INO Home", "use Rooms in my wiki", "add hunches to my wiki", or when tools/waiting.py names a customisation not set up yet. Reads design/customisations.json. Never copies another wiki's content.
 ---
 
 # Set up a customisation
 
 ## Why this exists
 
-INO Home has a Customise page at `https://ino-home.vercel.app/#/customise`. It lists what people have added to
+d.INO Home has a Templates page (once called Customise) at `https://ino-home.vercel.app/#/customise`. It lists what people have added to
 their own wikis: Robyn's rooms, Prateek's glossary, the xCO team's hunches, and more. Each one has a button,
 "Use this in my wiki".
 
@@ -45,7 +45,7 @@ It never gets Robyn's rooms.
 9. **Propose it.** Say what a reader will now find, in plain words. Then ask: "Shall I merge this? That saves it into
    your wiki."
 10. **Offer one next step.** If the change touched the lens, offer `lens-refresh`. The lens shows it only after a
-    rebuild and lock. INO Home shows most customisations as soon as the change is saved.
+    rebuild and lock. d.INO Home shows most customisations as soon as the change is saved.
 
 ## What each one needs from the owner
 
@@ -89,7 +89,7 @@ For a customisation not in this table, follow the entry's own `setup` line.
 
 ## Connections
 
-- INO Home's Customise page, which writes `design/customisations.json`.
+- d.INO Home's Templates page, which writes `design/customisations.json`.
 - `tools/waiting.py`, which names requests not set up yet.
 - `design/lens/SPEC.md`: what each lens setting does.
 - `lens-refresh`, `cross-check`, `.claude/rules/pushing.md`, `.claude/rules/finishing.md`.

@@ -307,7 +307,7 @@ def main():
     check("with no graph built it offers nothing rather than guessing",
           sb["available"] is False and sb["pages"] == [])
 
-    # Customisations asked for in INO Home: only the ones still wanted, and a broken file is not a crash.
+    # Customisations asked for in d.INO Home: only the ones still wanted, and a broken file is not a crash.
     with tempfile.TemporaryDirectory() as tmp:
         old_root = W.ROOT_P
         W.ROOT_P = pathlib.Path(tmp)

@@ -1,6 +1,6 @@
 ---
 name: contribute
-description: Propose a page from this wiki to the commons it contributes to. Use when the owner says "share this with the team", "contribute this", "send this to the team wiki", "propose this to the commons", or wants something they have written to become shared canon. Stages a sanitised, provenance-stamped bundle and opens a PR against the commons named in `design/federation.json`; never pushes to the commons directly.
+description: Propose a page from this wiki to the commons it contributes to. Use when the owner says "share this with the team", "contribute this", "send this to the team wiki", "propose this to the commons", or wants something they have written to become shared canon. Also "share this with Michelle", "send this to <person>": one page to one person's own wiki, without the team (see "Sharing with one person"). Stages a sanitised, provenance-stamped bundle and opens a PR against the commons named in `design/federation.json`; never pushes to the commons directly.
 ---
 
 # Contribute a page to the commons
@@ -51,22 +51,36 @@ whatever was exposed, on the assumption it has already been read.
 
 1. **Identify the page(s).** `python3 tools/contribute.py --list` shows what is eligible.
 2. **Check the tier with the owner** if anything is `private`. Do not promote it yourself.
-3. **Stage the bundle:**
+3. **Show the owner who will see it, and ask once.** Run the tool without the last flag:
 
    ```
    python3 tools/contribute.py <slug> [<slug> ...] --by <person>
    ```
 
+   It stages nothing yet. It prints a "who will see it" block, built from the sanitised copy:
+   the logins with access to the commons, the organisation's base permission, each page's
+   section headings and tags, and the people from the contact pages that the page names. Tell
+   the owner in plain words: "This goes to <commons>. These people can read it: ... It covers
+   ... It names ... Shall I send it?" One question. If the reader list could not be read, say
+   so: unknown is not nobody. Added 2 November 2026, after Michelle's point on the d.INO call
+   that people need to know who will see something before it travels.
+4. **Stage the bundle, only on their yes:**
+
+   ```
+   python3 tools/contribute.py <slug> [<slug> ...] --by <person> --readers-confirmed
+   ```
+
+   Never pass `--readers-confirmed` without that yes in this session.
    This writes a sanitised copy to `contrib/` and **nothing else** — no push, no PR. It
    refuses private and CRM pages outright, rebuilds frontmatter from a whitelist, redacts
    links to private pages, stamps provenance, and runs the sensitive-term scan over the
    result. If it refuses, the refusal is the answer; do not work around it.
    The staged file is named from the page's title, not its filename here, so a working name
    (such as who met) never travels. Name the commons branch after the staged file too.
-4. **Read what was staged.** Open the files. The tool guarantees the boundary; it cannot
+5. **Read what was staged.** Open the files. The tool guarantees the boundary; it cannot
    judge whether the page reads sensibly out of its original context. Fix wording that only
    made sense next to a private page.
-5. **Open a PR against the commons** — never a direct push:
+6. **Open a PR against the commons** — never a direct push:
 
    ```
    cd ../<commons> && git checkout main && git pull && git checkout -b contribute/<staged-name>
@@ -82,12 +96,36 @@ whatever was exposed, on the assumption it has already been read.
    ("depends on <commons>#<pr>; the diff narrows once that merges"). A PR based on
    another branch can report *merged* without ever reaching `main`: xco-team-wiki#134 did
    exactly that on 2026-09-25, and had to be repaired as #135.
-6. **Cascade happens in the commons, not here.** The receiving wiki updates its own index,
+7. **Cascade happens in the commons, not here.** The receiving wiki updates its own index,
    log and cross-references when the PR is reviewed. Do not edit the commons' index from
    this side.
-7. **Log it** — append `## [YYYY-MM-DD] contribute | <title> → <commons>#<pr>` to **today's**
+8. **Log it** — append `## [YYYY-MM-DD] contribute | <title> → <commons>#<pr>` to **today's**
    day file (`wiki/log/YYYY-MM-DD.md`, created with the header `# Log — YYYY-MM-DD` if it is the
    day's first entry), then run `python3 tools/sync_log_index.py`.
+
+## Sharing with one person
+
+Added 3 November 2026. A call between two people should reach the other person, not the whole
+team. So a page can go to one person's own wiki and stay `private` on both sides:
+
+1. **The owner names the person on the page.** Add `shared_with: [michelle-llm-wiki]` (their
+   wiki's name, or their GitHub login) to the page's details, with the owner's yes. The tool
+   refuses to send a page to anyone that list does not name.
+2. **Show who will see it, and ask once,** exactly as in step 3 above:
+
+   ```
+   python3 tools/contribute.py <slug> --by <person> --to-person michelle-llm-wiki
+   ```
+
+   The block lists everyone with access to that person's wiki, which may be more than the
+   person. Say so plainly.
+3. **On their yes,** add `--readers-confirmed`. The bundle lands in `contrib/`, private, with
+   `shared_by`, `from_wiki` and `shared_on` stamped.
+4. **Open a proposed change in the person's wiki**, never on its main. It arrives `private`, so
+   it never reaches their wiki's shared version. Saving it is the recipient's yes.
+
+A team wiki is refused as a person: use `--to` for that. CRM pages never travel. Links to other
+private pages are removed, and source paths never travel, as for a commons.
 
 ## What the tool guarantees (so you do not have to check by hand)
 
@@ -99,6 +137,7 @@ whatever was exposed, on the assumption it has already been read.
 | Links to private pages redacted | Including in `description` and other frontmatter strings |
 | Provenance stamped | `contributed_by`, `origin`, `origin_rev` — recorded, never invented |
 | Sensitive-term scan on the bundle | The commons is a wider audience than this repo |
+| Who will see it, shown before staging | The owner chooses the readers; `--readers-confirmed` records their yes |
 
 ## If the commons already has the page
 
@@ -143,6 +182,7 @@ useful context for the reviewer, and it is not the same as asserting the commons
 
 - **Never push to the commons directly.** Every contribution is a PR someone else merges.
 - **Never merge your own contribution** — the four-eyes rule is the commons' constitution.
+- **Never pass `--readers-confirmed` without the owner's yes** to the block it follows.
 - **Never promote a page's tier to make it contributable.** That is the owner's call, taken
   separately and for its own reasons.
 - **Never contribute CRM data, capital or deal specifics, or transcripts** — refused by the

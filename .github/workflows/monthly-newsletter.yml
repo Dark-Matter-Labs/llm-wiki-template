@@ -167,7 +167,7 @@ jobs:
           # default. Three dollars because $2 left fifteen per cent of headroom, and a
           # run cut off mid-write is worse than a slightly dearer one. The other nine
           # wikis are between 12 and 676 pages, so the cap will not bind on any of them.
-          claude_args: --model claude-sonnet-5 --max-budget-usd 3 --allowedTools "Bash(python3 tools/*),Bash(git log*),Bash(git status*),Read,Glob,Grep,Edit(wiki/**),Write(wiki/**)" --disallowedTools "WebFetch,WebSearch"
+          claude_args: --model claude-sonnet-5-5 --max-budget-usd 3 --allowedTools "Bash(python3 tools/*),Bash(git log*),Bash(git status*),Read,Glob,Grep,Edit(wiki/**),Write(wiki/**)" --disallowedTools "WebFetch,WebSearch"
           prompt: |
             Run the `newsletter` skill for ${{ steps.gather.outputs.month }}. The gathered
             material is at /tmp/material.json and `python3 tools/newsletter.py --json` will

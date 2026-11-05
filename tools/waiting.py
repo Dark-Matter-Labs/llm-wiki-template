@@ -553,9 +553,9 @@ def held_here():
 
 
 def customisations_asked():
-    """Customisations asked for in INO Home and not set up yet: their names, from design/customisations.json.
+    """Customisations asked for in d.INO Home and not set up yet: their names, from design/customisations.json.
 
-    INO Home's "Use this in my wiki" only records the request; the customise skill sets it up. Without this line a
+    d.INO Home's "Use this in my wiki" only records the request; the customise skill sets it up. Without this line a
     request sat in the file and nothing ever mentioned it (26 Oct 2026)."""
     try:
         doc = json.loads((ROOT_P / "design" / "customisations.json").read_text(encoding="utf-8"))
@@ -695,7 +695,7 @@ def render(m) -> str:
         out.append("")
 
     if m.get("customise"):
-        out.append(f"  {len(m['customise'])} customisation(s) asked for in INO Home, not set up yet: "
+        out.append(f"  {len(m['customise'])} customisation(s) asked for in d.INO Home, not set up yet: "
                    + ", ".join(m["customise"]))
         out.append("     Say \"set up my customisations\" and Claude sets each one up with this wiki's own content.")
         out.append("")

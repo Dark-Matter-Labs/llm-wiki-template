@@ -1,6 +1,6 @@
 ---
 name: metacognition
-description: Observe how the owner is using the wiki and where their working loop costs them. **Fires automatically** — when a month's log carries more `repair` entries than `rebuild` (the correction rate has spiked and something upstream is wrong); after roughly every 25 log entries; and whenever a session ends having corrected its own earlier work more than twice. Use when the owner says "how am I using this", "metacognition", or "usage patterns". Reads git history and the log, names the observed working patterns, suggests concrete workflow improvements, and flags candidate patterns for the learn skill.
+description: "How the owner uses the wiki and where their working loop costs them. **Fires automatically** when a month's log has more `repair` than `rebuild` entries, about every 25 log entries, and when a session corrected its own work more than twice. Also on \"how am I using this\", \"metacognition\", \"usage patterns\". Reads git history and the log, names the patterns, suggests improvements, flags candidates for `learn`."
 ---
 
 # Metacognition — how the owner uses the tool

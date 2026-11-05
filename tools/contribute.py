@@ -36,9 +36,24 @@ Usage:
   python3 tools/contribute.py <slug> --by gurden       # set contributed_by
   python3 tools/contribute.py --list                   # what is eligible
   python3 tools/contribute.py <slug> --out /tmp/bundle
+  python3 tools/contribute.py <slug> --by gurden --readers-confirmed
+      # stage only after the owner has seen who will see it and said yes
+  python3 tools/contribute.py <slug> --by gurden --to-person michelle-llm-wiki --readers-confirmed
+      # share with one person's own wiki
+
+Sharing with one person (added 2026-11-03)
+------------------------------------------
+`--to-person` sends a page to another person's own wiki instead of a team commons. The page
+stays `private` at home and arrives `private` there, so only that wiki's readers see it. It
+goes only to someone its own `shared_with:` list names: the list is the owner's decision,
+written on the page, and the flag only acts on it. A team wiki is refused as a target, since
+a commons is a group, not a person. Everything else is the same machinery: CRM never
+travels, other private pages are unlinked, source paths never travel, and the readers block
+must be confirmed.
 """
 
 import argparse
+import datetime
 import json
 import os
 import re
@@ -360,14 +375,25 @@ def check_collisions(wiki_dir, slugs, commons):
     return theirs, hits
 
 
-def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None):
+def shared_with(fm):
+    """The people a page's owner named in `shared_with:`, folded for matching."""
+    v = fm.get("shared_with") or []
+    return {str(x).strip().casefold() for x in (v if isinstance(v, list) else [v]) if str(x).strip()}
+
+
+def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None, person=None):
     """Return {relpath: text} for the staged contribution, or raise ValueError.
 
     `existing` maps title_key -> the commons' own filename, for pages it already holds.
+    `person` = {"wiki": ..., "owner": ...} sends the pages to one person's wiki instead.
     """
     existing = existing or {}
     labels = source_labels()
     nodes, title_to_slug = export.build_nodes(wiki_dir)
+    if person:
+        # The pages being shared are let through the boundary; every OTHER private page stays
+        # hidden, so its links and title are stripped exactly as for a commons.
+        nodes = {s: (dict(n, visibility="internal") if s in slugs else n) for s, n in nodes.items()}
     public, private_slugs = export.make_public(
         nodes, title_to_slug, hide=export.HIDE_FROM_SHARED)
     private_titles = {nodes[s]["title"] for s in private_slugs
@@ -388,9 +414,19 @@ def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None):
         if fm is None:
             raise ValueError(f"{slug}: no frontmatter")
 
-        ok, why = eligible(slug, fm)
-        if not ok:
-            raise ValueError(f"{slug}: refused — {why}")
+        if person:
+            if any(slug.startswith(p) for p in REFUSE_PATH_PREFIXES):
+                raise ValueError(f"{slug}: refused — CRM / relationship data never travels")
+            names = shared_with(fm)
+            if not names & {person["wiki"].casefold(), (person.get("owner") or "").casefold()}:
+                raise ValueError(f"{slug}: refused — its shared_with does not name "
+                                 f"{person['wiki']}. Add them to the page first: that is the "
+                                 f"owner's decision, written down")
+            fm = dict(fm, visibility="private")   # it arrives private, whatever it was at home
+        else:
+            ok, why = eligible(slug, fm)
+            if not ok:
+                raise ValueError(f"{slug}: refused — {why}")
         if slug not in public:
             raise ValueError(f"{slug}: excluded by the boundary filter (private)")
 
@@ -412,9 +448,15 @@ def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None):
             prov.append(f"validated_by: {export_shared._yaml_list([clean(str(b)) for b in backers])}")
             if fm.get("validated_at"):
                 prov.append(f"validated_at: {export_shared._yaml_scalar(clean(str(fm['validated_at'])))}")
-        prov += [f"contributed_by: {contributed_by}",
-                f"origin: {ORIGIN}",
-                f"origin_rev: {rev}"]
+        if person:
+            prov += [f"shared_by: {contributed_by}",
+                     f"from_wiki: {ORIGIN}",
+                     f"shared_on: {datetime.date.today().isoformat()}",
+                     f"origin_rev: {rev}"]
+        else:
+            prov += [f"contributed_by: {contributed_by}",
+                     f"origin: {ORIGIN}",
+                     f"origin_rev: {rev}"]
         lines = text.split("\n")
         if lines[-1] != "---":   # an assert vanishes under python -O, and a malformed bundle would be staged
             raise ValueError(f"{slug}: frontmatter did not end where expected; nothing staged")
@@ -437,6 +479,132 @@ def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None):
     return out
 
 
+# ---------------------------------------------------------------------------
+# Who will see it.
+#
+# Added 2026-11-02 at Gurden's yes, after Michelle's point on the 2 November d.INO call:
+# people speak and write less freely when they do not know where their words will travel,
+# so the owner sees the audience before a page leaves, not after. Every other gate here
+# protects the page; this one makes sure a person chose the readers.
+#
+# The block is built from the sanitised bundle, never from the source pages, so it cannot
+# show anything the bundle does not already carry: a private page's title is not in the
+# bundle, so it cannot be in the block either.
+ORG = "Dark-Matter-Labs"
+HEADING_RE = re.compile(r"^#{2,3}\s+(.+?)\s*$", re.M)
+TAGS_RE = re.compile(r"^tags:\s*\[(.*)\]\s*$", re.M)
+
+
+def gh_lines(*args):
+    """Lines of a `gh` call's output, or None when it cannot be read."""
+    try:
+        r = subprocess.run(["gh", *args], capture_output=True, text=True, timeout=60)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return r.stdout.split() if r.returncode == 0 else None
+
+
+def readers(commons):
+    """(logins with access to the commons repo, the org's base permission). None = unknown."""
+    logins = gh_lines("api", f"repos/{ORG}/{commons}/collaborators", "--paginate",
+                      "--jq", ".[].login")
+    base = gh_lines("api", f"orgs/{ORG}", "--jq", ".default_repository_permission")
+    base = base[0] if base and base[0] != "null" else None
+    return (sorted(set(logins)) if logins is not None else None), base
+
+
+def person_names(wiki_dir):
+    """Full names of the people this wiki keeps contact pages for.
+
+    shortcut: full names only, so a page that says only "Darko" is not caught; widen this
+    if first names turn out to be how pages name people.
+    """
+    names = set()
+    for slug, _p, fm, _b in export.discover(wiki_dir):
+        if slug.startswith("crm/contacts/") and isinstance(fm.get("title"), str):
+            name = re.sub(r"\s*\(contact\)\s*$", "", fm["title"]).strip()
+            if " " in name:
+                names.add(name)
+    return names
+
+
+def resolve_person(target, fetch=None, listing=None):
+    """(wiki, owner, error) for --to-person: a personal wiki's name, or its owner's GitHub login.
+
+    A team wiki is refused: sharing with a person means their own wiki, never a commons.
+    """
+    fetch = fetch or federation_of
+    if target.endswith("-wiki") or target.endswith("-commons"):
+        fed = fetch(target)
+        if fed is None:
+            return None, None, f"could not read {target}'s design/federation.json"
+        candidates = [(target, fed)]
+    else:
+        names = (listing or personal_wikis)()
+        if names is None:
+            return None, None, "could not list the organisation's wikis to find that login"
+        candidates = [(w, f) for w in names for f in [fetch(w)]
+                      if f and str(f.get("owner", "")).casefold() == target.casefold()]
+        if not candidates:
+            return None, None, (f"no personal wiki names {target!r} as its owner. "
+                                f"Give the wiki's name instead, for example michelle-llm-wiki")
+        if len(candidates) > 1:
+            return None, None, (f"{target!r} owns more than one wiki: "
+                                f"{', '.join(w for w, _f in candidates)}. Name one")
+    wiki, fed = candidates[0]
+    if fed.get("role") != "spoke":
+        return None, None, (f"{wiki} is a team wiki, not a person's. "
+                            f"Use --to {wiki} to contribute to it instead")
+    return wiki, fed.get("owner"), None
+
+
+def federation_of(wiki):
+    """Another wiki's design/federation.json, read through GitHub. None if unreadable."""
+    try:
+        r = subprocess.run(["gh", "api", f"repos/{ORG}/{wiki}/contents/design/federation.json",
+                            "-H", "Accept: application/vnd.github.raw"],
+                           capture_output=True, text=True, timeout=60)
+        return json.loads(r.stdout) if r.returncode == 0 else None
+    except (OSError, subprocess.TimeoutExpired, ValueError):
+        return None
+
+
+def personal_wikis():
+    """The organisation's personal wikis, by the naming every one of them uses."""
+    names = gh_lines("api", f"orgs/{ORG}/repos", "--paginate", "--jq", ".[].name")
+    return None if names is None else [n for n in names if n.endswith("-llm-wiki")]
+
+
+def who_will_see(commons, bundle, wiki_dir, lookup=None, person=False):
+    """The block the owner reads before a page leaves. Built from the staged bundle only."""
+    logins, base = (lookup or readers)(commons)
+    known = person_names(wiki_dir)
+    lines = [f"WHO WILL SEE IT: {commons}"]
+    if logins is None:
+        lines.append("  Readers: could not be read from GitHub. That does not mean nobody;"
+                     " ask the owner to check who has access before saying yes.")
+    else:
+        lines.append(f"  Readers: {len(logins)} people with access: {', '.join(logins)}")
+    if base == "none":
+        lines.append(f"  Nobody else in {ORG} can read it (the organisation's base permission is none).")
+    elif base:
+        lines.append(f"  Everyone in {ORG} can read it (the organisation's base permission is {base}).")
+    if person:
+        lines.append("  It arrives `private` there, so it never reaches that wiki's shared version.")
+    else:
+        lines.append(f"  Its shared version also reaches the wikis that read from {commons}.")
+    for rel, text in bundle.items():
+        heads = HEADING_RE.findall(text)[:8]
+        tags = TAGS_RE.search(text)
+        named = sorted(n for n in known if n in text)
+        lines.append(f"\n  {rel}")
+        lines.append(f"    Covers: {'; '.join(heads) if heads else '(no section headings)'}")
+        if tags and tags.group(1).strip():
+            lines.append(f"    Tags: {tags.group(1).strip()}")
+        lines.append(f"    Names: {', '.join(named) if named else 'nobody from your contact pages'}")
+    return "\n".join(lines)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Stage pages for contribution to the commons.")
     ap.add_argument("slugs", nargs="*")
@@ -449,6 +617,10 @@ def main(argv=None):
                          "declares more than one")
     ap.add_argument("--update", action="store_true",
                     help="the page already exists in the commons and you mean to replace it")
+    ap.add_argument("--to-person", default=None,
+                    help="share with one person: their wiki's name or their GitHub login")
+    ap.add_argument("--readers-confirmed", action="store_true",
+                    help="the owner has seen who will see it, and said yes")
     args = ap.parse_args(argv)
 
     if not os.path.isdir(args.wiki):
@@ -476,14 +648,22 @@ def main(argv=None):
     if not valid_by(args.by):
         ap.error("--by must be a plain name (letters, spaces, . ' -), up to 80 characters")
 
-    topo = topology()
-    commons, err = resolve_commons(args.to, topo)
-    if err:
-        print(f"error: {err}", file=sys.stderr)
-        return 1
-
-    # Refuse a silent overwrite before doing any work.
-    theirs, hits = check_collisions(args.wiki, set(args.slugs), commons)
+    person = None
+    if args.to_person:
+        if args.to:
+            ap.error("give --to (a team wiki) or --to-person (one person), not both")
+        wiki_to, owner, err = resolve_person(args.to_person)
+        if err:
+            print(f"error: {err}", file=sys.stderr)
+            return 1
+        commons, person, theirs, hits = wiki_to, {"wiki": wiki_to, "owner": owner}, {}, []
+    else:
+        commons, err = resolve_commons(args.to, topology())
+        if err:
+            print(f"error: {err}", file=sys.stderr)
+            return 1
+        # Refuse a silent overwrite before doing any work.
+        theirs, hits = check_collisions(args.wiki, set(args.slugs), commons)
     if theirs is None:
         print(f"note: no cached graph for {commons} (.commons/), so a page that already\n"
               f"      exists there cannot be detected. Run the 'Sync the commons' workflow\n"
@@ -515,9 +695,15 @@ def main(argv=None):
     existing = {title_key(t): s for t, s in (theirs or {}).items()
                 if isinstance(s, str) and SAFE_NAME_RE.fullmatch(s)}
     try:
-        bundle = build_bundle(args.wiki, args.slugs, args.by, rev, existing)
+        bundle = build_bundle(args.wiki, args.slugs, args.by, rev, existing, person)
     except ValueError as e:
         print(f"error: {e}", file=sys.stderr)
+        return 1
+
+    print(who_will_see(commons, bundle, args.wiki, person=bool(person)) + "\n", flush=True)  # before the refusal below
+    if not args.readers_confirmed:
+        print("error: nothing staged. Show the owner who will see it, above, and run again\n"
+              "       with --readers-confirmed only after they say yes.", file=sys.stderr)
         return 1
 
     os.makedirs(args.out, exist_ok=True)
@@ -537,8 +723,10 @@ def main(argv=None):
         print(leak.stdout or leak.stderr, file=sys.stderr)
         return 1
 
-    print(f"\n  {len(bundle)} page(s) staged in {args.out}/ at rev {rev}, contributed_by {args.by}.")
-    print(f"  Nothing has left this repo. Open a PR against {commons} to propose them.")
+    print(f"\n  {len(bundle)} page(s) staged in {args.out}/ at rev {rev}, "
+          f"{'shared_by' if person else 'contributed_by'} {args.by}.")
+    print(f"  Nothing has left this repo. Open a PR against {commons} to propose them"
+          + (" (they arrive private)." if person else "."))
     return 0
 
 

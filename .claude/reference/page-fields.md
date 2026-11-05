@@ -3,7 +3,7 @@
 
 # Page fields in full: tiers, validation, dormancy, decisions, identity, contradictions, citations
 
-Read this before setting `visibility`, `validation`, `machine_checks`, `status: dormant`, `decides:`, `same_as:`, `contradicts:`, `derivation:` or a verification mark.
+Read this before setting `visibility`, `validation`, `machine_checks`, `status: dormant`, `decides:`, `same_as:`, `shared_with:`, `contradicts:`, `derivation:` or a verification mark.
 
 ### Publication tiers — `visibility` (required)
 
@@ -124,6 +124,16 @@ This exists because the inventory at [[Unmerged work — inventory of 85 pages t
 closed a question on 2026-09-03, said in terms that it existed so nobody would re-derive it, and was
 re-derived twelve days later by a tool that could not see decisions. An inbox that keeps re-raising
 settled matters trains people to stop opening it.
+
+### Sharing one page with one person — `shared_with:` (optional)
+
+Added 3 November 2026. A list of the people a page may be sent to, by their wiki's name or
+their GitHub login: `shared_with: [michelle-llm-wiki]`. It is the owner's decision, written on
+the page; `contribute.py --to-person` only acts on it, and refuses anyone the list does not
+name. It changes nothing about the page's tier: a page with `shared_with` is still `private`
+here, still absent from every export and still refused by team sharing. The copy arrives
+`private` in the other person's wiki, and the list itself stays at home. See the `contribute`
+skill, "Sharing with one person".
 
 ### The same subject, in more than one wiki — `same_as:`
 

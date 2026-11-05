@@ -92,6 +92,123 @@ def check_topology(check):
           _os.path.join(".commons", "export", "wiki.shared.json") in paths, str(paths))
 
 
+def check_who_will_see(check):
+    """The owner sees who will read a page, what it covers and who it names, before it leaves.
+
+    Added 2026-11-02 (Michelle's point on the d.INO call): people must know where their words
+    travel. The block is built from the sanitised bundle, so a private title cannot reach it.
+    """
+    import contextlib
+    import io
+    tmp = tempfile.mkdtemp()
+    wiki = os.path.join(tmp, "wiki")
+    try:
+        write(wiki, "secret", "The Secret Position", vis="private")
+        write(wiki, "crm/contacts/jane-roe", "Jane Roe (contact)", vis="private")
+        write(wiki, "crm/contacts/richard-doe", "Richard Doe (contact)", vis="private")
+        write(wiki, "share-me", "A Page To Share", vis="internal",
+              body="## What we found\n\nJane Roe said so. See [[The Secret Position]].\n\n"
+                   "## What is open\n\nMore later.")
+        bundle = C.build_bundle(wiki, ["share-me"], "tester", "abc1234")
+
+        block = C.who_will_see("xco-team-wiki", bundle, wiki,
+                               lookup=lambda _c: (["alice", "bob"], "none"))
+        check("the readers are listed by login", "2 people with access: alice, bob" in block, block)
+        check("the base permission is said plainly", "base permission is none" in block, block)
+        check("the topics are the page's own headings",
+              "What we found; What is open" in block, block)
+        check("a person the page names is shown", "Jane Roe" in block, block)
+        check("a contact the page does not name is never shown", "Richard Doe" not in block, block)
+        check("a private page's title never reaches the block",
+              "The Secret Position" not in block, block)
+
+        unknown = C.who_will_see("xco-team-wiki", bundle, wiki, lookup=lambda _c: (None, None))
+        check("an unreadable reader list says so, and never says nobody",
+              "could not be read" in unknown and "0 people" not in unknown, unknown)
+
+        old_cwd, old_readers = os.getcwd(), C.readers
+        try:
+            os.chdir(tmp)
+            C.readers = lambda _c: (None, None)
+            to = (C.topology().get("contributes_to") or ["xco-team-wiki"])[0]
+            out, err = io.StringIO(), io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                rc = C.main(["share-me", "--by", "tester", "--to", to])
+            check("without --readers-confirmed nothing is staged",
+                  rc == 1 and not os.path.exists(os.path.join(tmp, "contrib")), f"rc={rc}")
+            check("the refusal names the flag", "--readers-confirmed" in err.getvalue(),
+                  err.getvalue())
+            check("the block is shown before the refusal", "WHO WILL SEE IT" in out.getvalue(),
+                  out.getvalue()[:200])
+        finally:
+            C.readers = old_readers
+            os.chdir(old_cwd)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def check_share_with_person(check):
+    """Sharing one page with one person, without the team commons (added 2026-11-03).
+
+    Asked for on the 2 November d.INO call: a call between two people had no way to reach
+    only the other one. The page goes to a person's own wiki, private, and only to someone
+    the page itself names in `shared_with:`.
+    """
+    feds = {"michelle-llm-wiki": {"role": "spoke", "owner": "MiZuGH"},
+            "gurden-llm-wiki": {"role": "spoke", "owner": "gurdenbatra"},
+            "xco-team-wiki": {"role": "commons"}}
+    fetch, listing = feds.get, lambda: ["michelle-llm-wiki", "gurden-llm-wiki"]
+
+    wiki, owner, err = C.resolve_person("mizugh", fetch, listing)
+    check("a GitHub login resolves to that person's own wiki",
+          (wiki, owner, err) == ("michelle-llm-wiki", "MiZuGH", None), f"{wiki} {owner} {err}")
+    check("a wiki's name resolves to itself",
+          C.resolve_person("michelle-llm-wiki", fetch, listing)[0] == "michelle-llm-wiki")
+    _w, _o, err = C.resolve_person("xco-team-wiki", fetch, listing)
+    check("a team wiki is refused as a person", err and "--to xco-team-wiki" in err, str(err))
+    _w, _o, err = C.resolve_person("nobody-here", fetch, listing)
+    check("an unknown login is refused, never guessed", err and "no personal wiki" in err, str(err))
+
+    tmp = tempfile.mkdtemp()
+    wiki_dir = os.path.join(tmp, "wiki")
+    try:
+        write(wiki_dir, "secret", "The Secret Position", vis="private")
+        write(wiki_dir, "our-call", "Our Call, 2 November", vis="private",
+              extra="shared_with: [michelle-llm-wiki]\n",
+              body="We agreed things. See [[The Secret Position]].")
+        write(wiki_dir, "not-for-her", "Not For Her", vis="private",
+              extra="shared_with: [gurden-llm-wiki]\n")
+        write(wiki_dir, "crm/contacts/x", "X (contact)", vis="private",
+              extra="shared_with: [michelle-llm-wiki]\n")
+        to_her = {"wiki": "michelle-llm-wiki", "owner": "MiZuGH"}
+
+        b = C.build_bundle(wiki_dir, ["our-call"], "tester", "abc1234", person=to_her)
+        text = next(iter(b.values()))
+        fm = text.split("---")[1]
+        check("a private page named in shared_with is staged for that person", len(b) == 1)
+        check("it arrives private in the recipient's wiki", "visibility: private" in fm, fm)
+        check("provenance says who shared it, from where and when",
+              "shared_by: tester" in fm and "from_wiki:" in fm and "shared_on:" in fm, fm)
+        check("another private page's title never travels with it",
+              "The Secret Position" not in text, text)
+        check("the shared_with list itself stays at home", "shared_with" not in text, fm)
+
+        for slug, why in (("not-for-her", "shared_with does not name"), ("crm/contacts/x", "CRM")):
+            try:
+                C.build_bundle(wiki_dir, [slug], "tester", "abc1234", person=to_her)
+                ok, msg = False, "no error raised"
+            except ValueError as e:
+                ok, msg = why in str(e), str(e)
+            check(f"refused: {slug}", ok, msg)
+
+        block = C.who_will_see("michelle-llm-wiki", b, wiki_dir,
+                               lookup=lambda _c: (["MiZuGH"], "none"), person=True)
+        check("the readers block names the recipient's readers and says it stays private",
+              "1 people with access: MiZuGH" in block and "arrives `private`" in block, block)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def main():
     failures = []
 
@@ -256,6 +373,8 @@ def main():
         shutil.rmtree(tmp, ignore_errors=True)
 
     check_topology(check)
+    check_who_will_see(check)
+    check_share_with_person(check)
 
     print()
     if failures:

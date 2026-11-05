@@ -120,9 +120,14 @@ only in a wiki that contributes up to a commons; the top commons has neither.
 
 ```
 python3 tools/contribute.py --list                       # what is eligible
-python3 tools/contribute.py <slug> --by "Your Name"      # stage one page
+python3 tools/contribute.py <slug> --by "Your Name"      # shows who will see it; stages nothing
+python3 tools/contribute.py <slug> --by "Your Name" --readers-confirmed   # stage, after the owner's yes
 python3 tools/contribute.py <slug> --by "Your Name" --to <commons>   # when there are several
 ```
+
+Before anything is staged, it shows who will see it: the people with access to the commons, the
+organisation's base permission, each page's headings and tags, and the people it names. It stages
+only with `--readers-confirmed`, which the skill passes after the owner says yes (since 2 November 2026).
 
 It stages a sanitised copy with provenance (`origin`, who contributed it, when), strips links to
 `private` pages, refuses any `private` page outright, and opens a pull request against the commons.
