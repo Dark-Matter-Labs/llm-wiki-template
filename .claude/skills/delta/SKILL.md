@@ -1,6 +1,6 @@
 ---
 name: delta
-description: Measure the delta between an incoming document and the wiki's current position — where it agrees, extends, diverges, or contradicts, and by how much. Use when the owner says "run a delta", "measure this against the wiki", "where does this sit / move us", "diff this paper against our position", or before deciding whether/how to ingest a collaborator's paper, an external report, a page coming down from the centre, or another member's wiki page. A delta is a signal of movement, not a verdict; it informs, it never auto-merges.
+description: "Measure where an incoming document agrees with, extends, diverges from or contradicts the wiki's position, and by how much. Use on \"run a delta\", \"measure this against the wiki\", \"where does this sit\", or before deciding whether to ingest a collaborator's paper, an external report, a page coming down from the centre, or another member's wiki page. A signal of movement, not a verdict; never auto-merges."
 ---
 
 # Delta — movement between a document and the wiki's position

@@ -349,8 +349,8 @@ def check(root=None) -> Report:
     is_commons = (role == "commons")
     export = root / EXPORT
     if not is_commons:
-        r.skip("two-cut export not checked — this is a spoke, which correctly publishes only "
-               "wiki.public.json")
+        r.skip("two-cut export not checked — this is a spoke; since 28 Oct 2026 a spoke publishes "
+               "wiki.shared.json too, so colleagues see its internal pages, but only a commons fails without it")
     elif not export.exists():
         r.fail(f"{EXPORT} does not exist in a commons")
     elif _code_names(export.read_text(encoding="utf-8"), SHARED_CUT_MARKER):

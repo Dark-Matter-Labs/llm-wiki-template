@@ -6,113 +6,113 @@
       "path": "design/federation.json",
       "repos": 10,
       "versions": 10,
-      "reason": "CORRECT AND PERMANENT \u2014 a wiki's position in the graph does not travel. Ten versions across ten repos is the designed state.",
+      "reason": "CORRECT AND PERMANENT — a wiki's position in the graph does not travel. Ten versions across ten repos is the designed state.",
       "per_repo": true
     },
     {
       "path": "design/.sync-state.json",
       "repos": 9,
       "versions": 9,
-      "reason": "CORRECT AND PERMANENT \u2014 the merge base. It records what the sync last WROTE into THIS repo, so a local change can be told apart from the source moving on. Identical copies would mean the record was not per-repo, which is the bug it exists to prevent.",
+      "reason": "CORRECT AND PERMANENT — the merge base. It records what the sync last WROTE into THIS repo, so a local change can be told apart from the source moving on. Identical copies would mean the record was not per-repo, which is the bug it exists to prevent.",
       "per_repo": true
     },
     {
       "path": "EDITING.md",
       "repos": 11,
       "versions": 8,
-      "reason": "LOCALISED \u2014 one line, `validated_by: [<owner name>]`. Verified 2026-09-10 across all eleven: every differing line is that substitution and nothing else. The guidance is identical everywhere."
+      "reason": "LOCALISED — one line, `validated_by: [<owner name>]`. Verified 2026-09-10 across all eleven: every differing line is that substitution and nothing else. The guidance is identical everywhere."
     },
     {
       "path": ".claude/skills/publish-web/SKILL.md",
       "repos": 23,
       "versions": 7,
-      "reason": "BY ROLE \u2014 a publishing surface, not a discipline. SEVENTH VARIANT READ 2026-10-12, count 6 -> 7. prateek-llm-wiki opens the skill with his own house-style note (rule 30, 2026-10-11: house style is an ongoing project, a designer will build it). indy-llm-wiki's copy took in the xCO Polyphonic Communication Style Guide v8.1 (#616, 2026-10-06), which must not travel to the Dm wikis. Both are deliberately local."
+      "reason": "BY ROLE — a publishing surface, not a discipline. SEVENTH VARIANT READ 2026-10-12, count 6 -> 7. prateek-llm-wiki opens the skill with his own house-style note (rule 30, 2026-10-11: house style is an ongoing project, a designer will build it). indy-llm-wiki's copy took in the xCO Polyphonic Communication Style Guide v8.1 (#616, 2026-10-06), which must not travel to the Dm wikis. Both are deliberately local."
     },
     {
       "path": "design/social-card.json",
       "repos": 8,
       "versions": 6,
-      "reason": "CORRECT \u2014 per-repo branding for the social card.",
+      "reason": "CORRECT — per-repo branding for the social card.",
       "per_repo": true
     },
     {
       "path": ".claude/skills/crm/SKILL.md",
-      "repos": 22,
-      "versions": 4,
-      "reason": "DELIBERATELY PERSONAL \u2014 the CRM must never reach a commons, and shipping the skill invites the pages. RE-READ 2026-10-12. A fifth variant appeared when ocean-studio-wiki was created from an older template copy. Reconciled the same day: every commons now carries the same not-used note (ocean-studio-wiki#217, learning-system-wiki#132), so the count is back to 4."
+      "repos": 26,
+      "versions": 7,
+      "reason": "DELIBERATELY PERSONAL — the CRM must never reach a commons, and shipping the skill invites the pages. RE-READ 2026-10-12. A fifth variant appeared when ocean-studio-wiki was created from an older template copy. Reconciled the same day: every commons now carries the same not-used note (ocean-studio-wiki#217, learning-system-wiki#132), so the count is back to 4. 2026-10-13: raised 4 -> 5 by the token trial, which shortened the description in indy-llm-wiki (the source) and in prateek-llm-wiki's own adapted copy. The other wikis take the source's version when the trial rolls out, which should bring the count back down. RAISED 5 -> 7 on 2026-10-15 by the CRM follow-ups rollout (indy-llm-wiki#657, #658, and the crm-follow-ups rollout to 25 wikis): every personal wiki's own crm skill gained the same 'Follow-ups and logging (tools/crm.py)' section, inserted into its own wording before Bookkeeping or Never, so the per-wiki variants stay distinct and two copies placed it differently. Read, and accepted: the added section is identical everywhere."
     },
     {
       "path": ".github/workflows/checks.yml",
       "repos": 23,
-      "versions": 7,
-      "reason": "BY ROLE \u2014 the gate set is not the same in every wiki, because the tools are not. This repo runs check_sources.py and sync_index_counts.py, which most wikis do not have. The one part that WAS shared drift \u2014 a hand-kept list of test files that covered 8 of 17 suites \u2014 was fixed on 2026-09-04 by making the step discover tools/test_*.py. What remains is each repo's own gates. FIFTH VARIANT READ 2026-09-25, count 4 -> 5 across 22 repos. It is the six commons set up 22-24 Sept (rz-commons, dm-llm-wiki, mission-pathways-wiki, people-hosts-wiki, hm-consciousness-lab-wiki, bioregional-finance-wiki), byte-identical to each other. Written by the 2026-09-23 'this commons finishes its setup' sync and copied at onboarding into the last two. It is the spoke-standard file plus one step, check_no_private.py, the commons-only warning. power-project-wiki runs the same step; its file and these six contain exactly the same run: commands. The only differences are where the step sits (after house_rules here, after cross_check there) and its comment, which here is xco-team-wiki's wording word for word. So this is a role difference with a cosmetic split, not a stray copy. Not reconciled: every repo involved is a commons, so closing the gap is a PR someone else merges. Adopting this layout in power-project-wiki, or power-project's in the six, would take it back to 4. SIXTH AND SEVENTH VARIANTS READ 2026-10-12, count 5 -> 7 across 23 repos. robyn-llm-wiki adds one step, name_check.py, for Robyn's name corrections (2026-10-04). people-hosts-wiki adds five People Circle gates: law sources, case shape, no names above private, private reflections, and the DPIA hold (Iyana's answers, 2026-10-07). Both are their own tools, so BY ROLE holds. An eighth variant, ocean-studio-wiki's, was the commons file in a different order and was reconciled to the commons standard the same day (ocean-studio-wiki#217)."
+      "versions": 8,
+      "reason": "BY ROLE — the gate set is not the same in every wiki, because the tools are not. This repo runs check_sources.py and sync_index_counts.py, which most wikis do not have. The one part that WAS shared drift — a hand-kept list of test files that covered 8 of 17 suites — was fixed on 2026-09-04 by making the step discover tools/test_*.py. What remains is each repo's own gates. FIFTH VARIANT READ 2026-09-25, count 4 -> 5 across 22 repos. It is the six commons set up 22-24 Sept (rz-commons, dm-llm-wiki, mission-pathways-wiki, people-hosts-wiki, hm-consciousness-lab-wiki, bioregional-finance-wiki), byte-identical to each other. Written by the 2026-09-23 'this commons finishes its setup' sync and copied at onboarding into the last two. It is the spoke-standard file plus one step, check_no_private.py, the commons-only warning. power-project-wiki runs the same step; its file and these six contain exactly the same run: commands. The only differences are where the step sits (after house_rules here, after cross_check there) and its comment, which here is xco-team-wiki's wording word for word. So this is a role difference with a cosmetic split, not a stray copy. Not reconciled: every repo involved is a commons, so closing the gap is a PR someone else merges. Adopting this layout in power-project-wiki, or power-project's in the six, would take it back to 4. SIXTH AND SEVENTH VARIANTS READ 2026-10-12, count 5 -> 7 across 23 repos. robyn-llm-wiki adds one step, name_check.py, for Robyn's name corrections (2026-10-04). people-hosts-wiki adds five People Circle gates: law sources, case shape, no names above private, private reflections, and the DPIA hold (Iyana's answers, 2026-10-07). Both are their own tools, so BY ROLE holds. An eighth variant, ocean-studio-wiki's, was the commons file in a different order and was reconciled to the commons standard the same day (ocean-studio-wiki#217). EIGHTH VARIANT READ 2026-10-15: prateek-llm-wiki renames one step, 'CLAUDE.md's generated block matches this repo' to 'Shared instruction context matches this repo', because that wiki moved its generated block into instructions/wiki-context.md so Codex and Claude share one set of rules (prateek-llm-wiki 2f409f1, 2026-10-13). Same commands; BY ROLE holds. health-keepers-wiki, a commons, carries the spoke-standard file without the commons check_no_private step; it adds no variant."
     },
     {
       "path": ".github/workflows/export-shared.yml",
-      "repos": 9,
-      "versions": 4,
-      "reason": "BY ROLE \u2014 the colleague mirror. Which repo it pushes to, and whether it runs at all, is a fact about this wiki's position in the graph, not a shared behaviour."
+      "repos": 27,
+      "versions": 5,
+      "reason": "BY ROLE — the colleague mirror. Which repo it pushes to, and whether it runs at all, is a fact about this wiki's position in the graph, not a shared behaviour. REREAD 2026-10-26, 4 -> 5 across 27: every copy now carries `if: vars.SHARED_REPO != ''` (Actions savings). Code differences left: indy and prateek/ocean avoid the `ls | head` broken pipe in their own ways; malik's and robyn's differ in comments only."
     },
     {
       "path": ".github/workflows/export.yml",
-      "repos": 22,
-      "versions": 6,
-      "reason": "BY ROLE, PLUS ONE ANOMALY \u2014 retriaged 2026-09-10, down from six variants. Seven spokes are now byte-identical. The remaining four: one spoke standard, and three commons whose only differences are comment prose describing the same mechanism (xco-team-wiki's carries repo-specific history about the September Vercel exposure, so it legitimately differs). The anomaly is fang-llm-wiki, a SPOKE running power-project-wiki's commons workflow byte-for-byte since 2026-09-01 \u2014 it publishes wiki.shared.json, which the recorded role split says only a commons does. Left as found: the commit message reads as a deliberate choice, and reverting someone's decision is not a sync's call. Needs one conversation, not a patch. FIFTH VARIANT READ 2026-09-25, count 4 -> 5 across 22 repos. The same six new commons, byte-identical, from the 2026-09-23 'fix: publish the shared cut' commit in the first four and copied at onboarding into hm-consciousness-lab-wiki and bioregional-finance-wiki. With comment lines and step names ignored, it is identical to power-project-wiki's (and fang-llm-wiki's) commons workflow: it publishes wiki.public.json and wiki.shared.json with private pages stripped. What differs is the step name and the comment's history. One factual defect: the comment says the wiki 'published only the public cut until 2026-09-23'. That is true of five of the six, since each template 'Initial commit' ran the spoke exporter for a few minutes before setup. It is wrong for bioregional-finance-wiki, where that happened on 2026-09-24; fixed in bioregional-finance-wiki#7, merged 2026-09-25. SIXTH VARIANT READ 2026-09-25, count 5 -> 6: that fix is the whole of it. bioregional-finance-wiki's copy differs from the other five new commons by one character in one comment line, the date (2026-09-24 where they say 2026-09-23), and each date is correct for its own repo. A per-repo fact in a comment, not drift; reconciling it would make one of them wrong. (Corrected 2026-09-25: the first reading wrongly called hm-consciousness-lab-wiki's copy false too.)"
+      "repos": 28,
+      "versions": 9,
+      "reason": "BY ROLE, PLUS ONE ANOMALY — retriaged 2026-09-10, down from six variants. Seven spokes are now byte-identical. The remaining four: one spoke standard, and three commons whose only differences are comment prose describing the same mechanism (xco-team-wiki's carries repo-specific history about the September Vercel exposure, so it legitimately differs). The anomaly is fang-llm-wiki, a SPOKE running power-project-wiki's commons workflow byte-for-byte since 2026-09-01 — it publishes wiki.shared.json, which the recorded role split says only a commons does. Left as found: the commit message reads as a deliberate choice, and reverting someone's decision is not a sync's call. Needs one conversation, not a patch. FIFTH VARIANT READ 2026-09-25, count 4 -> 5 across 22 repos. The same six new commons, byte-identical, from the 2026-09-23 'fix: publish the shared cut' commit in the first four and copied at onboarding into hm-consciousness-lab-wiki and bioregional-finance-wiki. With comment lines and step names ignored, it is identical to power-project-wiki's (and fang-llm-wiki's) commons workflow: it publishes wiki.public.json and wiki.shared.json with private pages stripped. What differs is the step name and the comment's history. One factual defect: the comment says the wiki 'published only the public cut until 2026-09-23'. That is true of five of the six, since each template 'Initial commit' ran the spoke exporter for a few minutes before setup. It is wrong for bioregional-finance-wiki, where that happened on 2026-09-24; fixed in bioregional-finance-wiki#7, merged 2026-09-25. SIXTH VARIANT READ 2026-09-25, count 5 -> 6: that fix is the whole of it. bioregional-finance-wiki's copy differs from the other five new commons by one character in one comment line, the date (2026-09-24 where they say 2026-09-23), and each date is correct for its own repo. A per-repo fact in a comment, not drift; reconciling it would make one of them wrong. (Corrected 2026-09-25: the first reading wrongly called hm-consciousness-lab-wiki's copy false too.) REREAD 2026-10-26, 6 -> 9 across 28: the Actions savings (indy #694, rollout ci-savings-1b) folded the export into the site job, so the 19 wikis with a site run export.yml by hand only and the 9 without keep the push trigger. Inside each half the variants are the same by-role split as before (public only, or public + shared), plus comment history."
     },
     {
       "path": "SHARING-AND-ACCESS.md",
       "repos": 11,
       "versions": 5,
-      "reason": "LOCALISED, plus one deliberate divergence. Nine spokes and the template differ only by the mirror repo's name and a per-repo state note. The fifth variant is xco-team-wiki's, written 2026-09-10 and NOT a localisation: in a commons the tiers invert \u2014 `internal` is the published tier, not the protected one, and `public` is published nowhere because there is no Pages site. Copying the spoke document there would have been worse than having none. Raised 4\u21925 with that variant, and it should not rise again: a sixth means a spoke has drifted, not that a commons was added. Note the count also rose 10\u219211 repos because `_repos()` was fixed the same day \u2014 it had been omitting the source wiki everywhere except the source wiki."
+      "reason": "LOCALISED, plus one deliberate divergence. Nine spokes and the template differ only by the mirror repo's name and a per-repo state note. The fifth variant is xco-team-wiki's, written 2026-09-10 and NOT a localisation: in a commons the tiers invert — `internal` is the published tier, not the protected one, and `public` is published nowhere because there is no Pages site. Copying the spoke document there would have been worse than having none. Raised 4→5 with that variant, and it should not rise again: a sixth means a spoke has drifted, not that a commons was added. Note the count also rose 10→11 repos because `_repos()` was fixed the same day — it had been omitting the source wiki everywhere except the source wiki."
     },
     {
       "path": "tools/classify_internal.py",
-      "repos": 10,
-      "versions": 3,
-      "reason": "DELIBERATE DIVERGENCE \u2014 learning-system-wiki's copy is de-projectised on purpose and says so: 'no project-specific strategy vocabulary \u2026 this file is versioned, and in an open repo'."
+      "repos": 28,
+      "versions": 5,
+      "reason": "DELIBERATE DIVERGENCE — learning-system-wiki's copy is de-projectised on purpose and says so: 'no project-specific strategy vocabulary … this file is versioned, and in an open repo'. REREAD 2026-10-26, 3 -> 5 across 28: learning-system now matches the template. indy and xco-team-wiki keep Indy's capital terms in the private-word list; prateek and ocean-studio add their own page types. Owners' own changes."
     },
     {
       "path": ".github/workflows/deploy-pages.yml",
-      "repos": 7,
-      "versions": 2,
-      "reason": "BY ROLE \u2014 a Pages deploy workflow, present only where a wiki publishes a site. power-project-wiki was given one on 2026-09-04 by an explicit decision (the repo has a docs/ directory and was not publishing). Kept out of the shared layer on purpose: turning on a publication surface must stay a decision someone makes, not something a sync does."
+      "repos": 19,
+      "versions": 8,
+      "reason": "BY ROLE — a Pages deploy workflow, present only where a wiki publishes a site. power-project-wiki was given one on 2026-09-04 by an explicit decision (the repo has a docs/ directory and was not publishing). Kept out of the shared layer on purpose: turning on a publication surface must stay a decision someone makes, not something a sync does. REREAD 2026-10-26, 2 -> 8 across 19: the same fold put the export's steps in the site job, so each site's copy also carries its export variant (public only, or public + shared in fang, learning-system, ocean and xco-team-wiki). indy keeps three extra site checks; robyn builds her own locked lens. prateek's and ocean's copies lack the 'Leave nothing of the export behind' step (their #699/#531 predate repair #695); harmless while their site jobs run no house-rules scan, worth adding with Prateek's yes."
     },
     {
       "path": ".github/workflows/validation-pass.yml",
       "repos": 9,
       "versions": 2,
-      "reason": "BY ROLE, DECISION TAKEN \u2014 runs daily with contents:write and pull-requests:write. Held until 2026-09-04, when xco-team-wiki was given it deliberately; all ten wikis now have it. Stays out of the shared layer for the same reason as deploy-pages: a job that opens PRs in someone's repo should arrive by decision, not by sync."
+      "reason": "BY ROLE, DECISION TAKEN — runs daily with contents:write and pull-requests:write. Held until 2026-09-04, when xco-team-wiki was given it deliberately; all ten wikis now have it. Stays out of the shared layer for the same reason as deploy-pages: a job that opens PRs in someone's repo should arrive by decision, not by sync."
     },
     {
       "path": "tools/README.md",
       "repos": 9,
       "versions": 2,
-      "reason": "CORRECT AND PER-REPO \u2014 a catalogue of THIS wiki's tools. The tool sets differ, so the READMEs must. (The naming difference that also showed here is not drift: a personal wiki's README may name its owner.)",
+      "reason": "CORRECT AND PER-REPO — a catalogue of THIS wiki's tools. The tool sets differ, so the READMEs must. (The naming difference that also showed here is not drift: a personal wiki's README may name its owner.)",
       "per_repo": true
     },
     {
       "path": "tools/export.py",
-      "repos": 10,
-      "versions": 2,
-      "reason": "BY PUBLISHING DECISION, not by role \u2014 one variant emits wiki.shared.json and the provenance fields, the other does not. The three commons take the first; so does fang-llm-wiki, a spoke, deliberately (fang-llm-wiki 5af7ceb, 1 Sept 2026): `internal` is the default tier, so publishing only the public cut shows a colleague less than half the canon, silently. This reason said \"a spoke does not\" and was wrong from that day. NOTE, unresolved: init_wiki.py --check says a spoke \"correctly publishes only wiki.public.json\". Both cannot be right, and which is a decision for the group."
+      "repos": 31,
+      "versions": 6,
+      "reason": "BY PUBLISHING DECISION, not by role — one variant emits wiki.shared.json and the provenance fields, the other does not. The three commons take the first; so does fang-llm-wiki, a spoke, deliberately (fang-llm-wiki 5af7ceb, 1 Sept 2026): `internal` is the default tier, so publishing only the public cut shows a colleague less than half the canon, silently. This reason said \"a spoke does not\" and was wrong from that day. NOTE, unresolved: init_wiki.py --check says a spoke \"correctly publishes only wiki.public.json\". Both cannot be right, and which is a decision for the group. THIRD VARIANT READ 2026-10-15: prateek-llm-wiki adds three page types its wiki uses (partner, event, protocol) and normalises path separators to '/' so the export reads the same on Windows (prateek-llm-wiki ab07ddd, 2026-10-13). The types are his wiki's own; the separator fix is worth taking into the source, which would leave only the types as a per-wiki difference. REREAD 2026-10-26, 3 -> 5 across 28: ocean-studio and xco-team-wiki add their own page types (xCO adds question). prateek adds his types and exports source_check fields for his source-checks customisation. Owners' own changes. REREAD 2026-10-28, 5 -> 6 across 31: risk-lab-wiki, a new team wiki, takes the commons version and adds the page types Prateek's wiki and the Ocean Studio wiki use, so the pages copied from them pass (risk-lab-wiki #2)."
     },
     {
       "path": "tools/sync_index_counts.py",
       "repos": 2,
       "versions": 2,
-      "reason": "BY ROLE \u2014 carries a repo-specific PATTERNS block matching that router's headings."
+      "reason": "BY ROLE — carries a repo-specific PATTERNS block matching that router's headings."
     },
     {
       "path": "tools/test_sync_index_counts.py",
       "repos": 2,
       "versions": 2,
-      "reason": "BY ROLE \u2014 pairs with sync_index_counts.py, already recorded as by-role: it carries a repo-specific PATTERNS block matching that router's headings. Only the two tiered-index wikis have either. A test cannot travel further than the tool it tests."
+      "reason": "BY ROLE — pairs with sync_index_counts.py, already recorded as by-role: it carries a repo-specific PATTERNS block matching that router's headings. Only the two tiered-index wikis have either. A test cannot travel further than the tool it tests."
     },
     {
       "path": ".github/workflows/weekly-reflect.yml",
       "repos": 10,
       "versions": 2,
-      "reason": "DEBT, OPENED DELIBERATELY 2026-09-15, AND IT SHOULD CLOSE. This wiki's copy lost its `schedule:` when the weekly reflection was retired (#461): across weeks 28-36 it produced eight reflections, drew ZERO inbound links from anywhere in the corpus, decayed from four touches on W30 to one each on W35 and W36, and failed five of fifteen runs including 11 September, which nobody noticed. The other ten copies still carry the cron, so ten wikis are still paying a model every Friday for an artefact the measurement says nobody reads. The fix is NOT to sync this file: retiring the weekly job without giving those wikis the monthly newsletter that replaces it would leave them with nothing. Closing this entry means rolling out tools/newsletter.py, the `newsletter` skill and monthly-newsletter.yml, then removing the cron everywhere \u2014 one decision, taken once, not a sync. Recorded rather than hidden so the debt is visible until someone takes it."
+      "reason": "DEBT, OPENED DELIBERATELY 2026-09-15, AND IT SHOULD CLOSE. This wiki's copy lost its `schedule:` when the weekly reflection was retired (#461): across weeks 28-36 it produced eight reflections, drew ZERO inbound links from anywhere in the corpus, decayed from four touches on W30 to one each on W35 and W36, and failed five of fifteen runs including 11 September, which nobody noticed. The other ten copies still carry the cron, so ten wikis are still paying a model every Friday for an artefact the measurement says nobody reads. The fix is NOT to sync this file: retiring the weekly job without giving those wikis the monthly newsletter that replaces it would leave them with nothing. Closing this entry means rolling out tools/newsletter.py, the `newsletter` skill and monthly-newsletter.yml, then removing the cron everywhere — one decision, taken once, not a sync. Recorded rather than hidden so the debt is visible until someone takes it."
     },
     {
       "path": "tools/prose-baseline.json",
@@ -147,6 +147,59 @@
       "versions": 23,
       "per_repo": true,
       "reason": "CORRECT AND PERMANENT, PER REPO. Each wiki's record of the sources its pages cite that are not in its own raw/ on the curator's machine. check_sources.py joined the shared layer on 2026-10-12; the list it checks against is that wiki's alone."
+    },
+    {
+      "path": "design/lens/settings.json",
+      "repos": 2,
+      "versions": 2,
+      "reason": "CORRECT AND PERMANENT, recorded 2026-10-16: the merged lens's per-wiki settings: name, colours, shelves, wording, which box sits under the overview. One per wiki by design.",
+      "per_repo": true
+    },
+    {
+      "path": "design/lens/hunches.json",
+      "repos": 2,
+      "versions": 2,
+      "reason": "CORRECT AND PERMANENT, recorded 2026-10-16: each wiki's own hunches for its lens's Hunches lane.",
+      "per_repo": true
+    },
+    {
+      "path": "design/lens/portfolio.json",
+      "repos": 2,
+      "versions": 2,
+      "reason": "CORRECT AND PERMANENT, recorded 2026-10-16: each wiki's own list of the positions and options its lens shows.",
+      "per_repo": true
+    },
+    {
+      "path": "design/lens/external-pages.json",
+      "repos": 2,
+      "versions": 2,
+      "reason": "CORRECT AND PERMANENT, recorded 2026-10-16: each wiki's own list of pages on other sites that its lens lists as published.",
+      "per_repo": true
+    },
+    {
+      "path": "design/budgets.json",
+      "repos": 28,
+      "versions": 14,
+      "per_repo": true,
+      "reason": "CORRECT AND PERMANENT, read 2026-10-26: each wiki's own token budget. The copies differ only in the always_loaded figure, which follows the size of that wiki's CLAUDE.md and rules."
+    },
+    {
+      "path": ".claude/skills/delta/compute_delta.py",
+      "repos": 28,
+      "versions": 2,
+      "reason": "READ 2026-10-26: michelle-llm-wiki's copy also accepts '### A1' axiom headings, not only '## A1'. Hers is the better version; take it into the source and add the file to SHARED so it travels."
+    },
+    {
+      "path": "tools/collect_published.py",
+      "repos": 2,
+      "versions": 2,
+      "reason": "READ 2026-10-26: two wikis' own tools for the lens's published pages. robyn-llm-wiki's follows her rule (only artefacts relevant to the wiki); xco-team-wiki's follows Prateek's team rule (any page with a link). Owners' own, not shared."
+    },
+    {
+      "path": "tools/test_contradictions.py",
+      "repos": 28,
+      "versions": 2,
+      "reason": "READ 2026-10-26: indy-llm-wiki's copy is ahead, with tests for stands_with (both stand). The other 27 carry the older test. Not in SHARED, so the newer test never travelled; add it to SHARED with the next rollout."
     }
   ],
   "_ratchet": "`versions` is the number of variants somebody REVIEWED. --check fails if a path gains one, so recording a path mutes it at a level rather than forever. Entries with \"per_repo\": true are exempt: one variant per repo is their designed state, so the count rises whenever a wiki joins and gating on it would fail every onboarding."

@@ -15,7 +15,7 @@ In plain-English terms, here is when each fires:
 | "add this", "ingest", "here's a new report"        | `ingest`  |
 | "what does the wiki say about…", "find", "compare" | `query`   |
 | "check the wiki", "is it healthy", "clean up"      | `lint`    |
-| "catch me up", "what's new", "weekly summary"      | `brief`   |
+| "catch me up", "what's new", "weekly summary" (read the latest Thursday digest in `wiki/digest/` first: `tools/weekly_digest.py` has counted the week) | `brief`   |
 | "I have a new idea / project", "help me think"     | `office-hours` |
 | "sharpen this", "test my idea", "make this defensible" (questions only, no answers) | `sharpen` |
 | "set up a wiki for X", "onboard a new option", "Santiago needs its own wiki" | `onboard` |
@@ -28,6 +28,7 @@ In plain-English terms, here is when each fires:
 | "make that a skill", "learn this pattern" (asks you to verify before creating) | `learn` |
 | "run a delta", "measure this against the wiki", "where does this sit / move us", "diff this paper against our position" | `delta` |
 | "share this with the team", "contribute this", "propose this to the commons" | `contribute` |
+| "share this with Michelle", "send this page to <person>" (one person's own wiki, private) | `contribute`, with `--to-person` |
 | "add a contact", "log that meeting", "met X today", "what follow-ups are due", "who do we know at…", "who haven't we spoken to", "funder pipeline", "prep me for my meeting with…" | `crm` (with `tools/crm.py`) |
 | "check new requests", "assess this request", "what came in for Indy" | `inbound` (private; drafts only, never sends) |
 | "find leads", "lead generation", "who should we approach about…", "who funds…" | `leads` |
@@ -53,6 +54,8 @@ In plain-English terms, here is when each fires:
 | "set up my customisations", "use Rooms in my wiki", and when `waiting.py` names a customisation | `customise` |
 | "make a pre-read for…", "a one-pager for…", "brief them before Thursday" | `pre-read` |
 | "add this style guide", "capture our visual guide", "which style guide do we use" | `visual-guide` |
+| "design this", "make the page or cards", "make it look good", "it looks too AI" | `design-brief` |
+| "review this design", "does this look AI-made", "is this on brand" | `design-critic` |
 | "am I over-reading this", "is this extrapolation" — **and automatically whenever the wiki's analysis sits beside someone else's document** | `source-proportion` |
 
 Published web pages live in `docs/` and are served by GitHub Pages at

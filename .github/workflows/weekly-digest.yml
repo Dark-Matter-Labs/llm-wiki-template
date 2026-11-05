@@ -1,0 +1,133 @@
+name: Weekly digest
+
+# 06:00 UTC every Thursday, and on demand. The Thursday digest in d.INO's weekly rhythm:
+# what moved in this wiki in the last seven days, counted by tools/weekly_digest.py from the
+# wiki's own history. No model and no API key, so it runs in every wiki.
+#
+# It opens a proposed change and never saves to main. A week in which no page moved writes
+# nothing and opens nothing. One short job: about a minute a run.
+on:
+  schedule:
+    - cron: "0 6 * * 4"
+  workflow_dispatch:
+    inputs:
+      week_ending:
+        description: "Last day of the week, as YYYY-MM-DD. Defaults to today."
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: weekly-digest
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # the digest compares this week's pages with last week's
+          persist-credentials: false
+
+      # So "could go up" can say what the commons already holds. Without the token the
+      # section says it could not check, rather than guessing. Same step as the newsletter's.
+      - name: Fetch the commons exports
+        env:
+          TOKEN: ${{ secrets.COMMONS_READ_TOKEN }}
+        run: |
+          if [ -z "${TOKEN}" ]; then
+            echo "::notice::COMMONS_READ_TOKEN not set; the digest will not check what the commons holds."
+            exit 0
+          fi
+          OWNER="${GITHUB_REPOSITORY%%/*}"
+          TARGETS=$(python3 -c "import sys; sys.path.insert(0,'tools'); import sync_commons; print('\n'.join(sync_commons.declared()))")
+          for NAME in $TARGETS; do
+            printf '%s' "$NAME" | grep -qE '^[A-Za-z0-9._-]+$' || { echo "::error::bad commons name"; exit 1; }
+            DEST=".commons/${NAME}/export"
+            mkdir -p "$(dirname "$DEST")"
+            if git -c http.https://github.com/.extraheader= clone --quiet --depth 1 --branch export \
+                 "https://x-access-token:${TOKEN}@github.com/${OWNER}/${NAME}.git" "$DEST" 2>/dev/null; then
+              git -C "$DEST" remote set-url origin "https://github.com/${OWNER}/${NAME}.git"
+            else
+              echo "::warning::Could not read the export branch of ${NAME}."
+            fi
+          done
+
+      - name: Write the digest
+        id: write
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Via env, never interpolated into the script: a dispatch input is text anyone who
+          # can dispatch controls.
+          WEEK_IN: ${{ github.event.inputs.week_ending }}
+        run: |
+          set -euo pipefail
+          WEEK="${WEEK_IN:-$(date -u +%F)}"
+          printf '%s' "$WEEK" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' || {
+            echo "::error::week_ending must look like YYYY-MM-DD"; exit 1; }
+          python3 tools/weekly_digest.py --week-ending "$WEEK" --write | tee -a "$GITHUB_STEP_SUMMARY"
+          # A tiered index counts synthesis pages, and the digest is one.
+          if [ -f tools/sync_index_counts.py ]; then python3 tools/sync_index_counts.py > /dev/null; fi
+          echo "week=$WEEK" >> "$GITHUB_OUTPUT"
+          if [ -n "$(git status --porcelain -- wiki/digest)" ]; then
+            echo "written=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "written=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # GitHub runs no checks on a proposal opened by github-actions[bot], so the gates that
+      # read a page run here, and the proposal says how they went.
+      - name: Check the digest
+        id: gates
+        if: steps.write.outputs.written == 'true'
+        run: |
+          rc=0
+          for t in check_frontmatter house_rules check_prose check_links; do
+            if [ -f "tools/$t.py" ]; then python3 "tools/$t.py" --check >> /tmp/gates.txt 2>&1 || rc=1; fi
+          done
+          python3 tools/export.py --check >> /tmp/gates.txt 2>&1 || rc=1
+          if [ -f tools/sync_index_counts.py ]; then python3 tools/sync_index_counts.py --check >> /tmp/gates.txt 2>&1 || rc=1; fi
+          tail -20 /tmp/gates.txt
+          echo "failed=$rc" >> "$GITHUB_OUTPUT"
+
+      - name: Open the proposal
+        if: steps.write.outputs.written == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WEEK: ${{ steps.write.outputs.week }}
+          GATES_FAILED: ${{ steps.gates.outputs.failed }}
+        run: |
+          set -euo pipefail
+          OUTSIDE=$(git status --porcelain --untracked-files=all | awk '{print $NF}' | grep -vE '^wiki/(digest/|index\.md$|index/)' || true)
+          if [ -n "$OUTSIDE" ]; then
+            echo "::error::files outside the digest and the index changed, so nothing is committed:"; echo "$OUTSIDE"; exit 1
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH="digest/${WEEK}"
+          git checkout -b "$BRANCH"
+          git add -A wiki
+          git commit -m "digest: week ending ${WEEK}"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${BRANCH}"
+          {
+            echo "This week's digest, counted from the wiki's history with no model. Read it, and say yes to save it."
+            echo ""
+            if [ "${GATES_FAILED}" = "1" ]; then
+              echo "**The digest does not pass this wiki's page checks.** The run page says which."
+            else
+              echo "The page checks were run on it before this was opened, and passed. The Checks tab below stays"
+              echo "empty, because GitHub runs no checks on a proposal opened by github-actions[bot]."
+            fi
+          } > /tmp/pr-body.md
+          gh pr create --base main --head "$BRANCH" --title "Weekly digest, week ending ${WEEK}" --body-file /tmp/pr-body.md
+
+      - name: Fail if the digest did not pass the checks
+        if: steps.write.outputs.written == 'true' && steps.gates.outputs.failed == '1'
+        run: |
+          echo "::error::the digest was written and proposed, but does not pass this wiki's page checks"
+          exit 1
