@@ -1,6 +1,6 @@
 ---
 name: rename
-description: Record a name change once and carry it through the wiki. Pages, links, tags, published copies and shared copies all follow, and drafts are checked against the list of names. Fires on "rename this", "it's now called X", "change the name to", "we don't call it that any more", "the title has changed", "use the new name", "is the name right everywhere".
+description: "Record a name change once and carry it through pages, links, tags and copies. \"it's now called X\", \"is the name right everywhere\"."
 ---
 
 # Rename

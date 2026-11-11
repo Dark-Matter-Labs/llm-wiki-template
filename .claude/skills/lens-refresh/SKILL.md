@@ -1,6 +1,6 @@
 ---
 name: lens-refresh
-description: Rebuild this wiki's lens from its own settings, have the owner lock it again, propose the locked page, and say in plain words what changed. Use when the owner says "refresh the lens", "update the lens", "rebuild the lens", "the lens doesn't show my new page", "put today's changes in the lens" or "relock the lens". Works in any wiki that has a lens. Claude never handles the password.
+description: "Rebuild this wiki's lens from its settings, have the owner relock it, and propose it. \"refresh the lens\", \"the lens doesn't show my page\". Claude never handles the password."
 ---
 
 # Refresh the lens
@@ -88,7 +88,7 @@ Lead with what a reader of the lens will now find. For example:
 
 - `guides/your-lens.md`: the owner's guide to reading the lens and keeping its password.
 - `design/lens/SPEC.md`: what each setting does, and "A third wiki" for setting up a new lens.
-- `.claude/rules/shared-changes.md` in the source wiki: shared changes and each wiki's own changes.
+- `.claude/reference/shared-changes.md` in the source wiki: shared changes and each wiki's own changes.
 - `.claude/rules/finishing.md`: how to ask "Shall I merge this?".
 - `publish-check`: for pages going on the open web. The lens is locked, so it needs the privacy check instead.
 - `tools/rollout.py` and `tools/deliver_shared.py`: for a lens change that goes to every wiki.

@@ -1,6 +1,6 @@
 ---
 name: leads
-description: "Lead finding: suggests organisations worth approaching for a goal or need, each with the reason, the source and whether a warm route exists, and creates a private prospect card only on a yes. Fires on \"find leads\", \"lead generation\", \"who should we approach about X\", \"who funds X\", \"build a prospect list for X\", \"who else should be in this pipeline\". Never contacts anyone; drafts a message only when asked, and never sends it."
+description: "Suggest organisations to approach for a goal, with reason, source and any warm route. \"find leads\", \"who funds X\". Never contacts anyone; a private card only on a yes."
 ---
 
 # Leads: who is worth approaching, and why

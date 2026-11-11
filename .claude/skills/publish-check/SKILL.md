@@ -1,6 +1,6 @@
 ---
 name: publish-check
-description: Check whether a wiki page or synthesis is ready to be shared or published externally. Use when the owner says "is this ready to publish", "can I share this", "check this before it goes out", or is about to lift wiki content into a report, post, or proposal. Verifies sourcing, flags unsupported claims, and checks for the kinds of issues that matter when work leaves the building.
+description: "Check a page is ready to leave the wiki: sources, unsupported claims, tier. \"is this ready to publish\", \"can I share this\"."
 ---
 
 # Publish check

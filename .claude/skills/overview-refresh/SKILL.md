@@ -1,6 +1,6 @@
 ---
 name: overview-refresh
-description: Bring the wiki's overview up to date with the pages added since it was last rewritten, and propose the change. Fires on "update the overview", "refresh the overview", "the overview is out of date", "bring the overview up to date", "what's the big picture now", or when a lint report names overview drift.
+description: "Bring the overview up to date and propose the change. \"update the overview\", \"what's the big picture now\", or when lint reports overview drift."
 ---
 
 # Overview refresh

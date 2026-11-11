@@ -1,6 +1,6 @@
 ---
 name: query
-description: Answer a question against the wiki. Use when the owner asks "what does the wiki say about…", "find…", "compare…", "summarise what we know about…", or any question they expect the accumulated knowledge to answer. Reads the index first, drills into relevant pages, synthesises a cited answer, and files good answers back into the wiki.
+description: "Answer a question from the wiki with citations, and file good answers back. \"what does the wiki say about\", \"what do we know about\"."
 ---
 
 # Query the wiki

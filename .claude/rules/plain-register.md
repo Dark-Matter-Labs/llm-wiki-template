@@ -20,36 +20,5 @@ SUGGESTED CHANGES ARE PROVISIONAL:
 - Keep the current wording visible. Do not delete it.
 - Do not mark a change adopted. Only a named person adopts a change.
 
-## How they sit beside the other rules
-
-The licences are the ones the Polyphonic Communication Style Guide already names: Encounter,
-Explanation and Decision. A wiki page is an Explanation, so it is STE-FLAVOURED by default.
-
-`ai-detox` still governs the words and shapes it bans. Its "under 20 words most of the time" and
-the limits above agree. Where a list is needed for three or more steps, use one. `ai-detox` bars
-lists from running prose, not from procedures.
-
-`talking.md` governs replies to people in a session. This rule governs written text: pages,
-instructions, prompts and interface copy.
-
-Quotations stay as written. A source's own sentence keeps its length, its semicolons and its
-phrasal verbs, the same reason `raw/` is never edited.
-
-## Where suggested changes apply
-
-They apply to wording a person wrote or has stood behind. That covers four cases:
-
-1. a page at `validation: self`, `peer` or `collective`
-2. a person's own draft or document
-3. a style guide
-4. any text where a person has asked to see changes as suggestions
-
-There, a change appears as a provisional block beside the current wording. Only a named person
-adopts it.
-
-They do not stop routine upkeep. When a source arrives, the ingest still updates the pages it
-touches. That work already waits for a person, because every change goes out as a proposed change
-that someone approves before it is saved.
-
-This scope is a reading of the rule, noted on 6 October 2026. If the rule is meant more widely,
-widen it here.
+How these sit beside `ai-detox` and `talking.md`, and where suggested changes apply, is in
+`.claude/reference/rules-in-full.md`. Read it before you show a suggested change.

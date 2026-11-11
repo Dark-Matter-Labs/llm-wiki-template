@@ -73,6 +73,21 @@ def main():
               "telling a top commons to contribute is telling it to do the impossible")
         check("and told that is correct rather than broken", "correct rather than broken" in b)
 
+    with tempfile.TemporaryDirectory() as t:   # added 2026-11-06: reads_from was ignored here
+        repo(t, {"name": "xco-team-wiki", "role": "commons", "contributes_to": [],
+                 "reads_from": ["ocean-studio-wiki", "rz-commons"]})
+        b = wc.render()
+        check("a top commons that reads other wikis is told which, and how they arrive",
+              "Nothing sits above" in b and "**Down:**" in b and "`rz-commons`" in b, b[:600])
+
+    with tempfile.TemporaryDirectory() as t:
+        repo(t, {"name": "s", "role": "spoke", "contributes_to": ["risk-lab-wiki"],
+                 "reads_from": ["xco-team-wiki", "risk-lab-wiki"]})
+        b = wc.render()
+        check("a spoke that reads more than it sends to is not told it runs both ways",
+              "both directions" not in b and "sends pages up to `risk-lab-wiki`" in b
+              and "cloned from `xco-team-wiki` and `risk-lab-wiki`" in b, b[:800])
+
     with tempfile.TemporaryDirectory() as t:
         repo(t, {"name": "w", "role": "spoke", "contributes_to": ["c"]},
              sources=(50_000, 60_000, 1_000))

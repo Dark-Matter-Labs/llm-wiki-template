@@ -1,6 +1,6 @@
 ---
 name: joker
-description: Counter-orthodoxy challenge. Use when the owner says "run the joker", "challenge this", "what's the counterposition", or "steelman the opposite". Identifies the orthodoxy a page/topic runs on (usually an entry in wiki/axioms.md), builds one to three coherent rival orthodoxies, reasons from each, and files a counterposition brief to wiki/challenges/.
+description: "Counter-orthodoxy challenge: name the orthodoxy, build rival ones, file a counterposition brief. \"run the joker\", \"challenge this\", \"steelman the opposite\"."
 ---
 
 # The Joker — counter-orthodoxy challenge

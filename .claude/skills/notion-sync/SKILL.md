@@ -1,6 +1,6 @@
 ---
 name: notion-sync
-description: Reconcile the wiki with the xCO Notion workspace. Use when someone says "do the notion sync", "does Notion match the wiki", "update the tracker", "check the option book against Notion", or after any ingest that changes the option book, the portfolio or a goal. Read-only by default; every write is named before it is made.
+description: "Reconcile the wiki with the xCO Notion workspace. \"do the notion sync\", \"update the tracker\", or after an ingest that changes the option book or a goal. Read-only unless a write is named first."
 ---
 
 # Reconcile the wiki with Notion

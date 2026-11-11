@@ -1,6 +1,6 @@
 ---
 name: call-notes
-description: File the week's project call notes into the wiki, with decisions and next steps, and propose the change. Fires on "do the call notes", "file my call notes", "add this week's calls", "the Friday call-notes check", "here are the notes from the call", "write up this meeting", "add the meeting notes".
+description: "File the week's project call notes with decisions and next steps, and propose the change. \"do the call notes\", \"write up this meeting\"."
 ---
 
 # Call notes
@@ -52,7 +52,13 @@ names, files the notes and proposes the change.
 9. **Rebuild the stand-up page.** Where this wiki has `tools/open_for_standup.py`, run it after
    filing.
 10. **Run the checks this wiki has.** Run `tools/house_rules.py`, `tools/quote_check.py --check` on
-    each page you wrote, and `tools/wiki_context.py`.
+    each page you wrote, `tools/check_prose.py --check` and `tools/wiki_context.py`. Fix what they find before
+    proposing. The same four slips came back on every call filed on 5 November 2026:
+    - **Words the prose check bans,** such as paradigm, landscape, transformative and ecosystem. Use them only
+      inside a quotation.
+    - **xCO casing inside an inline quotation.** Only a blockquote is exempt. Paraphrase a quote that says "XO".
+    - **A quotation split across a line break** in the source cannot be found. Quote a shorter run on one line.
+    - **Stray files.** Add the pages by name. Never "add everything", which sweeps in local files.
 11. **Propose the change.** Put the work on its own branch and open a pull request. In a personal
     wiki, ask once: "Shall I merge this? That saves it into your wiki". In a commons, propose and stop.
 

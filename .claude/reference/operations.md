@@ -15,6 +15,7 @@ In plain-English terms, here is when each fires:
 | "add this", "ingest", "here's a new report"        | `ingest`  |
 | "what does the wiki say about…", "find", "compare" | `query`   |
 | "check the wiki", "is it healthy", "clean up"      | `lint`    |
+| "run the weekly check" (where this wiki has the skill; it needs the whole `raw/` library on this machine) | `weekly-check` |
 | "catch me up", "what's new", "weekly summary" (read the latest Thursday digest in `wiki/digest/` first: `tools/weekly_digest.py` has counted the week) | `brief`   |
 | "I have a new idea / project", "help me think"     | `office-hours` |
 | "sharpen this", "test my idea", "make this defensible" (questions only, no answers) | `sharpen` |
@@ -54,6 +55,7 @@ In plain-English terms, here is when each fires:
 | "set up my customisations", "use Rooms in my wiki", and when `waiting.py` names a customisation | `customise` |
 | "make a pre-read for…", "a one-pager for…", "brief them before Thursday" | `pre-read` |
 | "add this style guide", "capture our visual guide", "which style guide do we use" | `visual-guide` |
+| "help me imagine", "what could this be", "I don't know what I want yet", before designing | `imagine` |
 | "design this", "make the page or cards", "make it look good", "it looks too AI" | `design-brief` |
 | "review this design", "does this look AI-made", "is this on brand" | `design-critic` |
 | "am I over-reading this", "is this extrapolation" — **and automatically whenever the wiki's analysis sits beside someone else's document** | `source-proportion` |

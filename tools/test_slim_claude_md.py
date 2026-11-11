@@ -35,6 +35,9 @@ def main():
     check("running it twice changes nothing", s.slim(after, compact)[0] == after)
     check("a compact section already in place is reported as such", dict((h, w) for h, w, *_ in s.slim(after, compact)[1])
           ["Working style"] == "already compact")
+    s.PREVIOUS["Page types"] = s.digest("## Page types\n\nOur first compact types.")
+    v1 = "# CLAUDE.md\n\n## Page types\n\nOur first compact types.\n"
+    check("an earlier compact version is replaced", "Types, briefly." in s.slim(v1, compact)[0])
     check("no change at all leaves the text identical", s.slim("# Only a title\n", compact)[0] == "# Only a title\n")
 
     shipped = os.path.join(ROOT, s.COMPACT)

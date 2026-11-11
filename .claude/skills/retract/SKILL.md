@@ -1,6 +1,6 @@
 ---
 name: retract
-description: Remove a leaked value (a secret, a private page's title, a person's name) from every copy in the wiki, without Claude ever seeing it. Fires on "something leaked", "remove this everywhere", "retract this", "I pasted a password", "a private title is on a public page", "scrub this name".
+description: "Remove a leaked value from every copy without Claude seeing it. \"something leaked\", \"I pasted a password\", \"scrub this name\"."
 ---
 
 # Retract a leaked value

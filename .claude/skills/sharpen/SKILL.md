@@ -1,6 +1,6 @@
 ---
 name: sharpen
-description: A critical-thinking session on one idea, claim, argument or decision, until it is clear, concise and defensible. Use when the owner says "sharpen this", "test my idea", "stress-test this claim", "make this defensible", "think this through with me, don't tell me", or "critical thinking session". Asks one question at a time, never answers for the person, never flatters, and ends with a conclusion the owner can keep or file.
+description: "A critical-thinking session on one idea until it is defensible, one question at a time, never answering for the person. \"sharpen this\", \"stress-test this claim\"."
 ---
 
 # Sharpen

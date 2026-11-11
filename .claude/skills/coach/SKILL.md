@@ -1,6 +1,6 @@
 ---
 name: coach
-description: Suggest the one useful next thing, so people discover what their wiki can do. Fires automatically at the start of a session (after the waiting check) and at the end of a finished task, and when someone asks "what can you do", "what should I do next", "any tips", or "how do I get more out of this". Also where to turn it down: "stop suggesting that", "fewer tips".
+description: "Suggest the one useful next thing. Fires at session start after the waiting check and after a finished task, and on \"what can you do\", \"any tips\". \"Fewer tips\" turns it down."
 ---
 
 # Coach: suggest the next useful thing

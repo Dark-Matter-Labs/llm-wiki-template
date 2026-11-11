@@ -1,6 +1,6 @@
 ---
 name: cross-check
-description: Have a different frontier model read a page and record what it said, in `machine_checks:`. Use when the owner says "cross-check this", "get a second opinion", "what would another model say", or "check this against GPT/Gemini" — and from the validation pass when it decides enough new material has landed. A machine check may move `confidence`; it may never move `validation`.
+description: "Have a different model read a page and record it in machine_checks. \"cross-check this\", \"second opinion\". May move confidence, never validation."
 ---
 
 # Cross-check

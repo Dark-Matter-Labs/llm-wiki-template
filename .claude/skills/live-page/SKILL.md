@@ -1,6 +1,6 @@
 ---
 name: live-page
-description: Revise a page that is already published. Apply the wiki's versioning rule, add a history line, check it at phone and laptop width in light and dark, and keep any mirror in step. Fires on "update the live page", "change the published page", "fix the page on the site", "make a new version of", "it looks wrong on my phone", "bump the version", "the site still shows the old one".
+description: "Revise a published page: versioning, history line, phone and laptop in light and dark, mirrors in step. \"update the live page\", \"it looks wrong on my phone\"."
 ---
 
 # Revise a live page

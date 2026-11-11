@@ -1,6 +1,6 @@
 ---
 name: rebuild-parity
-description: Count a rebuilt artifact's records against the version it replaces, before it ships. Fires automatically whenever an artifact carrying a countable record set is rebuilt, reskinned, regenerated, ported to a new register, or split — atlas nodes, register rows, party records, watchpoints, portfolio entries, slides, table rows. Also on request ("did anything get lost", "check parity", "is it all still there").
+description: "Count a rebuilt artifact's records against the version it replaces before it ships. Fires whenever a countable set is rebuilt, ported or split, and on \"did anything get lost\"."
 ---
 
 # Rebuild parity — count what went in, count what came out

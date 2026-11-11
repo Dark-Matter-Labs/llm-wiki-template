@@ -67,96 +67,55 @@ preferences they've stated more than once.
 
 ## The three layers (never blur them)
 
-1. **`raw/`**: the sources the owner curates. **Immutable**: read them, never edit or delete them. Images in `raw/assets/`.
-2. **`wiki/`**: the pages you own and write. Summaries, entities, concepts, comparisons, the overview, syntheses.
+1. **`raw/`**: the sources the owner curates. **Immutable**: read them, never edit or delete them. They are the ground
+   truth every page is checked against. Images in `raw/assets/`.
+2. **`wiki/`**: the pages you own and write. They exist so the next question costs less than this one.
 3. **`CLAUDE.md`, `.claude/skills/` and `.claude/reference/`**: the rules and workflows, co-evolved with the owner. If a
    workflow keeps needing the same correction, propose an edit to the skill or to this file.
 
-**Detail lives in `.claude/reference/`, read only when the work needs it** (moved there 2026-10-13 to save tokens on
-every turn; nothing was removed). Read the named file *before* doing that kind of work:
+**Detail lives in `.claude/reference/`, read only when the work needs it.** Nothing was removed when it moved there.
+Read the named file *before* doing that kind of work:
 
 | Before you… | read |
 |---|---|
-| set `visibility`, `validation`, `machine_checks`, dormancy, `decides:`, `same_as:`, `contradicts:`, `derivation:`, or a verification mark | `.claude/reference/page-fields.md` |
+| set any page field beyond the basics below, or a verification mark | `.claude/reference/page-fields.md` |
 | edit `wiki/index.md`, a shelf, or the log | `.claude/reference/navigation-and-log.md` |
-| decide which skill or tool fits a request not in the list below | `.claude/reference/operations.md` |
+| decide which skill or tool fits a request | `.claude/reference/operations.md` |
 | touch the house rules or any hard rule's edge case | `.claude/reference/house-rules.md` |
+| write about capital, funds, term sheets or capital calls | `.claude/reference/capital-vocabulary.md`, where it exists |
+| change a file other wikis share, or a rule in `.claude/rules/` | `.claude/reference/shared-changes.md`, where it exists |
 
 ---
 
 ## Wiki page conventions
 
-Every page in `wiki/` (except `index.md` and `log.md`) starts with YAML frontmatter:
+Every page in `wiki/` (except `index.md` and `log.md`) starts with frontmatter: `type`, `title`, `description`, `tags`,
+`status`, `visibility`, `confidence`, `validation`, `timestamp`, `sources` and `derivation`. The full schema is in
+`.claude/reference/page-fields.md`.
 
-```yaml
----
-type: entity | concept | summary | comparison | overview | synthesis | goal | commitment
-title: Human-readable title
-description: One sentence describing the page
-tags: [tag1, tag2]
-status: draft | reviewed | dormant
-visibility: public | unlisted | internal | private   # default: private
-confidence: high | medium | low
-validation: machine | self | peer | collective       # default: machine
-timestamp: YYYY-MM-DD
-sources: [raw/filename.pdf, raw/other.md]
-# optional viz-layer fields (set only when the page clearly belongs to a layer):
-layer: goal | portfolio | mechanism | sequence   # which frontend view it belongs to
-parent: "Title of parent page"                    # nesting (goal spaces nest)
-horizon: near | mid | far                         # for sequence views
----
-```
-
-- **`visibility`** (required, default `private`): `public` (open web) · `unlisted` (on the site, not indexed) ·
-  `internal` (colleagues via the shared mirror, never the open web) · `private` (never leaves the repo: not its
-  body, title or links to it). The owner opts a page up; never guess a page into `public`. Ask the tier **once per
-  ingest**; with no answer, file `private` (or the default this file's own rules set, as a
-  commons does). Keep the CRM, capital and deal specifics, term sheets, meeting transcripts and unpublished
-  positions `private`. The `publish-check` skill verifies a tier before anything ships.
-- **`validation`** (required, default `machine`) records who stood behind a page; `confidence` is the evidence.
-  You may set `machine` and propose `self`; **never award `peer` or `collective`**. `self`/`peer`/`collective`
-  need `validated_by`. A second model's reading goes in `machine_checks:` and may move `confidence`, never
-  `validation`; a second model's reading of a citation goes there too. A `disputes` entry stands until a person
-  decides. Run the `cross-check` skill for it.
-- **Viz-layer fields** (`layer`, `parent`, `horizon`): only when a page clearly belongs to a layer.
-- **`status: dormant`** retires a page without deleting it. **Only a human sets it**; `lint` proposes candidates.
-- **`decides:`** lists the branches a page settles; `tools/waiting.py` reads it.
-- **`same_as:`** records two pages are one subject. A person's judgement; you may propose. A page may only name a
-  target at least as open as itself, and a non-private page only one it can see (`tools/check_same_as.py --check`).
-- **`contradicts: "Title"`** goes on the newer page when two pages disagree. Declaring is your job, resolving is
-  not: a human adds `superseded_by` or `devalued_by`, or `stands_with` when both stand. Nothing is deleted. `python3 tools/contradictions.py`.
-- **`confidence`**: one source is `low`; confirmed across several is `high`.
-- **Links** are `[[Page Title]]`. Never split one across a newline; in a table use the plain `[[Full Title]]` form.
-- **Every factual claim cites its source** inline, e.g. `(raw/ccc-report-2025.pdf)`; mark your own synthesis as such.
-- **Verification is per claim.** A person's mark after a citation reads `{✓ Name YYYY-MM-DD}`. **You may never write
-  this mark.** `python3 tools/verification.py --sample 3` names the claims worth a person's reading.
-- **`derivation:`** (`source` | `synthesis` | `derivative`): set it on every page you write.
-- Keep pages **small and focused**: one entity or concept each. A distinct thing you would link to gets a new page;
-  an attribute or update of an existing one is edited in place. Prefer merging over near-duplicates.
+- **`visibility`** defaults to `private`. The owner opts a page up. Never guess a page into `public`. Ask the tier
+  once per ingest.
+- **`validation`**: you may set `machine` and propose `self`. **Never award `peer` or `collective`.**
+- **Never write a verification mark** (`{✓ Name YYYY-MM-DD}`). Only a person writes one.
+- **Every factual claim cites its source** inline, e.g. `(raw/ccc-report-2025.pdf)`. Mark your own synthesis as such.
+- **One thing per page.** Quote exact terms, figures and dates word for word on that thing's own page. A table that
+  compares things links to those pages and is never the only copy.
+- **Links** are `[[Page Title]]`, never split across a line.
 
 ---
 
 ## Page types
 
-`summary` (one per source) · `entity` (person, org, place, project, tool, programme) · `concept` (an idea spanning
-sources) · `comparison` · `overview` (`wiki/overview.md`, kept current) · `synthesis` (the evolving thesis) ·
-`goal` (a destination; carries `horizon`, and `parent` when goals nest) · `commitment` (resources against a goal:
-needs `commits_to`, `resources`, `until`, `state`: `proposed | held | honoured | revised | lapsed | exited | declined`;
-`declined` and `exited` are never failures, only `lapsed` counts against a goal). Progress is computed by
-`python3 tools/goals.py`, never typed.
+`summary` · `entity` · `concept` · `comparison` · `overview` · `synthesis` · `goal` · `commitment`. Each is defined in
+`.claude/reference/page-fields.md`. Goal progress is computed by `python3 tools/goals.py`, never typed.
 
 ---
 
 ## The index and the log
 
-- `wiki/index.md` is the **router**; catalogues sit on shelves under `wiki/index/` where the wiki has them. Load a shelf
-  only when a question is squarely in it. Every ingest adds the new page's **one-line** row. Counts are computed by
-  `tools/sync_index_counts.py` where it exists, and never typed.
-- The log is **one file per day**, `wiki/log/YYYY-MM-DD.md`. Append to today's file (create it with the usual header),
-  then run `python3 tools/sync_log_index.py`. Never rewrite a past day; correct by appending. To read the log, read
-  today's file first, then walk back through the month index.
-- Every ingest, query and lint gets one entry, prefixed `## [YYYY-MM-DD] ingest | …` (or `query`, `lint`,
-  `rebuild` for an advance, `repair` for a defect fixed: a repair of your own error reads `repair | … (mine)`; work that does both is a `rebuild` naming what it repaired).
+- `wiki/index.md` is the **router**. Every ingest adds the new page's **one-line** row to it or its shelf.
+- The log is **one file per day**, `wiki/log/YYYY-MM-DD.md`. Append, never rewrite a past day, then run
+  `python3 tools/sync_log_index.py`. Entry prefixes are in `.claude/reference/navigation-and-log.md`.
 
 ---
 

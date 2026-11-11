@@ -1,6 +1,6 @@
 ---
 name: office-hours
-description: Act as a rigorous thinking partner for a new idea, project, or concept note. Use when the owner says "I have a new idea", "help me think through…", "I'm working on a concept note", "push back on this", or wants to interrogate a plan before committing to it. Asks forcing questions, challenges the framing, grounds it in what the wiki already knows, and can write the result into the wiki.
+description: "A rigorous thinking partner for a new idea or concept note, grounded in the wiki. \"I have a new idea\", \"push back on this\"."
 ---
 
 # Office hours
