@@ -1,6 +1,6 @@
 ---
 name: design-brief
-description: Make a page, deck, card, dashboard or screen look made by a good studio, not by a model. Use when anyone asks Claude to design or build something people will look at ("make a landing page", "design the cards", "build the dashboard", "make it look good", "it looks too AI"). Reads the guide this wiki follows, writes a bold brief before building, then cuts. Pairs with design-critic.
+description: "Design a page, deck, card or screen so it looks made by a good studio. \"design this\", \"it looks too AI\"."
 ---
 
 # Design brief

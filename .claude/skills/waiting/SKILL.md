@@ -1,6 +1,6 @@
 ---
 name: waiting
-description: Say what needs a person right now, without using git's vocabulary. Fires on "what's waiting for me", "what needs me", "anything outstanding", "what have I missed", "is there anything to review". Built for the person who does not know git and should not have to.
+description: "Say what needs a person now, in plain words with no git terms. \"what's waiting for me\", \"anything outstanding\"."
 ---
 
 # What's waiting

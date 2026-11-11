@@ -1,6 +1,6 @@
 ---
 name: lint
-description: Run a health check over the wiki. Use when the owner says "check the wiki", "is it healthy", "clean up", "what's stale", or periodically after several ingests. Finds contradictions, stale claims, orphan pages, missing pages, missing cross-references, and schema problems, then produces a report. Never deletes or rewrites content unilaterally.
+description: "Health check: contradictions, stale claims, orphans, duplicates, schema. \"check the wiki\", \"what's stale\". Reports and proposes; never deletes or rewrites."
 ---
 
 # Lint the wiki

@@ -1,6 +1,6 @@
 ---
 name: source-refresh
-description: Check whether the web pages behind the wiki's saved sources have changed, been edited or gone, and file a changed one as a new source with a person's yes. Fires on "are my sources still current", "has this page changed", "refresh the sources", "check the links behind the sources", "is the Substack post the same", and as part of a periodic check.
+description: "Check whether the web pages behind saved sources changed or went, and file a changed one as a new source on a yes. \"are my sources still current\"."
 ---
 
 # Re-check web sources

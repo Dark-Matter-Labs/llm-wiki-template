@@ -64,6 +64,7 @@ import unicodedata
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import export            # noqa: E402
 import export_shared     # noqa: E402
+import share_packet      # noqa: E402
 
 DEFAULT_OUT = "contrib"
 
@@ -246,7 +247,7 @@ def resolve_commons(requested, topo):
                     "picking one for you would make it silently.")
 
 
-def _origin_repo():
+def _origin_repo(path=None):
     """This wiki's own name, derived from the git remote rather than hardcoded.
 
     Every spoke stamps its provenance with its own name. Hardcoding that means one
@@ -255,7 +256,7 @@ def _origin_repo():
     to prevent. Deriving it makes a fresh spoke correct with no setup step.
     """
     url = subprocess.run(["git", "remote", "get-url", "origin"],
-                         capture_output=True, text=True).stdout.strip()
+                         capture_output=True, text=True, cwd=path).stdout.strip()
     if not url:
         return "unknown-origin"
     name = url.rstrip("/").rsplit("/", 1)[-1]
@@ -381,13 +382,14 @@ def shared_with(fm):
     return {str(x).strip().casefold() for x in (v if isinstance(v, list) else [v]) if str(x).strip()}
 
 
-def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None, person=None):
+def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None, person=None, origin=None):
     """Return {relpath: text} for the staged contribution, or raise ValueError.
 
     `existing` maps title_key -> the commons' own filename, for pages it already holds.
     `person` = {"wiki": ..., "owner": ...} sends the pages to one person's wiki instead.
     """
     existing = existing or {}
+    origin = origin or ORIGIN
     labels = source_labels()
     nodes, title_to_slug = export.build_nodes(wiki_dir)
     if person:
@@ -418,7 +420,8 @@ def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None, person=Non
             if any(slug.startswith(p) for p in REFUSE_PATH_PREFIXES):
                 raise ValueError(f"{slug}: refused — CRM / relationship data never travels")
             names = shared_with(fm)
-            if not names & {person["wiki"].casefold(), (person.get("owner") or "").casefold()}:
+            if not names & ({(person.get("wiki") or "").casefold(),
+                             (person.get("owner") or "").casefold()} - {""}):
                 raise ValueError(f"{slug}: refused — its shared_with does not name "
                                  f"{person['wiki']}. Add them to the page first: that is the "
                                  f"owner's decision, written down")
@@ -450,12 +453,12 @@ def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None, person=Non
                 prov.append(f"validated_at: {export_shared._yaml_scalar(clean(str(fm['validated_at'])))}")
         if person:
             prov += [f"shared_by: {contributed_by}",
-                     f"from_wiki: {ORIGIN}",
+                     f"from_wiki: {origin}",
                      f"shared_on: {datetime.date.today().isoformat()}",
                      f"origin_rev: {rev}"]
         else:
             prov += [f"contributed_by: {contributed_by}",
-                     f"origin: {ORIGIN}",
+                     f"origin: {origin}",
                      f"origin_rev: {rev}"]
         lines = text.split("\n")
         if lines[-1] != "---":   # an assert vanishes under python -O, and a malformed bundle would be staged
@@ -575,12 +578,15 @@ def personal_wikis():
     return None if names is None else [n for n in names if n.endswith("-llm-wiki")]
 
 
-def who_will_see(commons, bundle, wiki_dir, lookup=None, person=False):
+def who_will_see(commons, bundle, wiki_dir, lookup=None, person=False, packet=False):
     """The block the owner reads before a page leaves. Built from the staged bundle only."""
-    logins, base = (lookup or readers)(commons)
+    logins, base = (None, None) if packet else (lookup or readers)(commons)
     known = person_names(wiki_dir)
     lines = [f"WHO WILL SEE IT: {commons}"]
-    if logins is None:
+    if packet:
+        lines.append(f"  Readers: whoever you send the packet to, then whoever can read {commons}."
+                     " Its owner decides whether to receive it.")
+    elif logins is None:
         lines.append("  Readers: could not be read from GitHub. That does not mean nobody;"
                      " ask the owner to check who has access before saying yes.")
     else:
@@ -621,6 +627,9 @@ def main(argv=None):
                     help="share with one person: their wiki's name or their GitHub login")
     ap.add_argument("--readers-confirmed", action="store_true",
                     help="the owner has seen who will see it, and said yes")
+    ap.add_argument("--packet", action="store_true",
+                    help="with --to-person: write a packet to send them, for when you cannot "
+                         "change their wiki yourself (tools/share_packet.py receives it)")
     args = ap.parse_args(argv)
 
     if not os.path.isdir(args.wiki):
@@ -653,10 +662,19 @@ def main(argv=None):
         if args.to:
             ap.error("give --to (a team wiki) or --to-person (one person), not both")
         wiki_to, owner, err = resolve_person(args.to_person)
+        if err and args.packet and "team wiki" not in err:
+            # A packet does not need their wiki to be readable from here: the receiving wiki
+            # checks it is addressed to it. Most people cannot read other people's wikis.
+            print(f"note: {err}.\n      Addressing the packet to {args.to_person!r} as given; "
+                  f"their wiki checks the name when it is received.", file=sys.stderr)
+            wiki_to, owner, err = ((args.to_person, None) if args.to_person.endswith("-wiki")
+                                   else (None, args.to_person)) + (None,)
         if err:
             print(f"error: {err}", file=sys.stderr)
             return 1
-        commons, person, theirs, hits = wiki_to, {"wiki": wiki_to, "owner": owner}, {}, []
+        commons, person, theirs, hits = wiki_to or owner, {"wiki": wiki_to, "owner": owner}, {}, []
+    elif args.packet:
+        ap.error("--packet goes with --to-person: a team wiki takes pages through proposals")
     else:
         commons, err = resolve_commons(args.to, topology())
         if err:
@@ -685,7 +703,8 @@ def main(argv=None):
         print(f"warning: {len(hits)} page(s) already in the commons will be REPLACED. "
               f"Say so in the PR body so the reviewer checks the diff.\n", file=sys.stderr)
 
-    rev = git("rev-parse", "--short", "HEAD") or "unknown"
+    rev = git("-C", args.wiki, "rev-parse", "--short", "HEAD") or "unknown"
+    origin = _origin_repo(args.wiki)   # the wiki being shared, which need not be this one
     if git("status", "--porcelain", "--", args.wiki):
         print("warning: wiki/ has uncommitted changes — origin_rev will not describe "
               "exactly what you are contributing. Commit first.", file=sys.stderr)
@@ -695,18 +714,22 @@ def main(argv=None):
     existing = {title_key(t): s for t, s in (theirs or {}).items()
                 if isinstance(s, str) and SAFE_NAME_RE.fullmatch(s)}
     try:
-        bundle = build_bundle(args.wiki, args.slugs, args.by, rev, existing, person)
+        bundle = build_bundle(args.wiki, args.slugs, args.by, rev, existing, person, origin)
+        packet = share_packet.make(bundle, args.by, origin, commons) if args.packet else None
     except ValueError as e:
         print(f"error: {e}", file=sys.stderr)
         return 1
 
-    print(who_will_see(commons, bundle, args.wiki, person=bool(person)) + "\n", flush=True)  # before the refusal below
+    print(who_will_see(commons, bundle, args.wiki, person=bool(person), packet=args.packet) + "\n",
+          flush=True)  # before the refusal below
     if not args.readers_confirmed:
         print("error: nothing staged. Show the owner who will see it, above, and run again\n"
               "       with --readers-confirmed only after they say yes.", file=sys.stderr)
         return 1
 
     os.makedirs(args.out, exist_ok=True)
+    if packet:
+        bundle = {f"packet-for-{commons}.md": packet}
     for rel, text in bundle.items():
         dest = os.path.join(args.out, rel)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -723,6 +746,11 @@ def main(argv=None):
         print(leak.stdout or leak.stderr, file=sys.stderr)
         return 1
 
+    if packet:
+        print(f"\n  Packet written: {os.path.join(args.out, next(iter(bundle)))}\n"
+              f"  Send it to them as an attached file; pasted text can change in a chat app, and\n"
+              f"  receiving refuses a page that changed. Nothing has left this repo yet.")
+        return 0
     print(f"\n  {len(bundle)} page(s) staged in {args.out}/ at rev {rev}, "
           f"{'shared_by' if person else 'contributed_by'} {args.by}.")
     print(f"  Nothing has left this repo. Open a PR against {commons} to propose them"

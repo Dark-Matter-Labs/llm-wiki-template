@@ -1,6 +1,6 @@
 ---
 name: visual-guide
-description: File a project's visual style guide (logo, colour, type, layout, components, motion, design tokens) as one wiki page in a standard shape, with every exact value cited. Use when someone says "add this style guide", "capture our visual guide", "here's the brand guide for…", "file the Figma style guide", or shares a style guide site, PDF or token file. Also says which guide a wiki follows when it has none of its own.
+description: "File a project's visual style guide as one page with every exact value cited. \"add this style guide\", \"capture our visual guide\"."
 ---
 
 # Visual guide

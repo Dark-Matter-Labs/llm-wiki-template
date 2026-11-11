@@ -1,6 +1,6 @@
 ---
 name: gravity
-description: Measure the repo's centre of mass and trajectory, and read inputs against both. Use when the owner asks "what's the gravity", "what's the trajectory", "where does this sit relative to the repo", "run the gravity check", or weekly from the reflect skill. Deterministic instrument (stdlib Python) — routes attention, never certifies.
+description: "Measure the repo's centre of mass and trajectory, and read an input against both. \"what's the gravity\", \"trajectory\", or weekly from reflect. Routes attention, never certifies."
 ---
 
 # Gravity — the wiki's mass and trajectory, measured

@@ -1,6 +1,6 @@
 ---
 name: newsletter
-description: Write the monthly issue — what the wikis learned, in something people will actually read. Fires on the first working day of each month, and when the owner says "write the newsletter", "do the monthly", "what went out this month". Replaces the weekly reflection, which nobody read.
+description: "Write the monthly issue of what the wikis learned. Fires on the first working day of the month, and on \"write the newsletter\"."
 ---
 
 # The monthly newsletter

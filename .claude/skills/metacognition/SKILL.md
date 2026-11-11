@@ -1,6 +1,6 @@
 ---
 name: metacognition
-description: "How the owner uses the wiki and where their working loop costs them. **Fires automatically** when a month's log has more `repair` than `rebuild` entries, about every 25 log entries, and when a session corrected its own work more than twice. Also on \"how am I using this\", \"metacognition\", \"usage patterns\". Reads git history and the log, names the patterns, suggests improvements, flags candidates for `learn`."
+description: "How the owner uses the wiki and where the loop costs them. Fires when a month has more repairs than rebuilds, about every 25 log entries, or after more than two self-corrections. \"how am I using this\"."
 ---
 
 # Metacognition — how the owner uses the tool

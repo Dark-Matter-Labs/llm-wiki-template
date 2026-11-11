@@ -1,6 +1,6 @@
 ---
 name: inquiry
-description: Bring a live problem to the corpus and get back what it holds — framed as Goal → Target → Search, with hypotheses and their sources, across every commons this wiki can read. Use when the owner says "I have a problem, help me think", "what would the wiki tell us to do about…", "how would you write this contract / brief / plan given everything we know", "run an inquiry on…", or asks for hypotheses rather than a summary. The inquiry-native way of using the system, named as a skill so it can travel.
+description: "Bring a live problem to the corpus: Goal, Target, Search, with sourced hypotheses across every readable commons. \"help me think\", \"run an inquiry on\", or hypotheses rather than a summary."
 ---
 
 # Inquiry — ask the corpus what to do, not what it says

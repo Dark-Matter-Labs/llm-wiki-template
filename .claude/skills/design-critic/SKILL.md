@@ -1,6 +1,6 @@
 ---
 name: design-critic
-description: Review a design from its screenshot, as a demanding studio would. Scores it out of 10 against its brief and the guide this wiki follows, names the AI tells from the slop checklist, and says what to cut. Use for "review this design", "does this look AI-made", "is this on brand", "check this page, card or deck", and inside design-brief's loop.
+description: "Score a design from its screenshot against its brief: AI tells and what to cut. \"review this design\", \"is this on brand\"."
 ---
 
 # Design critic

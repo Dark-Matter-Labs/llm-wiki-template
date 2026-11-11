@@ -1,6 +1,6 @@
 ---
 name: rulings
-description: "File the owner's standing ruling as a numbered decision, link it to the skill or rule it changes, and check drafts against open rulings. Fires when the owner gives a lasting instruction: \"from now on…\", \"always…\", \"never…\", \"make that a rule\", \"remember this for next time\", \"I've decided that…\", \"stop doing X\", \"that rule no longer applies\". Also on \"what rules have I set\" and \"which of my rules applied here\"."
+description: "File a standing instruction as a numbered ruling and check drafts against it. Fires on \"from now on\", \"always\", \"never\", \"make that a rule\", and on \"what rules have I set\"."
 ---
 
 # Rulings
@@ -60,7 +60,7 @@ Before any page, deck, message or reply the owner will read:
 - **Only a person makes a ruling.** Claude may propose one ("Shall I make that a standing rule?"). It is filed only on a clear yes.
 - **Never invent or paraphrase a ruling into something new.** The quote in `raw/decisions/` is the ruling. The numbered line summarises it.
 - **A ruling never overrides the hard rules in CLAUDE.md.** Visibility, never editing `raw/`, verification marks and the house spellings all stand.
-- **A ruling binds this wiki only.** A change to a shared rule in `.claude/rules/` is a system-wide change. Say so and follow `.claude/rules/shared-changes.md`.
+- **A ruling binds this wiki only.** A change to a shared rule in `.claude/rules/` is a system-wide change. Say so and follow `.claude/reference/shared-changes.md`.
 - **Superseded rulings stay listed.** History is kept. Nothing is deleted to tidy up.
 - **Respect visibility.** A ruling about a private matter keeps its words private. A public page never quotes it.
 - **Knowledge, not surveillance.** A ruling may not ask Claude to track what other people do.

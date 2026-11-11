@@ -8,13 +8,15 @@ Read this before editing `wiki/index.md`, a shelf, or the log.
 ## The two navigation files
 
 **`wiki/index.md`** — the **router**, not the catalogue. Sections, counts, and a pointer
-to each shelf. The heavy catalogues live under **`wiki/index/`** — `concepts.md`,
-`summaries.md`, `overview-synthesis.md` — and are loaded one at a time, only when a
-question is squarely in that section.
+to each shelf. The catalogues live under **`wiki/index/`** and are loaded one at a time,
+only when a question is squarely in that section. Each wiki has its own set of shelves.
 
 Tiered on 2026-08-23. `index.md` had reached ~55k tokens and was read before every
 operation, against a corpus whose median page is ~1.5k: routing cost more than reading
 thirty pages, and the map was growing as fast as the territory. The router is now ~9k.
+In the source wiki it had grown back to 47.8 KB by 2026-11-11, through long inline rows. Four sections moved to
+shelves and it went to 4.1 KB. A wiki may cap its router with `index_router` in `design/budgets.json`, checked
+by `tools/check_budgets.py`.
 
 **Retrieval order — search, then graph, then read:**
 

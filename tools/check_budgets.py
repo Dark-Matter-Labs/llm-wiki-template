@@ -55,6 +55,7 @@ def measure(root: pathlib.Path = ROOT) -> dict:
                          + sum(description_bytes(t) for t in texts.values()),
         "largest_skill": len(texts[biggest].encode("utf-8")) if biggest else 0,
         "largest_skill_name": biggest.parent.name if biggest else "",
+        "index_router": size(root / "wiki" / "index.md"),
     }
 
 
@@ -76,6 +77,10 @@ def problems(m: dict, b: dict) -> list:
                    f"(CLAUDE.md {m['claude_md']:,}, rules {m['rules']:,}, skill descriptions {m['skill_descriptions']:,})")
     if m["largest_skill"] > b["skill_body_max"]:
         out.append(f"the {m['largest_skill_name']} skill is {m['largest_skill']:,} bytes, over the {b['skill_body_max']:,} budget for one skill")
+    # Opt-in: CLAUDE.md has every session read wiki/index.md first, so a wiki may budget it too (11 Nov 2026).
+    if "index_router" in b and m.get("index_router", 0) > b["index_router"]:
+        out.append(f"wiki/index.md is {m['index_router']:,} bytes, over its budget of {b['index_router']:,}; "
+                   "move a long section onto a shelf under wiki/index/")
     return out
 
 
@@ -99,7 +104,8 @@ def main(argv=None) -> int:
     b = json.loads(path.read_text(encoding="utf-8"))
     found = problems(m, b)
     print(f"budgets — always loaded {m['always_loaded']:,} of {b['always_loaded']:,} bytes; "
-          f"largest skill {m['largest_skill_name']} {m['largest_skill']:,} of {b['skill_body_max']:,}")
+          f"largest skill {m['largest_skill_name']} {m['largest_skill']:,} of {b['skill_body_max']:,}"
+          + (f"; index {m['index_router']:,} of {b['index_router']:,}" if "index_router" in b else ""))
     for p in found:
         print(f"  OVER  {p}")
     if found:

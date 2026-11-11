@@ -1,6 +1,6 @@
 ---
 name: source-proportion
-description: Keep interpretation smaller than the thing interpreted, and keep it out of the author's voice. Fires automatically whenever the wiki's own analysis sits alongside someone else's document — during ingest, before publishing a page built on a source, and before any commentary goes onto a page that ships under Dark Matter Labs' name. Also on request ("am I over-reading this", "check the proportion", "is this extrapolation").
+description: "Keep interpretation smaller than the thing interpreted and out of the author's voice. Fires during ingest and before publishing on someone's source. \"am I over-reading this\"."
 ---
 
 # Source proportion — the analysis must not outgrow its source

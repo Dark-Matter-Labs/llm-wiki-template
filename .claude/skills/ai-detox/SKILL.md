@@ -1,6 +1,6 @@
 ---
 name: ai-detox
-description: Strip the machine tells out of writing. Use on anything a person will read, and always before the newsletter or any published page. Fires on "ai detox", "make this sound human", "take the AI out of this", "detox this draft".
+description: "Take the machine tells out of writing a person will read. Always before the newsletter or a published page. \"ai detox\", \"make this sound human\"."
 ---
 
 # AI detox

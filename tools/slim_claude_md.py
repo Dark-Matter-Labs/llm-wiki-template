@@ -31,6 +31,7 @@ SWAP = {
     "Wiki page conventions": "Wiki page conventions",
     "Page types": "Page types",
     "The two navigation files": "The index and the log",
+    "The index and the log": "The index and the log",
     "The core operations": "The core operations",
     "Hard rules": "Hard rules",
     "Working style": "Working style",
@@ -45,6 +46,18 @@ TEMPLATE = {
     "The core operations": "0b4f604c43e7093ad25bb5fa910138674cfc1009a8ab7d5072188c2e260ac5ef",
     "Hard rules": "16ef30c7b7b2c133b13c56233b7aa94915cba210d04706cfac76d9c775d04b27",
     "Working style": "c92e6a91670f3bcf2c3674f7c187a27ac6628c347e013a40a377dc4f2ef3bb57",
+}
+
+# sha256 of each section as the FIRST compact version wrote it (26 October 2026). The second (11 November 2026, after
+# Anthropic's agent-memory study found long instruction files lower adherence) replaces these too, never an owner's edit.
+PREVIOUS = {
+    "Hard rules": "84a680c104d361553fc9955a8103e227405d23b81f26d54bb54d88fd8b5fb8e0",
+    "Page types": "9617974f84320064c17e3f2ea167bbec18ae493be9ef63db888247c0c83b6085",
+    "The core operations": "87a5317d5b84e524acd5cf116164f8d3461296818d035935f3166bc5a9e56fdd",
+    "The index and the log": "26dbd14cde70db05d15809dfeb438909a866e2851c1a6886b360f964eeb5b42c",
+    "The three layers (never blur them)": "4bf8c6b5b656ef039c7eb13b118a6fa1dd4c81c1ea331bdba6cedfe07cceca0b",
+    "Wiki page conventions": "4b92b1961fc7637d291c4f6a6f4ebbfef9fa3af78fc05e3b73cfbb849185b970",
+    "Working style": "be5b1351507152a94cc19b1dc67ae68a0e02708a615f95947c5c39218c0af787",
 }
 
 
@@ -96,7 +109,7 @@ def slim(text, compact):
         if body == new:
             rows.append((h, "already compact", len(body.encode()), len(body.encode())))
             continue
-        if digest(body) != TEMPLATE[h]:
+        if digest(body) not in (TEMPLATE.get(h), PREVIOUS.get(h)):
             rows.append((h, "kept: changed in this wiki", len(body.encode()), len(body.encode())))
             continue
         out += lines[last:a] + (new + ("\n" + tail if tail else "")).split("\n")

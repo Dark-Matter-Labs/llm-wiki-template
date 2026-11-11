@@ -166,6 +166,8 @@ def render() -> str:
     name = fed.get("name") or ROOT.name
     role = fed.get("role", "spoke")
     ups = list(fed.get("contributes_to") or [])
+    # What sync_commons.py actually clones: reads_from when present, contributes_to when not.
+    downs = list(fed.get("reads_from") or []) if "reads_from" in fed else ups
     pages, n_src, n_big, largest = _corpus()
 
     L = [START, ""]
@@ -178,17 +180,38 @@ def render() -> str:
     # ── the federation, in plain words ────────────────────────────────────────────────────────
     L.append(f"**This wiki is `{name}`, a {role}.**")
     L.append("")
+    def listed(xs):
+        names = [f"`{x}`" for x in xs]
+        return names[0] if len(names) == 1 else " and ".join([", ".join(names[:-1]), names[-1]])
+
     if ups:
-        names = [f"`{u}`" for u in ups]
-        pretty = names[0] if len(names) == 1 else " and ".join([", ".join(names[:-1]), names[-1]])
-        theirs = "its" if len(names) == 1 else "their"
-        each = "it" if len(names) == 1 else "each of them"
-        L.append(f"- **It is connected to {pretty}.** Yes — the connection is real and it runs "
-                 f"in both directions.")
+        pretty = listed(ups)
+        each = "it" if len(ups) == 1 else "each of them"
+        if set(downs) == set(ups):
+            L.append(f"- **It is connected to {pretty}.** Yes — the connection is real and it runs "
+                     f"in both directions.")
+        else:
+            L.append(f"- **It sends pages up to {pretty}**"
+                     + (f", and reads {listed(downs)}." if downs else ", and reads no other wiki."))
         L.append(f"- **Up:** when the owner says *\"share this with the team\"*, the `contribute` "
                  f"skill stages a sanitised, provenance-stamped bundle and opens a pull request "
                  f"against {each}. It never pushes. A `private` page is refused outright.")
-        L.append(f"- **Down:** every Monday morning, {theirs} shared cut is cloned from {pretty} into "
+    else:
+        # Deliberately does not name the `contribute` skill in backticks. A commons does not
+        # carry that skill — it has nothing above it to send to — and `check_onboarding.py`
+        # reads "`x` skill" as a claim that the skill is here. The sentence was correct and
+        # the check was right to fire; the fix is the wording, not a hole in the check.
+        if role == "commons":
+            L.append("- **Nothing sits above this wiki.** It is a top commons: other wikis contribute "
+                     "*to* it, and it contributes onward to nobody. Contributing upward has no "
+                     "target here, and that is correct rather than broken.")
+        else:
+            L.append("- **Nothing sits above this wiki.** It sends pages up to no team wiki.")
+        if downs:
+            L.append(f"- **It reads {listed(downs)}.**")
+    if downs:
+        theirs = "its" if len(downs) == 1 else "their"
+        L.append(f"- **Down:** every Monday morning, {theirs} shared cut is cloned from {listed(downs)} into "
                  f"`.commons/<name>/` "
                  f"so this wiki can read what the group knows. If `.commons/` is empty, run "
                  f"`python3 tools/sync_commons.py` — the cache is gitignored, so a fresh checkout "
@@ -197,14 +220,6 @@ def render() -> str:
                  f"`delta` reads it, `gravity` reads it, and `contribution_prompt.py` uses it to "
                  f"name pages worth sharing. Nothing from a commons is written into `wiki/` "
                  f"without a person deciding.")
-    else:
-        # Deliberately does not name the `contribute` skill in backticks. A commons does not
-        # carry that skill — it has nothing above it to send to — and `check_onboarding.py`
-        # reads "`x` skill" as a claim that the skill is here. The sentence was correct and
-        # the check was right to fire; the fix is the wording, not a hole in the check.
-        L.append("- **Nothing sits above this wiki.** It is a top commons: other wikis contribute "
-                 "*to* it, and it contributes onward to nobody. Contributing upward has no "
-                 "target here, and that is correct rather than broken.")
     L.append("")
 
     # ── retrieval, identical everywhere ───────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 ---
 name: brief
-description: Produce a catch-up briefing from the wiki. Use when the owner says "catch me up", "what's new", "weekly summary", "what changed", or wants a digest of recent activity and open threads. Reads the log and recently-changed pages and writes a short, plain-language briefing.
+description: "A short catch-up from the log and recently changed pages. \"catch me up\", \"what's new\", \"what changed\"."
 ---
 
 # Brief

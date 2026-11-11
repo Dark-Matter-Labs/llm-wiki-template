@@ -1,6 +1,6 @@
 ---
 name: learn
-description: "Turn a verified recurring pattern into a new skill. **Fires automatically** when the same correction, question or workaround appears a third time, in the log, a session or across PRs. Also on \"make that a skill\" or \"learn this pattern\", or when metacognition or any session spots one. Always asks the owner to verify the pattern before creating anything."
+description: "Turn a verified recurring pattern into a skill. Fires when the same correction or workaround appears a third time, and on \"make that a skill\". Always asks the owner to verify first."
 ---
 
 # Learn — verified pattern → new skill

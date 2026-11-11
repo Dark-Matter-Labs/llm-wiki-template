@@ -1,6 +1,6 @@
 ---
 name: pre-read
-description: Build a short, sourced, versioned brief for one meeting or one audience from what the wiki already holds, with the audience's tier checked. Use when the owner says "make a pre-read for…", "brief me before…", "a one-pager for the investors", "something to send ahead of the workshop", "what should they read before Thursday", or "pull together what we know for the session on…". Proposes the brief as a page or a document. Never sends it.
+description: "A short, sourced, versioned brief for one meeting or audience, tier checked. \"make a pre-read for\", \"brief me before\". Never sends it."
 ---
 
 # Pre-read
@@ -31,7 +31,7 @@ than a dossier. It serves one meeting or audience and uses only what the wiki ho
 3. **Find the material.** Run `python3 tools/search.py "<topic>" --top 12`. Use `export/wiki.json` for the next hop.
    Then read the shortlist in full. Grep a large `raw/` source and read only the sections that matter.
 4. **Drop what the tier does not allow,** before you write. Check each page's `visibility`. When in doubt, leave it out.
-5. **For anything about capital,** follow `.claude/rules/capital-vocabulary.md` first, where this wiki has it. Use the shared terms and link them.
+5. **For anything about capital,** follow the capital vocabulary rule first (`capital-vocabulary.md` in `.claude/rules/` or `.claude/reference/`), where this wiki has it. Use the shared terms and link them.
 6. **Write the brief** (shape below). Every claim cites a wiki page as `[[Page Title]]` or a source as `(raw/…)`.
    - Mark your own synthesis as synthesis.
    - Where sources disagree, show both. Do not choose.
@@ -81,7 +81,7 @@ Lead the reply to the owner with what the brief says, then what it left out.
 
 - `query`: answers one question. A pre-read gathers answers for one audience.
 - `publish-check`: the gate for any brief that leaves Dark Matter Labs.
-- `.claude/rules/capital-vocabulary.md`: the shared capital terms.
+- `capital-vocabulary.md` (in `.claude/rules/` or `.claude/reference/`): the shared capital terms.
 - `.claude/rules/plain-register.md` and `ai-detox`: the writing rules.
 - `publish-web`: if the owner wants the brief as a web page, after `publish-check`.
 - `dossier`, where a wiki has it: for a fuller page gathered from sources beyond the wiki.

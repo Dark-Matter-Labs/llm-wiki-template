@@ -1,6 +1,6 @@
 ---
 name: ingest
-description: Add a new source to the wiki. Use whenever the owner drops a document into raw/ or says "add this", "ingest", "here's a new report/paper/article", or pastes/links content they want filed. Reads the source, writes a summary page, and cascades updates across all affected entity, concept, index, and log pages.
+description: "Add a new source: summary page, then cascade to every entity, concept, index and log entry it touches. \"add this\", \"ingest\", or a document dropped into raw/."
 ---
 
 # Ingest a source
@@ -43,6 +43,11 @@ The single most important operation. Done well, the wiki compounds. Done lazily
    fresh rather than trust the page's copy. Take such details from the source itself, never from
    another wiki page.
 
+   **Put each exact thing on its own page.** A contract's terms go on that contract's page, quoted
+   word for word. A table comparing several things links to those pages and repeats only what it
+   needs. In Anthropic's agent-memory study, one shared table kept 41 of 57 contract terms, and one
+   page per contract kept all 57.
+
 3. **Discuss briefly with the owner.** Give them 3–5 key takeaways in plain language
    before you start filing, so they can steer what to emphasise. Keep it short.
    **Ask the visibility tier once, here** — "Should these pages be public, unlisted, internal
@@ -79,8 +84,9 @@ The single most important operation. Done well, the wiki compounds. Done lazily
    under the right category. This is mandatory.
 
    The index is tiered: `wiki/index.md` is the router, and the rows live on shelves under
-   `wiki/index/` (`concepts.md`, `summaries.md`, `overview-synthesis.md`). A new concept
-   row goes on the concepts shelf; the small sections are still inline on the router.
+   `wiki/index/` where the wiki has them. A new row goes on its section's shelf. Only a
+   section with no shelf keeps its rows on the router. Every session reads the router, so
+   when a section there grows past a few lines, propose moving it onto a shelf.
    Then run `python3 tools/sync_index_counts.py` — the counts are computed, never typed.
    *(That tool carries a router-specific pattern block and so exists only in the wikis whose
    index is tiered. Where it is absent, the index has no computed counts to sync — skip it.)*

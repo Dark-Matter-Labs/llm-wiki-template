@@ -1,6 +1,6 @@
 ---
 name: customise
-description: Set up the customisations this wiki asked for in d.INO Home, one at a time, with this wiki's own content. Use when the owner says "set up my customisations", "set up what I asked for in d.INO Home", "use Rooms in my wiki", "add hunches to my wiki", or when tools/waiting.py names a customisation not set up yet. Reads design/customisations.json. Never copies another wiki's content.
+description: "Set up, one at a time and with this wiki's own content, the customisations asked for in d.INO Home. \"set up my customisations\", or when waiting.py names one."
 ---
 
 # Set up a customisation

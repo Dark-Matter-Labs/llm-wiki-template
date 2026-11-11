@@ -1,6 +1,6 @@
 ---
 name: onboard
-description: Run the first working session with a new option, team or person's wiki. Use when someone says "set up a wiki for X", "onboard a new option", "Santiago needs its own wiki", "get Copenhagen started", or a new repo has been created from the template and nobody has used it yet. This is an INQUIRY, not a setup wizard — the system asks what the work is trying to do, and the configuration falls out of the answers. Also fires when a wiki is found still carrying the template's worked demo.
+description: "Run the first working session with a new wiki, as an inquiry, not a wizard. \"set up a wiki for X\", or a wiki still carrying the template demo."
 ---
 
 # Onboard a new option

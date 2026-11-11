@@ -32,6 +32,8 @@ def main() -> int:
         check("growing past the budget is reported", any("always loaded" in p for p in B.problems(m2, b)))
         m3 = dict(m, largest_skill=b["skill_body_max"] + 1)
         check("an oversized skill is reported by name", any("big skill" in p for p in B.problems(m3, b)))
+        check("an index budget is ignored until a wiki sets one", B.problems(dict(m, index_router=10**6), b) == [])
+        check("an index over its budget is reported", any("index.md" in p for p in B.problems(dict(m, index_router=9001), dict(b, index_router=9000))))
     for f in fails:
         print(f"  FAIL {f}")
     print(f"{len(fails)} check(s) failed" if fails else "all checks passed")

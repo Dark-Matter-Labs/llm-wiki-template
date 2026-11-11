@@ -1,6 +1,6 @@
 ---
 name: ino-check
-description: Ask of any piece of work whether it knows which question it serves and what would change its mind, before it leaves a wiki. Fires automatically before a theory of change, proposal, brief, deck, contract or published page is shown to anyone outside the session, and after publish-check. On request, "run the INO check", "is this inquiry-native", "check this against INO", "does this know what it's testing". A mirror, never a gate: it reports, proposes, and leaves the decision to a person.
+description: "Ask whether a piece of work knows its question and what would change its mind. Fires before a proposal, brief, deck or published page leaves the session, and on \"run the INO check\". Reports, never gates."
 ---
 
 # INO check

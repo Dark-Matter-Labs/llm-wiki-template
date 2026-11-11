@@ -43,9 +43,9 @@
     },
     {
       "path": ".github/workflows/checks.yml",
-      "repos": 23,
-      "versions": 8,
-      "reason": "BY ROLE — the gate set is not the same in every wiki, because the tools are not. This repo runs check_sources.py and sync_index_counts.py, which most wikis do not have. The one part that WAS shared drift — a hand-kept list of test files that covered 8 of 17 suites — was fixed on 2026-09-04 by making the step discover tools/test_*.py. What remains is each repo's own gates. FIFTH VARIANT READ 2026-09-25, count 4 -> 5 across 22 repos. It is the six commons set up 22-24 Sept (rz-commons, dm-llm-wiki, mission-pathways-wiki, people-hosts-wiki, hm-consciousness-lab-wiki, bioregional-finance-wiki), byte-identical to each other. Written by the 2026-09-23 'this commons finishes its setup' sync and copied at onboarding into the last two. It is the spoke-standard file plus one step, check_no_private.py, the commons-only warning. power-project-wiki runs the same step; its file and these six contain exactly the same run: commands. The only differences are where the step sits (after house_rules here, after cross_check there) and its comment, which here is xco-team-wiki's wording word for word. So this is a role difference with a cosmetic split, not a stray copy. Not reconciled: every repo involved is a commons, so closing the gap is a PR someone else merges. Adopting this layout in power-project-wiki, or power-project's in the six, would take it back to 4. SIXTH AND SEVENTH VARIANTS READ 2026-10-12, count 5 -> 7 across 23 repos. robyn-llm-wiki adds one step, name_check.py, for Robyn's name corrections (2026-10-04). people-hosts-wiki adds five People Circle gates: law sources, case shape, no names above private, private reflections, and the DPIA hold (Iyana's answers, 2026-10-07). Both are their own tools, so BY ROLE holds. An eighth variant, ocean-studio-wiki's, was the commons file in a different order and was reconciled to the commons standard the same day (ocean-studio-wiki#217). EIGHTH VARIANT READ 2026-10-15: prateek-llm-wiki renames one step, 'CLAUDE.md's generated block matches this repo' to 'Shared instruction context matches this repo', because that wiki moved its generated block into instructions/wiki-context.md so Codex and Claude share one set of rules (prateek-llm-wiki 2f409f1, 2026-10-13). Same commands; BY ROLE holds. health-keepers-wiki, a commons, carries the spoke-standard file without the commons check_no_private step; it adds no variant."
+      "repos": 38,
+      "versions": 10,
+      "reason": "BY ROLE — the gate set is not the same in every wiki, because the tools are not. This repo runs check_sources.py and sync_index_counts.py, which most wikis do not have. The one part that WAS shared drift — a hand-kept list of test files that covered 8 of 17 suites — was fixed on 2026-09-04 by making the step discover tools/test_*.py. What remains is each repo's own gates. FIFTH VARIANT READ 2026-09-25, count 4 -> 5 across 22 repos. It is the six commons set up 22-24 Sept (rz-commons, dm-llm-wiki, mission-pathways-wiki, people-hosts-wiki, hm-consciousness-lab-wiki, bioregional-finance-wiki), byte-identical to each other. Written by the 2026-09-23 'this commons finishes its setup' sync and copied at onboarding into the last two. It is the spoke-standard file plus one step, check_no_private.py, the commons-only warning. power-project-wiki runs the same step; its file and these six contain exactly the same run: commands. The only differences are where the step sits (after house_rules here, after cross_check there) and its comment, which here is xco-team-wiki's wording word for word. So this is a role difference with a cosmetic split, not a stray copy. Not reconciled: every repo involved is a commons, so closing the gap is a PR someone else merges. Adopting this layout in power-project-wiki, or power-project's in the six, would take it back to 4. SIXTH AND SEVENTH VARIANTS READ 2026-10-12, count 5 -> 7 across 23 repos. robyn-llm-wiki adds one step, name_check.py, for Robyn's name corrections (2026-10-04). people-hosts-wiki adds five People Circle gates: law sources, case shape, no names above private, private reflections, and the DPIA hold (Iyana's answers, 2026-10-07). Both are their own tools, so BY ROLE holds. An eighth variant, ocean-studio-wiki's, was the commons file in a different order and was reconciled to the commons standard the same day (ocean-studio-wiki#217). EIGHTH VARIANT READ 2026-10-15: prateek-llm-wiki renames one step, 'CLAUDE.md's generated block matches this repo' to 'Shared instruction context matches this repo', because that wiki moved its generated block into instructions/wiki-context.md so Codex and Claude share one set of rules (prateek-llm-wiki 2f409f1, 2026-10-13). Same commands; BY ROLE holds. health-keepers-wiki, a commons, carries the spoke-standard file without the commons check_no_private step; it adds no variant. NINTH AND TENTH VARIANTS READ 2026-11-09, count 8 -> 10 across 38 repos. health-keepers-wiki adds two steps for its own signal-label tool, signal_labels.py and its tests (health-keepers-wiki #36, 2026-11-03); it still lacks the commons check_no_private step, as do learning-system-wiki and risk-lab-wiki, which is worth fixing separately. ocean-studio-wiki leaves the commons standard again, adding two of Prateek's checks (live_page_titles.py, set 30 October, and version_log.py, set 9 November). prateek-llm-wiki changed too, adding version_log.py, but stays one variant. All are the wikis' own tools, so BY ROLE holds."
     },
     {
       "path": ".github/workflows/export-shared.yml",
@@ -79,9 +79,9 @@
     },
     {
       "path": ".github/workflows/validation-pass.yml",
-      "repos": 9,
-      "versions": 2,
-      "reason": "BY ROLE, DECISION TAKEN — runs daily with contents:write and pull-requests:write. Held until 2026-09-04, when xco-team-wiki was given it deliberately; all ten wikis now have it. Stays out of the shared layer for the same reason as deploy-pages: a job that opens PRs in someone's repo should arrive by decision, not by sync."
+      "repos": 38,
+      "versions": 3,
+      "reason": "BY ROLE, DECISION TAKEN — runs daily with contents:write and pull-requests:write. Held until 2026-09-04, when xco-team-wiki was given it deliberately; all ten wikis now have it. Stays out of the shared layer for the same reason as deploy-pages: a job that opens PRs in someone's repo should arrive by decision, not by sync. REREAD 2026-11-09, 2 -> 3, and now in all 38 repos. indy-llm-wiki asks for claude-sonnet-5-5 where the other 36 ask for claude-sonnet-5 (indy dfdf2dc6, 2026-11-03); xco-team-wiki is the older second variant. The others' runs still pass (robyn and dm, 5 November). Because this file stays out of the shared layer, the model change reaches the others only by a deliberate rollout."
     },
     {
       "path": "tools/README.md",
@@ -92,9 +92,9 @@
     },
     {
       "path": "tools/export.py",
-      "repos": 31,
-      "versions": 6,
-      "reason": "BY PUBLISHING DECISION, not by role — one variant emits wiki.shared.json and the provenance fields, the other does not. The three commons take the first; so does fang-llm-wiki, a spoke, deliberately (fang-llm-wiki 5af7ceb, 1 Sept 2026): `internal` is the default tier, so publishing only the public cut shows a colleague less than half the canon, silently. This reason said \"a spoke does not\" and was wrong from that day. NOTE, unresolved: init_wiki.py --check says a spoke \"correctly publishes only wiki.public.json\". Both cannot be right, and which is a decision for the group. THIRD VARIANT READ 2026-10-15: prateek-llm-wiki adds three page types its wiki uses (partner, event, protocol) and normalises path separators to '/' so the export reads the same on Windows (prateek-llm-wiki ab07ddd, 2026-10-13). The types are his wiki's own; the separator fix is worth taking into the source, which would leave only the types as a per-wiki difference. REREAD 2026-10-26, 3 -> 5 across 28: ocean-studio and xco-team-wiki add their own page types (xCO adds question). prateek adds his types and exports source_check fields for his source-checks customisation. Owners' own changes. REREAD 2026-10-28, 5 -> 6 across 31: risk-lab-wiki, a new team wiki, takes the commons version and adds the page types Prateek's wiki and the Ocean Studio wiki use, so the pages copied from them pass (risk-lab-wiki #2)."
+      "repos": 38,
+      "versions": 7,
+      "reason": "BY PUBLISHING DECISION, not by role — one variant emits wiki.shared.json and the provenance fields, the other does not. The three commons take the first; so does fang-llm-wiki, a spoke, deliberately (fang-llm-wiki 5af7ceb, 1 Sept 2026): `internal` is the default tier, so publishing only the public cut shows a colleague less than half the canon, silently. This reason said \"a spoke does not\" and was wrong from that day. NOTE, unresolved: init_wiki.py --check says a spoke \"correctly publishes only wiki.public.json\". Both cannot be right, and which is a decision for the group. THIRD VARIANT READ 2026-10-15: prateek-llm-wiki adds three page types its wiki uses (partner, event, protocol) and normalises path separators to '/' so the export reads the same on Windows (prateek-llm-wiki ab07ddd, 2026-10-13). The types are his wiki's own; the separator fix is worth taking into the source, which would leave only the types as a per-wiki difference. REREAD 2026-10-26, 3 -> 5 across 28: ocean-studio and xco-team-wiki add their own page types (xCO adds question). prateek adds his types and exports source_check fields for his source-checks customisation. Owners' own changes. REREAD 2026-10-28, 5 -> 6 across 31: risk-lab-wiki, a new team wiki, takes the commons version and adds the page types Prateek's wiki and the Ocean Studio wiki use, so the pages copied from them pass (risk-lab-wiki #2). REREAD 2026-11-09, 6 -> 7 across 38: indy-llm-wiki's copy differs from the spoke standard by one word in one comment, 'd.INO Home' for 'INO Home' (indy d291b4bb, 2026-11-03). export.py is not in the shared layer, so the wording did not travel. Cosmetic; delivering it to the spokes would take the count back to 6."
     },
     {
       "path": "tools/sync_index_counts.py",
@@ -200,6 +200,30 @@
       "repos": 28,
       "versions": 2,
       "reason": "READ 2026-10-26: indy-llm-wiki's copy is ahead, with tests for stands_with (both stand). The other 27 carry the older test. Not in SHARED, so the newer test never travelled; add it to SHARED with the next rollout."
+    },
+    {
+      "path": ".claude/skills/xco-voice/SKILL.md",
+      "repos": 18,
+      "versions": 2,
+      "reason": "READ 2026-11-09. Hand-copied to the 17 xCO wikis, deliberately not in the shared layer (see the skill's own 'How it travels'). The 17 carry the 30 October wording, that the Dm guide reaches Dm wikis only. ocean-studio-wiki also holds a copy, with the earlier wording ('takes the place dm-style-guide holds in other wikis'). It is not one of the 17, so the copy-round missed it. Bringing it up to date is the owner's yes in his wiki; doing so takes the count to 1."
+    },
+    {
+      "path": ".claude/skills/learning-update/SKILL.md",
+      "repos": 2,
+      "versions": 2,
+      "reason": "READ 2026-11-09. Prateek's skill for the Risk Intelligence Lab's Notion page, written in prateek-llm-wiki (#748, 31 October) and copied into risk-lab-wiki (#19, 1 November) with 'Prateek' changed to 'the person running it', because the team runs it there. One skill, two voices by design: owner's own, BY ROLE."
+    },
+    {
+      "path": "design/definitions-replaced.json",
+      "repos": 2,
+      "versions": 2,
+      "reason": "READ 2026-11-09. Prateek's agreed-definitions list, in his own wiki and in ocean-studio-wiki. Each wiki lists its own replaced terms (his: the Paraglacial Transition Facility is an idea, not an option; Ocean Studio's: keystone, from the 5 November decision). Per-wiki content, BY ROLE."
+    },
+    {
+      "path": "tools/check_definitions.py",
+      "repos": 2,
+      "versions": 2,
+      "reason": "READ 2026-11-09. The check that reads design/definitions-replaced.json, in prateek-llm-wiki (#770, 3 November) and ocean-studio-wiki. Ocean Studio's copy says the source of truth moved to the Agreed Wording pages in Notion on 6 November and this file is their mirror; his wiki's copy predates that. Owner's own change; whether his wiki takes the newer wording is his call."
     }
   ],
   "_ratchet": "`versions` is the number of variants somebody REVIEWED. --check fails if a path gains one, so recording a path mutes it at a level rather than forever. Entries with \"per_repo\": true are exempt: one variant per repo is their designed state, so the count rises whenever a wiki joins and gating on it would fail every onboarding."
