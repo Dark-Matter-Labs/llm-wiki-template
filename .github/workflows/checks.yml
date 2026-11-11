@@ -6,7 +6,8 @@ name: Wiki checks
 on:
   pull_request:
     # labeled/unlabeled: adding or removing approved-removal re-runs the history guard below.
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+    # ready_for_review: a draft is not checked (see the job's `if`), so marking it ready runs the checks once.
+    types: [opened, synchronize, reopened, labeled, unlabeled, ready_for_review]
   push:
     branches: [main]
   workflow_dispatch:
@@ -32,9 +33,14 @@ jobs:
     # A merge to main was already checked as its proposal, so the push of the merge is skipped: re-checking it
     # cost about 4,200 Actions minutes a month and only re-reported proposals merged while red (measured
     # 26 Oct 2026). A direct push to main is still checked.
+    #
+    # A draft proposal is not checked (11 Nov 2026). Long sessions pushed to an open proposal after almost every
+    # step, and each push ran every check again: 302 of 642 proposal runs in early November, about 28% of all
+    # minutes. A draft cannot be saved, so it loses nothing; marking it ready runs the checks once, on the final work.
     if: >-
-      github.event_name != 'push' ||
-      !(startsWith(github.event.head_commit.message, 'Merge pull request #') || contains(github.event.head_commit.message, ' (#'))
+      (github.event_name != 'pull_request' || !github.event.pull_request.draft) &&
+      (github.event_name != 'push' ||
+      !(startsWith(github.event.head_commit.message, 'Merge pull request #') || contains(github.event.head_commit.message, ' (#')))
     steps:
       - name: Checkout
         uses: actions/checkout@v7
