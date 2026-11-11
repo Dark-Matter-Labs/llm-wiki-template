@@ -12,5 +12,9 @@ Before you push a draft:
 4. Fix what it reports, then commit all of the work.
 5. Push once, and open the proposal.
 
-Push again only to fix what the checks found on GitHub. Do not push work in progress to an open proposal.
+If you open a proposal before the work is finished, open it as a draft (`gh pr create --draft`). The checks
+do not run on a draft. When the work is done, mark it ready (`gh pr ready`), which runs them once. Do this
+before you ask "Shall I merge this?": a draft cannot be saved.
+
+Push again only to fix what the checks found on GitHub. Do not push work in progress to a proposal that is ready.
 Never re-run a check by hand to see it pass. Save shared changes for the weekly rollout unless they are urgent.
