@@ -193,7 +193,7 @@
     ".claude/skills/design-critic/checklist.md": "ebf0f47dff5a37d46689c06fe7792a27400cb2a49f719f2d145becc54c020f23",
     "tools/weekly_digest.py": "14e0d37acd4bd551985c1a5d373e0161216b327cf281365c2362c77250508cfb",
     "tools/test_weekly_digest.py": "33e0d10314a32610fabf84653bddf0289ddd868a1fbc1f450082ad1c7fbeb8de",
-    ".github/workflows/weekly-digest.yml": "2a608572ae4ec797cb5ba0c0c531b897fb0e05e1f7d0e952dbf4db2b49628718",
+    ".github/workflows/weekly-digest.yml": "f0e863195bd14499ebbf174640db2b23b634c2cdf35fc88a32cb67b214005a06",
     "tools/share_packet.py": "32ce5a928e7659dbc924fac30047152ed1b1cb0b0e7de01a726f2bb268ca72f2",
     ".claude/skills/imagine/SKILL.md": "fe352dc026a812b1891c8f061ea264817fde3ca8f105a2d54cdc3a2f8f85849e",
     ".claude/skills/imagine/noise.py": "259a15aedb1af4a9a4042407f11997013399c07b5e27f5320aa5bb03eaa0d5dd",
