@@ -4,8 +4,8 @@ name: Weekly digest
 # what moved in this wiki in the last seven days, counted by tools/weekly_digest.py from the
 # wiki's own history. No model and no API key, so it runs in every wiki.
 #
-# It opens a proposed change and never saves to main. A week in which no page moved writes
-# nothing and opens nothing. One short job: about a minute a run.
+# It opens a proposed change and never saves to main, and closes last week's if it was never saved.
+# A week in which no page moved writes nothing and opens nothing. One short job: about a minute a run.
 on:
   schedule:
     - cron: "0 6 * * 4"
@@ -124,7 +124,17 @@ jobs:
               echo "empty, because GitHub runs no checks on a proposal opened by github-actions[bot]."
             fi
           } > /tmp/pr-body.md
-          gh pr create --base main --head "$BRANCH" --title "Weekly digest, week ending ${WEEK}" --body-file /tmp/pr-body.md
+          NEW_URL=$(gh pr create --base main --head "$BRANCH" --title "Weekly digest, week ending ${WEEK}" --body-file /tmp/pr-body.md)
+          echo "$NEW_URL"
+          # Only the latest digest waits for a yes. Unsaved ones piled up in eight wikis by 16 November
+          # 2026 and hid the proposals that matter. A closed one can be reopened from its page, and any
+          # week can be rebuilt with weekly_digest.py --week-ending.
+          OLD=$(gh pr list --state open --limit 50 --json number,headRefName \
+                  -q ".[] | select(.headRefName | startswith(\"digest/\")) | select(.headRefName != \"${BRANCH}\") | .number")
+          for N in $OLD; do
+            gh pr close "$N" --comment "Replaced by this week's digest: ${NEW_URL}. Only the latest digest waits for a yes. This one can be reopened here if you still want it saved." || \
+              echo "::warning::could not close the earlier digest #${N}"
+          done
 
       - name: Fail if the digest did not pass the checks
         if: steps.write.outputs.written == 'true' && steps.gates.outputs.failed == '1'
