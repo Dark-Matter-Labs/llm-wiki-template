@@ -33,14 +33,15 @@ Nothing goes into your wiki without you saying yes.
 Just two things:
 
 1. **A GitHub account** that can open this wiki. If you can see this page, you have one.
-2. **Claude**, at **[claude.ai/code](https://claude.ai/code)**. Open it in your browser, pick this wiki,
-   and start typing. There's nothing to install.
+2. **Claude**, in the **Claude desktop app**. Open its **Code** tab, pick this wiki, and start typing.
+   Most people here work this way. If you'd rather not install anything, the same thing runs in a web
+   browser at [claude.ai/code](https://claude.ai/code).
 
 ---
 
 ## Your first ten minutes
 
-Open [claude.ai/code](https://claude.ai/code), pick this wiki, and try one of these:
+Open the Code tab in the Claude desktop app, pick this wiki, and try one of these:
 
 > *"Catch me up."*
 > *"What does this wiki say about \<something you care about\>?"*
