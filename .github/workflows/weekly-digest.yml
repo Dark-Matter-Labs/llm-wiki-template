@@ -18,6 +18,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write   # to start the wiki's checks on the proposal (see "Open the proposal")
 
 concurrency:
   group: weekly-digest
@@ -80,8 +81,7 @@ jobs:
             echo "written=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # GitHub runs no checks on a proposal opened by github-actions[bot], so the gates that
-      # read a page run here, and the proposal says how they went.
+      # The gates that read a page run here too, so the proposal can say at once how they went.
       - name: Check the digest
         id: gates
         if: steps.write.outputs.written == 'true'
@@ -120,12 +120,16 @@ jobs:
             if [ "${GATES_FAILED}" = "1" ]; then
               echo "**The digest does not pass this wiki's page checks.** The run page says which."
             else
-              echo "The page checks were run on it before this was opened, and passed. The Checks tab below stays"
-              echo "empty, because GitHub runs no checks on a proposal opened by github-actions[bot]."
+              echo "The page checks were run on it before this was opened, and passed. The wiki's full checks"
+              echo "are started on it too, so it can be saved like any other proposal."
             fi
           } > /tmp/pr-body.md
           NEW_URL=$(gh pr create --base main --head "$BRANCH" --title "Weekly digest, week ending ${WEEK}" --body-file /tmp/pr-body.md)
           echo "$NEW_URL"
+          # GitHub starts no checks for a proposal this job opens, and main needs "checks" to pass, so the
+          # digest could only be saved by an admin skipping them (19 Nov 2026). Starting checks.yml by hand
+          # is the one way this job's token may start another workflow; its result shows on the proposal.
+          gh workflow run checks.yml --ref "$BRANCH" || echo "::warning::could not start the checks; run Wiki checks on ${BRANCH} by hand"
           # Only the latest digest waits for a yes. Unsaved ones piled up in eight wikis by 16 November
           # 2026 and hid the proposals that matter. A closed one can be reopened from its page, and any
           # week can be rebuilt with weekly_digest.py --week-ending.
