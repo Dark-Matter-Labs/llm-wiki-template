@@ -33,9 +33,9 @@ hidden prompt in their own terminal. Claude works from the tool's report, which 
    removed lines hold the value. Write the proposed change's description from the tool's report only.
 6. **A past day's log** changed by this fails the history guard. Only a person adds the `approved-removal`
    label. Never add it yourself.
-7. **Say what is still to do**, in this order: rotate a secret; rebuild and lock the lens (it is encrypted, so
-   the tool cannot search it); run the same in any wiki or commons that received a copy; git history still holds
-   the old text, and rewriting it is an admin's decision.
+7. **Say what is still to do**, in this order: rotate a secret; where this wiki has a lens, rebuild and lock it
+   (it is encrypted, so the tool cannot search it); run the same in any wiki or commons that received a copy; git
+   history still holds the old text, and rewriting it is an admin's decision.
 8. **Log it** without the value: `## [YYYY-MM-DD] repair | retraction: N copies in M files`.
 
 ## Hard rules
@@ -51,4 +51,4 @@ hidden prompt in their own terminal. Claude works from the tool's report, which 
 - `tools/retract.py` and its test.
 - `publish-check` and `tools/scan_public_leaks.py` find what should not be public. This removes it.
 - `tools/check_history.py`: the history guard that a past log's change must pass.
-- `lens-refresh`: to rebuild and lock the lens afterwards.
+- `lens-refresh`, in a wiki with a lens: to rebuild and lock it afterwards.
