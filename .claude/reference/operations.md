@@ -31,6 +31,7 @@ In plain-English terms, here is when each fires:
 | "share this with the team", "contribute this", "propose this to the commons" | `contribute` |
 | "share this with Michelle", "send this page to <person>" (one person's own wiki, private) | `contribute`, with `--to-person` |
 | "add a contact", "log that meeting", "met X today", "what follow-ups are due", "who do we know at…", "who haven't we spoken to", "funder pipeline", "prep me for my meeting with…" | `crm` (with `tools/crm.py`) |
+| "does anyone on the team know X?", "share X's card with the team", "stop sharing X" | `crm` (with `tools/who_knows.py`) |
 | "check new requests", "assess this request", "what came in for Indy" | `inbound` (private; drafts only, never sends) |
 | "find leads", "lead generation", "who should we approach about…", "who funds…" | `leads` |
 | "cross-check this", "get a second opinion", "what would another model say" | `cross-check` |
@@ -51,7 +52,7 @@ In plain-English terms, here is when each fires:
 | "are my sources still current", "has this page changed", "refresh the sources" | `source-refresh` |
 | "something leaked", "remove this everywhere", "retract this", "I pasted a password" | `retract` |
 | "run the INO check", "is this inquiry-native", "does this know what it's testing" — and before a theory of change, proposal, brief, deck or published page leaves the wiki | `ino-check` |
-| "refresh the lens", "the lens doesn't show my new page", "relock the lens" | `lens-refresh` |
+| "refresh the lens", "the lens doesn't show my new page", "relock the lens" | `lens-refresh` (only in a wiki with a lens) |
 | "set up my customisations", "use Rooms in my wiki", and when `waiting.py` names a customisation | `customise` |
 | "make a pre-read for…", "a one-pager for…", "brief them before Thursday" | `pre-read` |
 | "add this style guide", "capture our visual guide", "which style guide do we use" | `visual-guide` |
