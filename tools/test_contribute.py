@@ -233,6 +233,8 @@ def main():
         write(wiki, "self-page", "A Self Validated Page", vis="internal", val="self",
               extra="validated_by: [Indy]\nvalidated_at: 2026-09-01\n")
         write(wiki, "self-unnamed", "Self With Nobody Named", vis="internal", val="self")
+        write(wiki, "self-default", "A Default Self Page", vis="internal", val="self",
+              extra="validated_by: [Indy]\nvalidated_at: 2026-11-19\nvalidation_note: default\n")
         write(wiki, "odd-tier", "An Odd Tier Page", vis="Private")
         # a private title hidden in a YAML comment — the reason frontmatter is rebuilt
         write(wiki, "sneaky", "Sneaky", vis="internal",
@@ -300,6 +302,8 @@ def main():
               self_text.split("---")[1][-160:])
         check("self with nobody named is re-based to machine, never passed on unbacked",
               val_of("self-unnamed") == "machine", f"got {val_of('self-unnamed')}")
+        check("a default self lands as machine: nobody there has stood behind it",
+              val_of("self-default") == "machine", f"got {val_of('self-default')}")
         try:
             build(["odd-tier"]); ok = False; why = "no error raised"
         except ValueError as e:

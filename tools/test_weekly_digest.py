@@ -115,6 +115,27 @@ def main():
     finally:
         wd.contribute.commons_titles = real
 
+    # Private pages that look like a shared wiki's material: named only to their owner, never offered up.
+    real_profile = wd.share_hint.commons_profile
+    wd.share_hint.commons_profile = lambda name: {"titles": {"open page"}, "tags": {"team-topic"}}
+    try:
+        priv = {"slug": "draft", "title": "Private Draft", "visibility": "private",
+                "outbound_links": ["Open Page"], "tags": ["team-topic"]}
+        crm = {"slug": "crm/contacts/x", "title": "A Contact", "visibility": "private",
+               "outbound_links": ["Open Page"], "tags": ["team-topic"]}
+        opn = {"slug": "shared-note", "title": "Shared Note", "visibility": "internal",
+               "outbound_links": ["Open Page"], "tags": ["team-topic"]}
+        nodes = {"draft": priv, "crm/contacts/x": crm, "shared-note": opn}
+        got = wd.could_open(["draft", "crm/contacts/x", "shared-note"], nodes, {"contributes_to": ["team"]})
+        check("a private page that looks like team material is named to its owner", got, [{"commons": "team", "pages": ["Private Draft"], "more": 0}])
+        rendered = wd.render({"week_ending": "2026-11-19", "since": "2026-11-13",
+                              "visibility": "private", "added": [], "changed": [], "hunches": [], "commitments_due": [],
+                              "questions": [], "quiet": False, "proposals": [], "worth_sharing": [], "could_open": got})
+        check("the digest says it stays private unless the owner says otherwise",
+              "they stay here" in rendered and "Private Draft" in rendered, True)
+    finally:
+        wd.share_hint.commons_profile = real_profile
+
     print()
     if FAILURES:
         print(f"{len(FAILURES)} failed")
