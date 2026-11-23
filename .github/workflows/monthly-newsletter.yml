@@ -29,7 +29,8 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  id-token: write        # required by claude-code-action for OIDC auth
+  # No `id-token: write` since 2026-11-20: the model step is handed this job's own token (below), so the action no
+  # longer swaps an identity for the organisation-wide Claude app's token, which can also change workflows.
 
 concurrency:
   group: monthly-newsletter
@@ -139,14 +140,22 @@ jobs:
       # Hardened 2026-09-29 (federation review). This step reads ingested text, which a
       # stranger may have written, so it runs as if that text were hostile: the action is
       # pinned to a commit rather than a tag that can move, the shell reaches only this
-      # repo's own tools and read-only git, edits reach only wiki/, the web tools are off,
-      # and checkout leaves no write credential on disk. The commit step refuses the run if
-      # anything outside wiki/ changed. A person still reviews the PR before it merges.
+      # repo's own named tools (the seven the skill uses, not every file under tools/, and no git:
+      # `python3 tools/*` also matched `tools/../wiki/x.py`, and `git log --output=` writes a file),
+      # edits reach only wiki/, the web tools are off, and checkout leaves no write credential on
+      # disk. The commit step refuses the run if anything changed except the issue, today's log
+      # entry and the generated index files. A person still reviews the PR before it merges.
       - name: Write the issue
         if: steps.guard.outputs.enabled == 'true'
         uses: anthropics/claude-code-action@8ce9314fa9a404564fa7e954cd84f25bcba2b829  # v1, pinned 2026-09-29
+        env:
+          # Programs the model starts (its shell, the wiki's own tools) do not inherit the API key or any token.
+          # Added 2026-11-20 after the security audit: a poisoned page should find nothing to send anywhere.
+          CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: "1"
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # This job's own token: this repository only, gone when the job ends, and unable to change workflows.
+          github_token: ${{ github.token }}
           # MODEL AND BUDGET ARE PINNED, because neither was, and the default is the
           # most expensive configuration on offer. Left alone the action resolves to
           # `claude-opus-5[1m]` — Opus with a one-million-token context — which is what
@@ -167,7 +176,7 @@ jobs:
           # default. Three dollars because $2 left fifteen per cent of headroom, and a
           # run cut off mid-write is worse than a slightly dearer one. The other nine
           # wikis are between 12 and 676 pages, so the cap will not bind on any of them.
-          claude_args: --model claude-sonnet-5-5 --max-budget-usd 3 --allowedTools "Bash(python3 tools/*),Bash(git log*),Bash(git status*),Read,Glob,Grep,Edit(wiki/**),Write(wiki/**)" --disallowedTools "WebFetch,WebSearch"
+          claude_args: --model claude-sonnet-5-5 --max-budget-usd 3 --allowedTools "Bash(python3 tools/newsletter.py*),Bash(python3 tools/learning_outcomes.py*),Bash(python3 tools/sync_log_index.py*),Bash(python3 tools/gates.py*),Bash(python3 tools/check_prose.py*),Bash(python3 tools/house_rules.py*),Bash(python3 tools/search.py*),Read,Glob,Grep,Edit(wiki/**),Write(wiki/**)" --disallowedTools "WebFetch,WebSearch"
           prompt: |
             Run the `newsletter` skill for ${{ steps.gather.outputs.month }}. The gathered
             material is at /tmp/material.json and `python3 tools/newsletter.py --json` will
@@ -300,12 +309,15 @@ jobs:
           # still a value reaching a branch name, so it is checked here too.
           printf '%s' "$MONTH" | grep -qE '^[0-9]{4}-(0[1-9]|1[0-2])$' || {
             echo "::error::unexpected month value from the gather step"; exit 1; }
-          # Only wiki/ may change (review, 2026-09-29). The model step can edit files, and
-          # an edit to tools/*.py would run through the allowed shell pattern; this refuses
-          # the run rather than committing anything written outside the wiki.
-          OUTSIDE=$(git status --porcelain --untracked-files=all | awk '{print $NF}' | grep -v '^wiki/' || true)
+          # Only the issue, today's log entry and the generated index files may change (2026-11-20; before
+          # that, anything under wiki/, review of 2026-09-29). The model reads pages other people and other
+          # wikis wrote, so an instruction hidden in one could have it edit any page, such as turning
+          # `visibility: private` into `public`. This refuses the run rather than committing that.
+          TODAY=$(date -u +%F)
+          ALLOWED="^wiki/(newsletter/${MONTH}\\.md|log/${TODAY}\\.md|log/[0-9]{4}-[0-9]{2}\\.md|log\\.md|index\\.md|index/[a-z0-9-]+\\.md)$"
+          OUTSIDE=$(git status --porcelain --untracked-files=all | awk '{print $NF}' | grep -vE "$ALLOWED" || true)
           if [ -n "$OUTSIDE" ]; then
-            echo "::error::the model step changed files outside wiki/, so nothing is committed:"
+            echo "::error::the model step changed files other than the issue, today's log and the index, so nothing is committed:"
             echo "$OUTSIDE"
             exit 1
           fi

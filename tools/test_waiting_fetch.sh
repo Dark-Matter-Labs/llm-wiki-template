@@ -57,7 +57,8 @@ chk(){ if [ "$2" = "$3" ]; then echo "  PASS  $1"; else echo "  FAIL  $1"; echo 
 
 run_case(){ # $1=dir  rest=env
   d=$(mktemp -d); mkdir -p "$d/bin" "$d/design"
-  printf '#!/bin/sh\nfor a in "$@"; do case "$a" in https://*) echo "CLONE ${a##*@}";; esac; done\nexit 0\n' > "$d/bin/git"
+  # The stand-in git reports each clone, and each time the step rewrites a clone's address (to take the token out).
+  printf '#!/bin/sh\nkind=OTHER\nfor a in "$@"; do case "$a" in clone) kind=CLONE;; set-url) kind=SCRUB;; esac; done\nfor a in "$@"; do case "$a" in https://*) if [ "$kind" = CLONE ]; then echo "CLONE ${a##*@}"; else echo "$kind $a"; fi;; esac; done\nexit 0\n' > "$d/bin/git"
   chmod +x "$d/bin/git"
   [ -n "${FED:-}" ] && printf '%s' "$FED" > "$d/design/federation.json"
   ( cd "$d" && PATH="$d/bin:$PATH" GITHUB_REPOSITORY="Dark-Matter-Labs/indy-llm-wiki" \
@@ -73,8 +74,10 @@ chk "says why" "$(printf '%s' "$out" | grep -c 'COMMONS_READ_TOKEN not set')" "1
 echo "2. two declared commons — both fetched"
 out=$(TOKEN=tok FED='{"contributes_to":["xco-team-wiki","power-project-wiki"]}' run_case)
 chk "clones two" "$(printf '%s' "$out" | grep -c CLONE)" "2"
-chk "the first" "$(printf '%s' "$out" | grep -c 'github.com/Dark-Matter-Labs/xco-team-wiki.git')" "1"
-chk "the second" "$(printf '%s' "$out" | grep -c 'github.com/Dark-Matter-Labs/power-project-wiki.git')" "1"
+chk "the first" "$(printf '%s' "$out" | grep -c '^CLONE github.com/Dark-Matter-Labs/xco-team-wiki.git')" "1"
+chk "the second" "$(printf '%s' "$out" | grep -c '^CLONE github.com/Dark-Matter-Labs/power-project-wiki.git')" "1"
+chk "each clone's address is rewritten afterwards" "$(printf '%s' "$out" | grep -c '^SCRUB https://github.com/Dark-Matter-Labs/')" "2"
+chk "and the rewritten address holds no token" "$(printf '%s' "$out" | grep '^SCRUB' | grep -c -e '@' -e 'tok')" "0"
 
 echo "3. a commons that feeds nobody — nothing to fetch"
 out=$(TOKEN=tok FED='{"contributes_to":[]}' run_case)
@@ -92,7 +95,9 @@ d=$(mktemp -d); mkdir -p "$d/bin" "$d/design"
 printf '#!/bin/sh\nfor a in "$@"; do case "$a" in https://*) echo "CLONE ${a##*@}";; esac; done\nexit 0\n' > "$d/bin/git"; chmod +x "$d/bin/git"
 printf '%s' '{"contributes_to":["xco-team-wiki","power-project-wiki"]}' > "$d/design/federation.json"
 out=$( cd "$d" && PATH="$d/bin:$PATH" GITHUB_REPOSITORY="Dark-Matter-Labs/indy-llm-wiki" TOKEN=tok COMMONS="" bash -c "$MUT" 2>&1 ); rm -rf "$d"
-chk "mutant fetches one where the real one fetches two" "$(printf '%s' "$out" | grep -c CLONE)" "1"
+# This stand-in reports every address it is handed, so the address rewrite after the clone counts too:
+# count the distinct wikis reached, not the lines.
+chk "mutant fetches one where the real one fetches two" "$(printf '%s' "$out" | grep CLONE | grep -o 'Dark-Matter-Labs/[a-z0-9-]*' | sort -u | wc -l | tr -d ' ')" "1"
 
 echo
 [ "$nbad" = 0 ] && echo "all passed" || echo "FAILURES: $nbad"
