@@ -13,7 +13,10 @@ records, so it costs nothing and runs in the wikis that hold no model key:
   * the questions written on the pages that changed;
   * proposals waiting for a yes (waiting.py);
   * pages that moved this week and could go up to a commons that does not hold them yet
-    (contribution_prompt.candidates, which applies contribute.eligible).
+    (contribution_prompt.candidates, which applies contribute.eligible);
+  * in a personal wiki only, private pages that moved this week and look like a shared wiki's material
+    (share_hint.py). Only the owner reads this page; opening a page stays their decision. Added
+    23 November 2026: most good work never reached a shared wiki because it was private by default.
 
 Sections with nothing in them are left out, and a week in which no page moved writes nothing.
 
@@ -45,6 +48,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import contribute  # noqa: E402
 import contribution_prompt  # noqa: E402
+import share_hint  # noqa: E402
 import export  # noqa: E402
 import open_questions  # noqa: E402
 import staleness  # noqa: E402
@@ -278,7 +282,18 @@ def gather(week_ending, online=True):
     # GitHub is asked only when there is a page to write, and never by the tests.
     m["proposals"] = proposals() if online and not m["quiet"] else None
     m["worth_sharing"] = worth_sharing([nodes[s] for s in sorted(moved) if s in nodes], topo)
+    m["could_open"] = could_open(sorted(moved), nodes, topo) if not commons else []
     return m
+
+
+def could_open(slugs, nodes, topo, top=5):
+    """Private pages that moved this week and look like a shared wiki's material: [{commons, pages, more}].
+    A personal wiki's digest is private, so naming them here tells only their owner."""
+    by = {}
+    for h in share_hint.hints(slugs, nodes=nodes, topo=topo):
+        if h["kind"] == "open first":
+            by.setdefault(h["commons"], []).append(h["title"])
+    return [{"commons": c, "pages": t[:top], "more": max(0, len(t) - top)} for c, t in sorted(by.items())]
 
 
 def long_date(iso):
@@ -333,6 +348,13 @@ def render(m):
         more = f", and {t['more']} more" if t["more"] else ""
         share.append(f"- To `{t['commons']}`: " + ", ".join(f'"{x}"' for x in t["pages"]) + f"{more}.")
     section("Moved this week, and could go up", share)
+    opened = [f"- For `{t['commons']}`: " + ", ".join(f'"{x}"' for x in t["pages"])
+              + (f", and {t['more']} more" if t["more"] else "") + "." for t in m.get("could_open") or []]
+    if opened:
+        opened.append("")
+        opened.append("These are private, so they stay here. If any is team material, say \"mark these for colleagues "
+                      "and share them\": Claude shows who would read them and asks before anything moves.")
+    section("Private, but they look like team material", opened)
     return "\n".join(out).rstrip() + "\n"
 
 

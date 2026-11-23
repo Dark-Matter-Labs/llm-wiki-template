@@ -26,6 +26,7 @@ inherit a consensus it was never party to. So:
 
     machine    -> machine     (nobody has stood behind it anywhere)
     self       -> self        (the author still stands behind it; that travels)
+    self, by default -> machine (`validation_note: default`: the owner never read it through)
     peer       -> self        (re-earn it here)
     collective -> self        (re-earn it here)
 
@@ -444,7 +445,8 @@ def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None, person=Non
         # Validation travels with the names behind it, or not at all. `self` without
         # `validated_by` fails the commons' own schema check, so a stood-behind page used to
         # land red (review, 2026-09-29); one with nobody named was never really stood behind.
-        if rebased != "machine" and not backers:
+        # A default self is Claude's, set at the owner's request. A commons stays at machine until a person there acts.
+        if (rebased != "machine" and not backers) or fm.get("validation_note") == "default":
             rebased = "machine"
         prov = [f"validation: {rebased}"]
         if rebased != "machine":

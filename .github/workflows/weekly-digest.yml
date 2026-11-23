@@ -18,7 +18,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  actions: write   # to start the wiki's checks on the proposal (see "Open the proposal")
+  actions: write   # to approve the proposal's waiting checks run (see "Open the proposal")
 
 concurrency:
   group: weekly-digest
@@ -28,6 +28,9 @@ jobs:
   digest:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # The bookkeeper App's key lives in a `bookkeeper` environment that allows main only, set up so far only in
+    # the wikis whose bookkeeping is derived. Named only there: naming it in any other wiki would create an empty one.
+    environment: ${{ github.ref == 'refs/heads/main' && vars.BOOKKEEPER_APP_ID != '' && 'bookkeeper' || '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -95,10 +98,26 @@ jobs:
           tail -20 /tmp/gates.txt
           echo "failed=$rc" >> "$GITHUB_OUTPUT"
 
+      # GitHub holds the checks of a proposal opened with the job's own token until a person approves them
+      # (19 Nov 2026: seven digests blocked). A proposal opened by the App starts its checks like anyone's.
+      # Asking for pull requests too means that, until the App holds that permission, this step fails and
+      # the job opens the proposal with its own token, as before.
+      - name: Mint the bookkeeper token
+        id: app
+        if: steps.write.outputs.written == 'true' && github.ref == 'refs/heads/main' && vars.BOOKKEEPER_APP_ID != ''
+        continue-on-error: true
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.BOOKKEEPER_APP_ID }}
+          private-key: ${{ secrets.BOOKKEEPER_APP_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
       - name: Open the proposal
         if: steps.write.outputs.written == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          APP_TOKEN: ${{ steps.app.outputs.token }}   # empty without the App: the job's own token is used
           WEEK: ${{ steps.write.outputs.week }}
           GATES_FAILED: ${{ steps.gates.outputs.failed }}
         run: |
@@ -113,23 +132,46 @@ jobs:
           git checkout -b "$BRANCH"
           git add -A wiki
           git commit -m "digest: week ending ${WEEK}"
-          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${BRANCH}"
+          git push "https://x-access-token:${APP_TOKEN:-$GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${BRANCH}"
           {
             echo "This week's digest, counted from the wiki's history with no model. Read it, and say yes to save it."
             echo ""
             if [ "${GATES_FAILED}" = "1" ]; then
               echo "**The digest does not pass this wiki's page checks.** The run page says which."
             else
-              echo "The page checks were run on it before this was opened, and passed. The wiki's full checks"
-              echo "are started on it too, so it can be saved like any other proposal."
+              echo "The page checks were run on it before this was opened, and passed."
+            fi
+            echo ""
+            if [ -n "${APP_TOKEN}" ]; then
+              echo "The wiki's full checks start on it as on any other proposal."
+            else
+              echo "If its full checks show as waiting, someone who can change this wiki approves them here first."
             fi
           } > /tmp/pr-body.md
-          NEW_URL=$(gh pr create --base main --head "$BRANCH" --title "Weekly digest, week ending ${WEEK}" --body-file /tmp/pr-body.md)
+          # Only the opening needs the App: its other calls below keep the job's own token and permissions.
+          NEW_URL=$(GH_TOKEN="${APP_TOKEN:-$GH_TOKEN}" gh pr create --base main --head "$BRANCH" --title "Weekly digest, week ending ${WEEK}" --body-file /tmp/pr-body.md)
           echo "$NEW_URL"
-          # GitHub starts no checks for a proposal this job opens, and main needs "checks" to pass, so the
-          # digest could only be saved by an admin skipping them (19 Nov 2026). Starting checks.yml by hand
-          # is the one way this job's token may start another workflow; its result shows on the proposal.
-          gh workflow run checks.yml --ref "$BRANCH" || echo "::warning::could not start the checks; run Wiki checks on ${BRANCH} by hand"
+          # GitHub holds the checks of a proposal this job opens at "waiting for approval", and main needs
+          # "checks" to pass. A run started by hand does not count for the proposal; approving the waiting one
+          # does (19 Nov 2026). So the job approves its own proposal's run, and says so when it cannot.
+          FOUND=""
+          for _ in 1 2 3 4 5 6; do
+            sleep 10
+            FOUND=$(gh api -X GET "repos/${GITHUB_REPOSITORY}/actions/runs" -f event=pull_request -f branch="$BRANCH" \
+                      -q '.workflow_runs[] | select(.path == ".github/workflows/checks.yml") | "\(.id) \(.conclusion)"' \
+                      | head -1 || true)
+            [ -n "$FOUND" ] && break
+          done
+          RUN="${FOUND%% *}"
+          if [ -z "$RUN" ]; then
+            echo "::warning::no checks run appeared on ${BRANCH}; run Wiki checks on it by hand"
+          elif [ "${FOUND#* }" != "action_required" ]; then
+            echo "The checks run ${RUN} started without waiting; nothing to approve."
+          elif gh api -X POST "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN}/approve" > /dev/null; then
+            echo "Approved the waiting checks run ${RUN}."
+          else
+            echo "::warning::could not approve the waiting checks; a person can approve run ${RUN} on its run page"
+          fi
           # Only the latest digest waits for a yes. Unsaved ones piled up in eight wikis by 16 November
           # 2026 and hid the proposals that matter. A closed one can be reopened from its page, and any
           # week can be rebuilt with weekly_digest.py --week-ending.
