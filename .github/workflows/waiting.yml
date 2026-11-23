@@ -99,6 +99,8 @@ jobs:
             if git clone --depth 1 --branch export \
                  "https://x-access-token:${TOKEN}@github.com/${C}.git" \
                  ".commons/${C##*/}/export" 2>/dev/null; then
+              # The clone's settings keep the address it came from, token included. Take the token out.
+              git -C ".commons/${C##*/}/export" remote set-url origin "https://github.com/${C}.git"
               echo "Fetched the commons export from ${C}."
             else
               echo "::warning::No export branch on ${C} - its checks cannot run."

@@ -53,6 +53,11 @@ jobs:
       - name: Build the export graph
         run: python3 tools/export.py
 
+      - name: Block deploy if sensitive material is on a public surface
+        # Tripwire: fails (and stops the deploy) if any never-public term from
+        # tools/sensitive_terms.txt appears anywhere under docs/. No untrusted input.
+        run: python3 tools/scan_public_leaks.py
+
       - name: Publish the public and shared graphs to an orphan export branch
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -79,11 +84,6 @@ jobs:
         # The publish above builds the export branch in _publish/. The site checks below scan the working copy,
         # and found the export's text there on the first run (26 Oct 2026), so it goes before they run.
         run: rm -rf _publish
-
-      - name: Block deploy if sensitive material is on a public surface
-        # Tripwire: fails (and stops the deploy) if any never-public term from
-        # tools/sensitive_terms.txt appears anywhere under docs/. No untrusted input.
-        run: python3 tools/scan_public_leaks.py
 
       - name: Block deploy on design-standard errors
         # ERROR-level findings only (missing link preview, a skip link pointing at

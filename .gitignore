@@ -67,3 +67,10 @@ contrib/
 
 # The Needs-you page is built and locked at publish time, never saved in the wiki.
 docs/needs-you/
+
+# Agent session files and saved permission rules. A "yes, don't ask again" can save a whole command,
+# password included, into settings.local.json; the autoharness folder holds per-session counters.
+# Neither belongs in a wiki. (Security audit, 20 November 2026.)
+.claude/settings.local.json
+.claude/autoharness/
+**/.claude/autoharness/

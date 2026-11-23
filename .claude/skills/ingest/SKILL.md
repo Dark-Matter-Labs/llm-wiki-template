@@ -41,7 +41,26 @@ The single most important operation. Done well, the wiki compounds. Done lazily
    **Give exact things a locator.** A figure, a date, a contract term or a quotation is cited
    with where it sits in the source (section, heading or page), so a later answer can read it
    fresh rather than trust the page's copy. Take such details from the source itself, never from
-   another wiki page.
+   another wiki page. For a PDF, the locator always includes the page number.
+
+   **Keep tables, figures and spreadsheets whole.** Added 20 November 2026, after Calvin asked what text-only
+   knowledge loses. Converters lose tables, charts and diagrams most often.
+   - **Tables.** Keep a source's table as a table. Keep its headings and every cell as written. Never merge rows or
+     round numbers.
+   - **Figures.** A diagram, chart or map may carry meaning the text does not. View it. Save it beside the source
+     in `raw/assets/` where you can. On the page, say what it shows in one or two sentences, and cite it.
+   - **What you could not read.** If meaning sits in a figure you cannot read, say so on the page. Name what is
+     missing. Never fill the gap.
+   - **Slides and Docs from Google Drive.** The connector drops their images. Ask the owner to export the file as a
+     PDF, then read its pages as images as well as text.
+   - **Spreadsheets.** Before you copy a figure, check these:
+     1. A blank cell stays blank.
+     2. A literal "NA" or "NULL" is text, not a missing value.
+     3. A whole number keeps its form, with no ".0" added.
+     4. Hidden sheets are named and left out, unless the owner asks for them.
+     5. Say whether you read the formula or the shown value.
+
+     Cite the sheet and the cell. If a converter made the text, check three figures against the original.
 
    **Put each exact thing on its own page.** A contract's terms go on that contract's page, quoted
    word for word. A table comparing several things links to those pages and repeats only what it
@@ -80,16 +99,23 @@ The single most important operation. Done well, the wiki compounds. Done lazily
 
 6. **Update `wiki/overview.md`** if this source shifts the big picture.
 
-7. **Update the catalogue** — add every new page with a **genuinely one-line** summary
-   under the right category. This is mandatory.
+7. **Update the catalogue.**
+   - **In a live wiki** (`design/bookkeeping.json` exists), do not add a row.
+     Write a one-line `description` for the page, 200 characters at most for a new page.
+     The page's type decides its shelf. Set `shelf: <region>` to place it elsewhere.
+     Set `shelf: none` to keep it off the catalogue. The catalogue rebuilds itself after the save.
+   - **Otherwise**, do as follows.
 
-   The index is tiered: `wiki/index.md` is the router, and the rows live on shelves under
-   `wiki/index/` where the wiki has them. A new row goes on its section's shelf. Only a
-   section with no shelf keeps its rows on the router. Every session reads the router, so
-   when a section there grows past a few lines, propose moving it onto a shelf.
-   Then run `python3 tools/sync_index_counts.py` — the counts are computed, never typed.
-   *(That tool carries a router-specific pattern block and so exists only in the wikis whose
-   index is tiered. Where it is absent, the index has no computed counts to sync — skip it.)*
+     Add every new page with a **genuinely one-line** summary under the right category.
+     This is mandatory.
+
+     The index is tiered: `wiki/index.md` is the router, and the rows live on shelves under
+     `wiki/index/` where the wiki has them. A new row goes on its section's shelf. Only a
+     section with no shelf keeps its rows on the router. Every session reads the router, so
+     when a section there grows past a few lines, propose moving it onto a shelf.
+     Then run `python3 tools/sync_index_counts.py` — the counts are computed, never typed.
+     *(That tool carries a router-specific pattern block and so exists only in the wikis whose
+     index is tiered. Where it is absent, the index has no computed counts to sync — skip it.)*
 
    **One line means one line.** The rows drifted to a median of 294 characters and a worst
    case of 4,400 before the split, which is how the catalogue became a second corpus and
@@ -99,7 +125,8 @@ The single most important operation. Done well, the wiki compounds. Done lazily
 8. **Append to the today's log file (`wiki/log/YYYY-MM-DD.md`; see `wiki/log.md`):** `## [YYYY-MM-DD] ingest | <Source Title>` plus a
    one-line note of what it touched (e.g. "new summary + updated 4 entities, 2 concepts").
 
-9. **Regenerate the wiki-context block, then commit.** Once everything is filed and before
+9. **Regenerate the wiki-context block, then commit** (skip the regeneration when
+   `design/bookkeeping.json` exists). Once everything is filed and before
    committing, run `python3 tools/wiki_context.py`, and commit `CLAUDE.md` with the rest if it
    changed. The block in `CLAUDE.md` states the corpus's size, and CI fails the pull request
    when it is stale. An ingest that adds a few dozen pages is exactly what moves it, which is
