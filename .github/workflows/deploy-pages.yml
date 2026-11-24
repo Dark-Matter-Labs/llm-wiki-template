@@ -129,21 +129,25 @@ jobs:
         with:
           path: docs
 
-      # GitHub lists a just-uploaded bundle a moment late. Publishing within a second of the upload found
-      # "0 artifact(s)" and failed about half the time (24 November 2026), so wait until it is listed.
-      - name: Wait until GitHub lists the Pages bundle
-        if: steps.configure.outcome == 'success'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          for i in $(seq 1 30); do
-            n=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?name=github-pages" --jq '.total_count' 2>/dev/null || echo 0)
-            if [ "${n:-0}" -gt 0 ]; then echo "The bundle is listed (check $i)."; sleep 2; exit 0; fi
-            sleep 2
-          done
-          echo "::warning::GitHub has not listed the bundle after a minute; publishing anyway."
-
+      # GitHub's artifact service often reports "0 artifact(s)" for a bundle uploaded seconds earlier (since
+      # 23 November 2026). A miss fails before anything is published, so it is tried again after 30 and 60 s.
       - name: Deploy to GitHub Pages
+        continue-on-error: true   # a miss is tried again below
         id: deployment
         if: steps.configure.outcome == 'success'
+        uses: actions/deploy-pages@v5
+      - name: Wait before the second try
+        if: steps.deployment.outcome == 'failure' && steps.configure.outcome == 'success'
+        run: sleep 30
+      - name: Deploy to GitHub Pages (second try)
+        id: deployment_second
+        if: steps.deployment.outcome == 'failure' && steps.configure.outcome == 'success'
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+      - name: Wait before the third try
+        if: steps.deployment_second.outcome == 'failure' && steps.configure.outcome == 'success'
+        run: sleep 60
+      - name: Deploy to GitHub Pages (third try)
+        id: deployment_third
+        if: steps.deployment_second.outcome == 'failure' && steps.configure.outcome == 'success'
         uses: actions/deploy-pages@v5
