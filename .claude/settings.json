@@ -6,5 +6,19 @@
     "allow": [
       "WebFetch(domain:dark-matter-labs.github.io)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/tools/prepush_check.py\"",
+            "timeout": 600
+          }
+        ]
+      }
+    ]
   }
 }

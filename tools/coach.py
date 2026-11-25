@@ -292,6 +292,15 @@ def suggestions(root=ROOT, today=None, limit=3):
             "them count for more.",
             "What should I stand behind?", "No page carries validation: self, peer or collective.")
 
+    # More fixing than advancing is a cost worth naming (moved here from metacognition's description, 25 Nov 2026).
+    recent = [k for d, k in entries if 0 <= (today - _date(d)).days <= 30]
+    repairs, rebuilds = recent.count("repair"), recent.count("rebuild")
+    if repairs >= 5 and repairs > rebuilds and (root / ".claude" / "skills" / "metacognition" / "SKILL.md").exists():
+        add("metacognition", 25,
+            f"In the last 30 days the log records {repairs} repairs and {rebuilds} rebuilds. More fixing than "
+            "building can mean the way you work costs you time.",
+            "How am I using the wiki?", f"{repairs} repair and {rebuilds} rebuild entries in 30 days.")
+
     last = max((_date(d) for d, _k in entries), default=None)
     if last and (today - last).days >= 7:
         add("catch-up", 20,

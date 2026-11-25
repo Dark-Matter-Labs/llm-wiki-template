@@ -1,6 +1,6 @@
 ---
 name: inquiry
-description: "Bring a live problem to the corpus: Goal, Target, Search, with sourced hypotheses across every readable commons. \"help me think\", \"run an inquiry on\", or hypotheses rather than a summary."
+description: "Bring a live problem to the corpus: Goal, Target, Search, with sourced hypotheses across every readable commons. \"run an inquiry on\", \"what are the hypotheses\"."
 ---
 
 # Inquiry — ask the corpus what to do, not what it says
@@ -86,8 +86,8 @@ material. The default includes everything, because the owner reading their own w
    and `derivation: derivative` or `synthesis` as appropriate. Ask first; then also propose
    whether it should travel up via `contribute`.
 
-7. **Log it.** Append `## [YYYY-MM-DD] query | inquiry: <the question>` to today's log file and
-   run `python3 tools/sync_log_index.py`. It borrows the `query` prefix on purpose: an inquiry is
+7. **Log it.** Append `## [YYYY-MM-DD] query | inquiry: <the question>` to today's log file.
+   Finish as `.claude/rules/pushing.md` and `finishing.md` say. It borrows the `query` prefix on purpose: an inquiry is
    a question asked of the corpus, and the log's greppable prefixes should stay few.
 
 ## Output shape

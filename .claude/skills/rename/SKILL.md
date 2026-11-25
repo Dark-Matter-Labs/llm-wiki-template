@@ -36,10 +36,10 @@ each link changes too.
 7. **Carry it through the text.** Search the wiki for the old name in prose. Change uses that mean the
    thing itself. Keep uses that record history, quote a source, or mean something else.
 8. **Leave the log's past alone.** Past days are never rewritten. Today's file may have its links
-   updated. Append `## [YYYY-MM-DD] rebuild | Renamed <old> to <new>` to today's file, then run
-   `python3 tools/sync_log_index.py`.
-9. **Update the index.** Change the page's one-line row in `wiki/index.md` and in any shelf under
-   `wiki/index/`.
+   updated. Append `## [YYYY-MM-DD] rebuild | Renamed <old> to <new>` to today's file.
+9. **Update the index.**
+   - **In a live wiki** (`design/bookkeeping.json` exists), do not edit the index. The catalogue rebuilds itself after the save, with the new title and description.
+   - **Otherwise,** change the page's one-line row in `wiki/index.md` and in any shelf under `wiki/index/`.
 10. **Check the published copies.** Look under `docs/` for a page built from this one. Change the name
     in its title, headings and links. A slug change moves its address too, and old links stop working.
 11. **Check the shared copies.** Search each commons copy (`.commons/<name>/`) for a page whose
@@ -65,7 +65,7 @@ One draft change and a plain summary, for example:
 > Renamed "<old>" to "<new>". One page moved, 14 links and 3 mentions updated, 2 kept as history. The
 > published page's address changes. A matching change is proposed to the team wiki.
 
-Then ask: "Shall I merge this? That saves it into your wiki."
+Finish as `.claude/rules/pushing.md` and `finishing.md` say.
 
 ## Hard rules
 

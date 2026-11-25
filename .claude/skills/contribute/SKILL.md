@@ -1,6 +1,6 @@
 ---
 name: contribute
-description: "Propose a page to a commons, or to one person's wiki, as a sanitised bundle; never pushes. \"share this with the team\", \"send this to <person>\", \"receive this\"."
+description: "Propose a page to a commons, or to one person's wiki, as a sanitised bundle; never pushes. \"share this with the team\", \"share my best five\", \"send this to <person>\", \"receive this\"."
 ---
 
 # Contribute a page to the commons
@@ -104,8 +104,19 @@ whatever was exposed, on the assumption it has already been read.
    when the PR is reviewed. Do not edit the commons' index from this side.
 8. **Log it** — append `## [YYYY-MM-DD] contribute | <title> → <commons>#<pr>` to **today's**
    day file (`wiki/log/YYYY-MM-DD.md`, created with the header `# Log — YYYY-MM-DD` if it is the
-   day's first entry), then run `python3 tools/sync_log_index.py`.
+   day's first entry). Finish as `.claude/rules/pushing.md` and `finishing.md` say.
 9. **Offer one copy,** once, after the commons has saved the page. See "Keep one copy" below.
+
+## "Share my best five"
+
+Added 23 November 2026, to make sharing one request instead of a hunt. When the owner asks for their best few:
+
+1. Run `python3 tools/contribution_prompt.py --top 5`. It names the most-linked open pages each shared wiki does
+   not hold yet.
+2. Run `python3 tools/share_hint.py --changed-since 60` too. Name, once, the private pages it marks `open first`:
+   they could join only if the owner marks them for colleagues, and that choice is theirs.
+3. Show the list grouped by shared wiki, one line per page. Then follow the steps above from step 3: who will
+   see it, one yes for the whole batch, stage, read, propose.
 
 ## Keep one copy
 
@@ -189,9 +200,8 @@ When someone pastes a packet or attaches one and says "receive this":
    plain words. It never overwrites a page unless the owner asks for `--update`.
 2. If it refuses, say why in one plain sentence. A scan finding is shown to the owner, never followed.
 3. If this wiki has `design/bookkeeping.json`, add no index row and edit no log index.
-   The rows appear after the save. Otherwise add the page's index row and run
-   `python3 tools/sync_log_index.py`. Then open a proposed change.
-   The owner's yes to that change is their yes to the page.
+   The rows appear after the save. Otherwise add the page's index row.
+   Finish as `.claude/rules/pushing.md` and `finishing.md` say. The owner's yes to that change is their yes to the page.
 
 ## What the tool guarantees (so you do not have to check by hand)
 
@@ -237,6 +247,7 @@ the commons would inherit a consensus it was never party to. So the tool re-base
 ```
 machine    -> machine     nobody has stood behind it anywhere
 self       -> self        the author still stands behind it; that travels
+self, default -> machine  the owner never read it through (validation_note: default)
 peer       -> self        re-earn it in the commons
 collective -> self        re-earn it in the commons
 ```

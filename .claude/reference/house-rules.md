@@ -33,6 +33,11 @@ that must be exempt can carry the marker `house-rules: ignore-file`.
   never work as quasi-surveillance on anyone. (An owner querying their own activity in their own
   wiki is fine — the rule protects people from *each other's* queries, and binds hardest
   in the team wiki and every shared instance.)
+- **Validation: self by default, ask on critical, never award `peer` or `collective`** (Gurden,
+  19 November 2026). In a personal wiki, a page written at the owner's request gets `self` with
+  `validation_note: default`. A critical page waits for the owner's yes, and a commons waits for a
+  person there. Team validation goes through the `validation` skill. Never write a verification mark.
+  The full rule is in `.claude/reference/page-fields.md`.
 - **Never modify `raw/`.** Read-only, always.
 - **Never invent sources or citations.** If you don't have a source for a claim,
   either mark it as your own synthesis or say you don't know. Do not fabricate.

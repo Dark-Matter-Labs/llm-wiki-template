@@ -95,7 +95,9 @@ Every page in `wiki/` (except `index.md` and `log.md`) starts with frontmatter: 
 
 - **`visibility`** defaults to `private`. The owner opts a page up. Never guess a page into `public`. Ask the tier
   once per ingest.
-- **`validation`**: you may set `machine` and propose `self`. **Never award `peer` or `collective`.**
+- **`validation`**: in a personal wiki, a page written at the owner's request gets `self` with
+  `validation_note: default`. A critical page (a budget, a commitment, a named person, contested, a decision)
+  stays `machine` until the owner says yes. A commons stays `machine`. **Never award `peer` or `collective`.**
 - **Never write a verification mark** (`{✓ Name YYYY-MM-DD}`). Only a person writes one.
 - **Every factual claim cites its source** inline, e.g. `(raw/ccc-report-2025.pdf)`. Mark your own synthesis as such.
 - **One thing per page.** Quote exact terms, figures and dates word for word on that thing's own page. A table that
@@ -125,7 +127,7 @@ Each skill in `.claude/skills/` says when it fires; read its SKILL.md before run
 add a source, `ingest` · a question, `query` · "check the wiki", `lint` · "catch me up", `brief` · a new idea,
 `office-hours` · "share this with the team", `contribute` · contacts and meetings, `crm` · "what's waiting", `waiting`
 · "what don't we know", `open_questions.py` then `inquiry` · call notes, `call-notes` · "that's done", `my-commitments`
-· a brief for a meeting, `pre-read` · "is this inquiry-native", `ino-check` · "have my sources changed", `source-refresh` · "something leaked", `retract` · "refresh the lens", `lens-refresh` · "set up my customisations", `customise`. If unsure, see `.claude/reference/operations.md`.
+· a brief for a meeting, `pre-read` · "is this inquiry-native", `ino-check` · "have my sources changed", `lint` · "something leaked", `retract` · "refresh the lens", `lens-refresh` · "set up my customisations", `customise`. If unsure, see `.claude/reference/operations.md`.
 If intent is ambiguous, ask **one** short question, then proceed.
 
 - **The Axioms Register** (`wiki/axioms.md`) holds the corpus's foundational assumptions; `joker` and `reflect` read it.

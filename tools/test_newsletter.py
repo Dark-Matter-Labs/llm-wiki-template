@@ -57,6 +57,8 @@ def main():
     check("...and never per person",
           not any("Malik" in str(k) or "Fang" in str(k) for k in got), str(got))
     check("a page dated outside the window is not counted", sum(got.values()) == 3, str(got))
+    check("arrivals are listed alphabetically, not biggest first",
+          list(got) == ["fang-llm-wiki", "malik-llm-wiki"], str(got))
     check("a page with no origin is attributed to this wiki, not to nobody",
           N.arrivals([{"timestamp": "2026-08-02"}], dt.date(2026, 8, 1), dt.date(2026, 8, 31))
           == {"(written here)": 1})
@@ -196,6 +198,23 @@ def main():
     check("a wiki with no goals is left out rather than reported as zero",
           N.goal_vectors({"empty": [{"type": "concept"}]}, dt.date(2026, 8, 1),
                          dt.date(2026, 8, 31)) == {})
+
+    # New in the shared wikis: credit without a scorecard (asked for 23 November 2026).
+    cuts = {"m2m-shared-wiki": [
+        {"timestamp": "2026-08-04", "origin": "zed-llm-wiki", "title": "Deep Codes"},
+        {"timestamp": "2026-08-09", "origin": "ann-llm-wiki", "title": "Beyond the Rules"},
+        {"timestamp": "2026-08-10", "origin": "ann-llm-wiki", "title": "A third"},
+        {"timestamp": "2026-08-11", "title": "Written in the commons"},
+        {"timestamp": "2026-07-12", "origin": "zed-llm-wiki", "title": "Last month"},
+    ]}
+    p = N.shared_pulse(cuts, dt.date(2026, 8, 1), dt.date(2026, 8, 31))
+    check("contributing wikis are credited alphabetically, without counts",
+          p["contributing_wikis"] == ["ann-llm-wiki", "zed-llm-wiki"], str(p))
+    check("the pulse compares the group's month with the last",
+          (p["pages"], p["pages_last_month"], p["wikis"], p["wikis_last_month"]) == (4, 1, 2, 1), str(p))
+    check("new titles are newest first", p["new"]["m2m-shared-wiki"][0] == "Written in the commons", str(p))
+    check("the rendered credit names no counts beside a wiki",
+          "     with thanks to ann-llm-wiki, zed-llm-wiki" in N._render_shared(p))
 
     # Every signal is optional. A wiki without the tool gets a stated blank, never a guess.
     with tempfile.TemporaryDirectory() as tmp:

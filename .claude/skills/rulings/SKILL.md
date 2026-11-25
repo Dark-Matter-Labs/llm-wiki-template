@@ -38,8 +38,8 @@ A ruling said once in chat is lost by the next session. A numbered ruling with i
    Never reuse a number. Never renumber.
 6. **Mark a superseded ruling** in place: "Superseded by ruling M (date)." Keep its text. Never delete it.
 7. **Add the pointer back** in the place it changes.
-8. **Log it:** `## [YYYY-MM-DD] rebuild | Ruling N: <short title>`, then run `python3 tools/sync_log_index.py`.
-9. Open the proposed change, say in one line what the ruling now does, and ask "Shall I merge this? That saves it into your wiki".
+8. **Log it:** `## [YYYY-MM-DD] rebuild | Ruling N: <short title>`.
+9. Say in one line what the ruling now does. Finish as `.claude/rules/pushing.md` and `finishing.md` say.
 
 ## When drafting
 

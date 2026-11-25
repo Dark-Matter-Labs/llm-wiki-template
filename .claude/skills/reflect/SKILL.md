@@ -23,8 +23,11 @@ their order stable.**
 Frontmatter: `type: synthesis`, `title: "Weekly reflection — YYYY-Www"`, timestamp,
 tags `[reflection, weekly]`, and a `visibility` that depends on which kind of wiki this is:
 
+Read which kind it is from `role` in `design/federation.json`: `spoke` is a personal wiki, `commons` a commons.
+A wiki with no `role` is a personal wiki.
+
 - **A personal wiki** → `unlisted`. It can appear on the interface without being publicly indexed.
-- **A commons** (`xco-team-wiki`, `learning-system-wiki`, `power-project-wiki`) → `internal`, the cut
+- **A commons** → `internal`, the cut
   every member reads. `unlisted` would push it into the public export, which in a commons carries
   nothing on purpose. A reflection here is a shared record, not a private notebook: it describes how
   the group's thinking moved, and members who read only this repo are among its readers.
@@ -91,9 +94,13 @@ writing it is the shortcut the whole layer exists to refuse — or **pad the thr
 week is a habit; a backlog is a refusal.
 
 ## After writing
-File it, add it to `index.md`, and log `## [YYYY-MM-DD] reflect | week YYYY-Www` in today's
-day file (`wiki/log/YYYY-MM-DD.md`), then run `python3 tools/sync_log_index.py` so the month
-index picks it up. The index is regenerated, never hand-typed.
+File it, and log `## [YYYY-MM-DD] reflect | week YYYY-Www` in today's day file (`wiki/log/YYYY-MM-DD.md`).
+- **In a live wiki** (`design/bookkeeping.json` exists), do not edit the index.
+  Give the page a one-line `description`. Set `shelf: reflections` if `design/bookkeeping.json` has that region.
+  The catalogue and the month index rebuild themselves after the save.
+- **Otherwise,** add it to `index.md`.
+
+Finish as `.claude/rules/pushing.md` and `finishing.md` say.
 *(Contributed upstream from learning-system-wiki, 2026-09-04.)*
 
 ## Rules

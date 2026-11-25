@@ -60,6 +60,12 @@ PREVIOUS = {
     "Working style": "be5b1351507152a94cc19b1dc67ae68a0e02708a615f95947c5c39218c0af787",
 }
 
+# sha256 of sections as the SECOND compact version (11 November 2026) wrote them, where one changed since. Replaced the
+# same way. 19 November 2026: validation became self by default (page-fields.md).
+SECOND = {
+    "Wiki page conventions": "897b82e32ba1afd42e8470a57ef7a4fbdcfc8e7a3fa28848f35797d5409bc5e9",
+}
+
 
 def sections(text):
     """[(heading, start line, end line)] for each '## ' section outside code fences; it ends before the next heading."""
@@ -109,7 +115,7 @@ def slim(text, compact):
         if body == new:
             rows.append((h, "already compact", len(body.encode()), len(body.encode())))
             continue
-        if digest(body) not in (TEMPLATE.get(h), PREVIOUS.get(h)):
+        if digest(body) not in (TEMPLATE.get(h), PREVIOUS.get(h), SECOND.get(h)):
             rows.append((h, "kept: changed in this wiki", len(body.encode()), len(body.encode())))
             continue
         out += lines[last:a] + (new + ("\n" + tail if tail else "")).split("\n")

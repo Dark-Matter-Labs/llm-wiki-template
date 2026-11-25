@@ -309,7 +309,10 @@ def build(since: datetime.date, until: datetime.date, audience: str = "internal"
                 axiom_moves.append({"axiom": aid, "from": None, "to": status})
 
     # ── STOOD BEHIND ────────────────────────────────────────────────────────────────
-    validations = [n for n in pages if (n.get("validation") in HUMAN)
+    # A default `self` is Claude's, set at the owner's request (page-fields.md). Nobody stood behind it, so it is not
+    # an event. Read from the page, because export.py does not travel and older copies drop the field.
+    defaults = {s for s, _p, fm, _b in export.discover(str(WIKI)) if fm.get("validation_note") == "default"}
+    validations = [n for n in pages if (n.get("validation") in HUMAN) and n.get("slug") not in defaults
                    and in_window(n.get("validated_at"), since, until)]
     marks = 0
     marks_hidden = 0

@@ -40,7 +40,7 @@ or added open questions, and left declared contradictions open.
    Cut catalogue paragraphs, because the index already lists pages. Keep it short, and no longer
    than it was unless the owner asks. Mark your own synthesis as synthesis. Keep every hedge.
 7. **Keep the owner's wording where they stood behind it.** If `validation` is `self`, `peer` or
-   `collective`, do not overwrite. Write each change as a provisional block at its target, as
+   `collective`, do not overwrite. A `self` with `validation_note: default` counts as `machine` here. Write each change as a provisional block at its target, as
    `.claude/rules/plain-register.md` says:
 
    > **[PROVISIONAL / proposed]** <id> · <target> · proposed by <agent> · <date>
@@ -56,10 +56,8 @@ or added open questions, and left declared contradictions open.
    `tools/scan_public_leaks.py`.
 10. **Log it.** Append to today's log:
     `## [YYYY-MM-DD] rebuild | Overview brought up to date with N pages added since <date>`.
-    Add one short paragraph on the new through-lines and questions. Then run
-    `python3 tools/sync_log_index.py`.
-11. **Propose the change.** Put the work on its own branch and open a pull request. In a personal
-    wiki, ask once: "Shall I merge this? That saves it into your wiki". In a commons, propose and stop.
+    Add one short paragraph on the new through-lines and questions.
+11. **Propose the change.** Finish as `.claude/rules/pushing.md` and `finishing.md` say.
 
 ## Output
 
@@ -87,4 +85,4 @@ Tell the owner, in plain words and in this order:
 - `tools/staleness.py`, `tools/dependency_staleness.py`, `tools/contradictions.py` and `tools/search.py`.
 - `brief`: "catch me up" reads the overview first.
 - `publish-check`: run it before a non-private overview is published.
-- `cross-check`: a second model's reading of the new through-lines, if the owner wants one.
+- `lint`, "A second model's read": a second model's reading of the new through-lines, if the owner wants one.

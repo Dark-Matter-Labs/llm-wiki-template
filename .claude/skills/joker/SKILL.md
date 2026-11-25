@@ -66,9 +66,14 @@ sources: []
 
 Body: the orthodoxy named (with axiom links); each rival orthodoxy with its axioms, predictions,
 critique, favouring evidence; then "What we'd have to concede or strengthen"; then optional
-real-world holders/signals. Link the brief from the target page (`[[Joker: …]]`), add it to
-`index.md`, and log `## [YYYY-MM-DD] joker | <target>` in today's day file
-(`wiki/log/YYYY-MM-DD.md`), then run `python3 tools/sync_log_index.py`.
+real-world holders/signals. Link the brief from the target page (`[[Joker: …]]`), and log
+`## [YYYY-MM-DD] joker | <target>` in today's day file (`wiki/log/YYYY-MM-DD.md`).
+- **In a live wiki** (`design/bookkeeping.json` exists), do not edit the index.
+  Give the page a one-line `description`. Set `shelf: challenges` if `design/bookkeeping.json` has that region.
+  The catalogue and the month index rebuild themselves after the save.
+- **Otherwise,** add it to `index.md`.
+
+Finish as `.claude/rules/pushing.md` and `finishing.md` say.
 
 ## Rules
 - Steelman, never strawman. A dishonest rival is worthless to the people holding the position.

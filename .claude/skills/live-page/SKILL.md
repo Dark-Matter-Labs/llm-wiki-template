@@ -1,6 +1,6 @@
 ---
 name: live-page
-description: "Revise a published page: versioning, history line, phone and laptop in light and dark, mirrors in step. \"update the live page\", \"it looks wrong on my phone\"."
+description: "Revise a published page: versioning, history line, phone and laptop in light and dark, mirrors in step. \"update the live page\", \"it looks wrong on my phone\", \"did anything get lost\"."
 ---
 
 # Revise a live page
@@ -49,7 +49,8 @@ designed pages. Gurden verified the pattern on 20 October 2026.
     a commons. Do not edit it. Propose the same change there, through `contribute` or that wiki's own
     route, with the owner's yes.
 11. **Log it.** Append `## [YYYY-MM-DD] rebuild | <page>, v<old> to v<new>` to today's log, with one
-    line on what changed. Run `python3 tools/sync_log_index.py`.
+    line on what changed. If the revision rebuilt the page, add the counts from
+    `.claude/reference/rebuild-parity.md`.
 
 ## Output
 
@@ -57,8 +58,8 @@ One draft change and a short summary, for example:
 > The funding page is now v1.3. It adds the funding timeline. Checked at phone, tablet and laptop
 > width, in light and dark. The team wiki copy has a matching proposed change.
 
-Then ask: "Shall I merge this? That saves it into your wiki." Add one line: the site changes a few
-minutes after GitHub publishes it, and it can lag.
+Finish as `.claude/rules/pushing.md` and `finishing.md` say. Add one line: the site changes a few minutes after
+GitHub publishes it, and it can lag.
 
 ## Hard rules
 
@@ -74,6 +75,7 @@ minutes after GitHub publishes it, and it can lag.
 
 - `publish-web` builds a new published page. This skill revises one.
 - `publish-check` and `tools/scan_public_leaks.py` guard the tier before anything ships.
-- `rebuild-parity` applies when a revision rebuilds the page. Count what went in and what came out.
+- `.claude/reference/rebuild-parity.md` applies when a revision rebuilds the page, and on "did anything get lost".
+  Count what went in and what came out.
 - `contribute` carries a change to a mirror in a commons.
 - `rename` applies when the page's title or address changes.

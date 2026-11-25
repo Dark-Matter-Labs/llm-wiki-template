@@ -383,6 +383,25 @@ def shared_with(fm):
     return {str(x).strip().casefold() for x in (v if isinstance(v, list) else [v]) if str(x).strip()}
 
 
+def unlink_missing(text, known_keys):
+    """[[Title]] and [[Title|words]] whose page the target wiki lacks become plain words.
+
+    Added 25 November 2026: Sofia's Santiago page went red on the commons' own link check
+    because four links pointed at pages only her wiki held. Returns (text, [missing titles]).
+    """
+    missing = []
+
+    def repl(m):
+        target = m.group(1).split("#", 1)[0].strip()
+        if title_key(target) in known_keys:
+            return m.group(0)
+        if target not in missing:
+            missing.append(target)
+        return (m.group(2) or m.group(1)).strip()
+
+    return export.WIKILINK_RE.sub(repl, text), missing
+
+
 def build_bundle(wiki_dir, slugs, contributed_by, rev, existing=None, person=None, origin=None):
     """Return {relpath: text} for the staged contribution, or raise ValueError.
 
@@ -721,6 +740,21 @@ def main(argv=None):
     except ValueError as e:
         print(f"error: {e}", file=sys.stderr)
         return 1
+
+    if theirs is not None and not person:
+        # A link the commons cannot resolve fails its checks after the save; make it plain words now.
+        known = {title_key(t) for t in theirs} | {title_key((export.split_frontmatter(t)[0] or {}).get("title"))
+                                                  for t in bundle.values()}
+        unlinked = set()
+        for rel in bundle:
+            bundle[rel], missing = unlink_missing(bundle[rel], known)
+            unlinked.update(missing)
+        if unlinked:
+            print("note: these links point at pages the commons does not hold, so they are now plain\n"
+                  "      words. Say so in the PR body; contribute those pages too to bring the links back:",
+                  file=sys.stderr)
+            for title in sorted(unlinked):
+                print(f"        {title}", file=sys.stderr)
 
     print(who_will_see(commons, bundle, args.wiki, person=bool(person), packet=args.packet) + "\n",
           flush=True)  # before the refusal below

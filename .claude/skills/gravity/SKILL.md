@@ -1,6 +1,6 @@
 ---
 name: gravity
-description: "Measure the repo's centre of mass and trajectory, and read an input against both. \"what's the gravity\", \"trajectory\", or weekly from reflect. Routes attention, never certifies."
+description: "Measure the wiki's centre of mass and trajectory, and read an input against both. \"what's the gravity\", \"where is this heading\"."
 ---
 
 # Gravity — the wiki's mass and trajectory, measured

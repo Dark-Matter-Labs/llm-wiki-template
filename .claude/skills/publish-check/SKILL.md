@@ -35,7 +35,7 @@ bar, and the bar is easier to hold before the content has left.
    publishing is often not the person who wrote it. Credit the author by name, not the repo.
    If the content draws on external frameworks, other
    people's ideas, or contributors, check they're credited. (If the owner has a house style
-   guide for attribution/licensing, apply it here.)
+   guide for attribution/licensing, apply it here. In a Dm wiki that is the `dm-style-guide` skill.)
 
 6. **Plain-language pass.** Flag jargon that a general reader wouldn't follow, and any
    claim that would land differently out of context.
@@ -67,6 +67,10 @@ bar, and the bar is easier to hold before the content has left.
    one. Read every mention with the owner: leave it, reword it, or rename the private page. A one-word title is
    usually an ordinary word. Never redact mentions in bulk: one private title in indy-llm-wiki is an everyday
    name used in 175 pages that leave the wiki (26 October 2026).
+
+10. **Proportion.** If the page interprets someone else's document, check it against
+   `.claude/reference/source-proportion.md`. Analysis that outgrows its source, or speaks in the author's voice,
+   must not leave the wiki.
 
 ## Output
 

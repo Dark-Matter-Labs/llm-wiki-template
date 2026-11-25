@@ -1,6 +1,6 @@
 ---
 name: notion-sync
-description: "Reconcile the wiki with the xCO Notion workspace. \"do the notion sync\", \"update the tracker\", or after an ingest that changes the option book or a goal. Read-only unless a write is named first."
+description: "Reconcile the wiki with the xCO Notion workspace. \"do the notion sync\", \"update the tracker\"."
 ---
 
 # Reconcile the wiki with Notion
@@ -90,6 +90,8 @@ looks wrong against the book, report the disagreement — do not resolve it by p
 
 ## Hard rules
 
+- **Read-only unless a write is named first.** Run it on "do the notion sync", "update the tracker", or after
+  an ingest that changes the option book or a goal.
 - **No figures into Notion.** The 2026-09-04 decision, above.
 - **Nothing `private` crosses**, and the CRM never crosses at all.
 - **Never guess the join.** No `Wiki page` means no link, not a plausible one.

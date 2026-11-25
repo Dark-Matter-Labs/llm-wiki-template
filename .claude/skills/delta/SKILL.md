@@ -1,6 +1,6 @@
 ---
 name: delta
-description: "Measure where an incoming document agrees with, extends or contradicts the wiki. \"run a delta\", \"where does this sit\", or before ingesting someone else's paper. A signal, never a merge."
+description: "Measure where an incoming document agrees with, extends or contradicts the wiki. \"run a delta\", \"where does this sit\", or before ingesting someone else's paper."
 ---
 
 # Delta — movement between a document and the wiki's position
@@ -67,7 +67,7 @@ the contact ledger (which pages and axioms it touches, and how). Use both when i
    corpus. Delta only surfaces the movement.
 
 8. **Log it.** Append `## [YYYY-MM-DD] delta | <document> vs the wiki` with a one-line reading to
-   today's day file (`wiki/log/YYYY-MM-DD.md`), then run `python3 tools/sync_log_index.py`.
+   today's day file (`wiki/log/YYYY-MM-DD.md`). Finish as `.claude/rules/pushing.md` and `finishing.md` say.
 
 ## Delta brief structure (keep stable — deltas will be compared across documents and, later, wikis)
 

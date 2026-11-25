@@ -1,6 +1,6 @@
 ---
 name: coach
-description: "Suggest the one useful next thing. Fires at session start after the waiting check and after a finished task, and on \"what can you do\", \"any tips\". \"Fewer tips\" turns it down."
+description: "Suggest the one useful next thing from the wiki's own signals. \"what can you do\", \"any tips\", \"fewer tips\"."
 ---
 
 # Coach: suggest the next useful thing
@@ -28,6 +28,7 @@ it writes nothing. `--all` lists everything, `--json` for reading it yourself.
 | the overview more than 14 days behind the newest page | update it | "Update the overview." |
 | no health check in 21 days | run one | "Check the wiki." |
 | no page with a person's name behind it | stand behind a few | "What should I stand behind?" |
+| more repairs than rebuilds in the log in 30 days, where the wiki has `metacognition` | look at how the wiki is used | "How am I using the wiki?" |
 | no work recorded in 7 days | catch up | "Catch me up." |
 | nothing needs attention | one tip, rotating daily | (in the tip) |
 
@@ -50,7 +51,7 @@ question, in the same message, as one line.
 | a source was ingested | ask a question of it; or share it with the team, if it is labelled for colleagues |
 | an answer, summary or map someone else would want to read | make it a shareable page (an artifact) |
 | several ingests since the last health check | "check the wiki" |
-| a synthesis or strong position was written | "challenge this", or a second opinion ("cross-check this") |
+| a synthesis or strong position was written | "challenge this", or a second opinion ("cross-check this", in `lint`) |
 | someone else's paper or report came in | "run a delta" on it |
 | a meeting was discussed | log it with the `crm` skill, if this wiki has one |
 | the person is weighing a new idea | "help me think through this" (`office-hours`) |
@@ -98,5 +99,5 @@ artifacts, say so and offer the alternative.
 - `.claude/rules/finishing.md`: opens every session with what is waiting, and ends work with "Shall I
   merge this?". This skill adds one next step to both.
 - The `waiting` skill: the authoritative account of unsaved work.
-- The `lint`, `brief`, `joker`, `cross-check`, `delta`, `office-hours`, `contribute` and `publish-web`
+- The `lint`, `brief`, `joker`, `delta`, `office-hours`, `contribute` and `publish-web`
   skills: most suggestions point at one of them.

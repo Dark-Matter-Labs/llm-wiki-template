@@ -102,6 +102,27 @@ def main():
           ("visibility: internal" in page, "It names no private page." in page), (True, True))
     check("no [[links]] are written", "[[" in page, False)
 
+    # --- the Slack version names no private page (24 November 2026) ------------------
+    sm = {"week_ending": "2026-11-23", "since": "2026-11-17", "visibility": "private",
+          "added": [{"title": "Open Page", "type": "concept", "description": "", "visibility": "internal"},
+                    {"title": "Secret Plan", "type": "concept", "description": "", "visibility": "private"}],
+          "changed": [{"title": "No Tier Given", "type": "entity", "description": ""}],
+          "hunches": [{"hunch": "Private hunch text", "serves": ""}],
+          "commitments_due": [{"due": "2026-11-25", "commitment": "Private commitment text"}],
+          "questions": [{"page": "Secret Plan", "items": ["Private question?"], "more": 1}],
+          "proposals": [{"number": 1}], "worth_sharing": [{"commons": "team", "pages": ["Open Page"], "more": 0,
+                                                          "held_unknown": False}],
+          "could_open": [{"commons": "team", "pages": ["Secret Plan"], "more": 0}]}
+    text = wd.render_slack(sm, "gurden-llm-wiki")
+    check("Slack names an open page", '"Open Page"' in text, True)
+    check("Slack never names a private page, or one with no tier",
+          any(x in text for x in ("Secret Plan", "No Tier Given")), False)
+    check("Slack says how many were left unnamed", "2 of them private and not named here" in text, True)
+    check("hunch, commitment and question text stays out of Slack, only counted",
+          (any(x in text for x in ("Private hunch", "Private commitment", "Private question")),
+           "1 hunch added" in text, "1 commitment due" in text, "2 open questions" in text), (False, True, True, True))
+    check("private team material is counted, not named", "1 private page looks like team material" in text, True)
+
     # --- worth sharing: never guessed --------------------------------------------
     real = wd.contribute.commons_titles
     try:

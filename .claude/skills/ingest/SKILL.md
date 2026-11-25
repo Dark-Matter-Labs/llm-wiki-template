@@ -1,6 +1,6 @@
 ---
 name: ingest
-description: "Add a new source: summary page, then cascade to every entity, concept, index and log entry it touches. \"add this\", \"ingest\", or a document dropped into raw/."
+description: "Add a new source: summary page, then cascade to every entity, concept, index and log entry it touches. \"add this\", \"ingest\", \"am I over-reading this\", or a document dropped into raw/."
 ---
 
 # Ingest a source
@@ -78,7 +78,9 @@ The single most important operation. Done well, the wiki compounds. Done lazily
 4. **Write the summary page** at `wiki/<slug>-summary.md` with full frontmatter
    (`type: summary`, `visibility:` set from step 3, the source in `sources:`, a
    `confidence` reflecting how much corroboration exists). Cite the source inline on
-   factual claims. **Set the viz-layer fields** (`layer`, and `parent`/`horizon` where
+   factual claims. **Set `validation`** as `.claude/reference/page-fields.md` says: in a personal
+   wiki, `self` with `validation_note: default`. A critical page, and every page in a commons,
+   stays `machine`. **Set the viz-layer fields** (`layer`, and `parent`/`horizon` where
    they apply) *only when the page clearly belongs to a layer* — a goal space, a
    portfolio, a mechanism, or a sequence. Leave them off when it's not obvious; an
    accurate blank beats a wrong tag.
@@ -96,6 +98,9 @@ The single most important operation. Done well, the wiki compounds. Done lazily
    wrote or changed>`. It fails if a passage in quotation marks is not in the source it cites.
    Fix each one before going on: copy the source's exact words, or take the quotation marks off
    a paraphrase. A quote "worded differently" is a near miss; make it exact.
+
+   **Keep the reading in proportion.** When a page interprets someone else's document, check it against
+   `.claude/reference/source-proportion.md`. Do the same on "am I over-reading this".
 
 6. **Update `wiki/overview.md`** if this source shifts the big picture.
 
@@ -136,6 +141,16 @@ The single most important operation. Done well, the wiki compounds. Done lazily
 
 10. **Report back in plain language.** Tell the owner what you learned and what pages
    changed, framed so his PR review is easy. Lead with the knowledge, not the filenames.
+   If a page you wrote is critical (a budget, a commitment, a named person, contested, a decision),
+   name it and its reason. Ask once whether the owner stands behind it. With no answer it stays `machine`.
+
+11. **Offer a home, once.** In a personal wiki, run `python3 tools/share_hint.py <slug> ...` on the pages you
+    wrote. Added 23 November 2026, so that good work reaches the team while it is fresh.
+    - For a page marked `share`, ask once: "This looks like <shared wiki> material. Share it there?" On a yes,
+      follow the `contribute` skill.
+    - For a page marked `open first`, say once that it is private and looks like that wiki's material. Opening it
+      is the owner's decision: never change its tier yourself.
+    - Say nothing for the rest. One question for the whole batch, never one per page. With no answer, leave it.
 
 ## Rules
 - Never edit `raw/`.

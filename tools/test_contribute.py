@@ -48,6 +48,22 @@ def write(root, slug, title, vis="internal", val="machine",
                              extra=extra, body=body))
 
 
+def check_unlink_missing(check):
+    """Links the commons cannot resolve become plain words before anything is proposed."""
+    known = {C.title_key("Madrid"), C.title_key("Impact web")}
+    text, missing = C.unlink_missing(
+        "See [[Madrid]], [[madrid]], [[Impact web|webs]], [[Madrid 2050°]] and [[Overlaps|my overlaps]].", known)
+    check("a link the commons holds stays a link, whatever its case", "[[Madrid]]" in text and "[[madrid]]" in text,
+          "a working link would be lost")
+    check("a missing link becomes its own words, or its display words",
+          "Madrid 2050°" in text and "[[Madrid 2050°]]" not in text and "my overlaps" in text
+          and "[[Overlaps" not in text, "the commons check fails after the save")
+    check("the missing titles are reported once each", missing == ["Madrid 2050°", "Overlaps"],
+          "the owner would not know which pages to contribute")
+    check("a section link counts as its page", C.unlink_missing("[[Madrid#Heat]]", known)[1] == [],
+          "a link to a section of a held page would be dropped")
+
+
 def check_topology(check):
     """The second commons.
 
@@ -126,11 +142,13 @@ def check_who_will_see(check):
         check("an unreadable reader list says so, and never says nobody",
               "could not be read" in unknown and "0 people" not in unknown, unknown)
 
-        old_cwd, old_readers = os.getcwd(), C.readers
+        old_cwd, old_readers, old_topology = os.getcwd(), C.readers, C.topology
         try:
             os.chdir(tmp)
             C.readers = lambda _c: (None, None)
-            to = (C.topology().get("contributes_to") or ["xco-team-wiki"])[0]
+            # A fixed set-up, not this wiki's own: a top commons contributes to nothing and would be refused.
+            C.topology = lambda: {"role": "spoke", "contributes_to": ["xco-team-wiki"]}
+            to = "xco-team-wiki"
             out, err = io.StringIO(), io.StringIO()
             with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
                 rc = C.main(["share-me", "--by", "tester", "--to", to])
@@ -141,7 +159,7 @@ def check_who_will_see(check):
             check("the block is shown before the refusal", "WHO WILL SEE IT" in out.getvalue(),
                   out.getvalue()[:200])
         finally:
-            C.readers = old_readers
+            C.readers, C.topology = old_readers, old_topology
             os.chdir(old_cwd)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -377,6 +395,7 @@ def main():
         shutil.rmtree(tmp, ignore_errors=True)
 
     check_topology(check)
+    check_unlink_missing(check)
     check_who_will_see(check)
     check_share_with_person(check)
 
