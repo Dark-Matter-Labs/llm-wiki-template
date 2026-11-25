@@ -35,6 +35,7 @@ These help the frontend "lens" place a page in the right view. Set them only whe
   `mechanism` (how something works), or `sequence` (a staged/temporal view).
 - **`parent`** — the exact title of the parent page, for nesting (goal spaces nest inside goal spaces).
 - **`horizon`** — `near` | `mid` | `far`, for sequence/timeline views.
+- **`shelf`** — live wikis only (`design/bookkeeping.json` exists). `shelf: <region>` lists the page in that catalogue region. `shelf: none` keeps it off the catalogue. Without it, the page's type decides.
 
 ### Validation — who has stood behind a page (required)
 
@@ -42,14 +43,54 @@ These help the frontend "lens" place a page in the right view. Set them only whe
 evidence; validation records **who has stood behind it**. A well-sourced page nobody has
 confirmed is a different object from a hunch the group has endorsed.
 
-- **`machine`** — you wrote or filed it; nobody has confirmed it. This is the default and
-  the honest state for anything new.
-- **`self`** — the owner confirmed it. Requires `validated_by`.
+- **`machine`** — nobody stands behind it yet.
+- **`self`** — the owner stands behind it. Requires `validated_by` and `validated_at`.
 - **`peer`** — another member confirmed it. Requires `validated_by`.
 - **`collective`** — reviewed together. Requires `validated_by`.
 
-**You may set `machine`, and propose `self`. You may never award `peer` or `collective`** —
-those need a second person, and a model granting them would make the hierarchy meaningless.
+**Self by default** (Gurden, 19 November 2026: "no one is validating anything"). In a personal
+wiki, a page you write at the owner's request, from sources they gave, gets these four lines:
+
+```yaml
+validation: self
+validated_by: [<owner login from design/federation.json>]
+validated_at: <today>
+validation_note: default
+```
+
+`validation_note: default` means the owner asked for the page and has not read it through. The
+owner confirms it for real by deleting that line. Where a skill or tool asks whether a person stood
+behind the *wording*, a default `self` counts as `machine`. These keep `machine`:
+
+- every page in a commons, until a person there acts.
+- a page the owner did not ask for, such as a scheduled job's output (`derivation: derivative`), a
+  pattern you proposed, or a page from another wiki (`origin:`).
+- a critical page, until the owner says yes.
+
+**Critical: ask the owner once, before you set `self`.** A page is critical when it:
+
+1. sets a budget: a `budget` tag, or "budget" in its title. A sum mentioned in passing does not make a
+   page critical.
+2. commits someone's time or money: `type: commitment` or `goal`, or a `commits_to:` field.
+3. makes claims about a named person: `type: person`, a person or contact tag, or a CRM card.
+4. is contested: `contradicts:`, `superseded_by:`, `devalued_by:`, `status: contested`, or a
+   `disputes` machine check.
+5. closes a decision: a `decides:` field.
+
+A public or unlisted page is not critical for that reason alone. Publishing it already took the owner's
+yes and the publish check. Gurden chose this narrower list on 20 November 2026, because the wider one
+(every currency figure, every public page) made the ask group as large as the default group.
+
+Ask in plain words, for example "This page states a budget figure. Do you stand behind it as
+written?" On a yes, set `self` with the owner's login and today's date, and no `validation_note`.
+With no answer, leave it at `machine`. It then shows in what is waiting. For a batch, ask once per
+reason, never once per page. `python3 tools/validation_sweep.py` applies this list to older pages.
+
+**Team validation is rare.** `peer` and `collective` follow the `validation` skill: a Slack
+message the owner posts, an item on the next team meeting's agenda, a Disagreements section on the
+page, one named person who calls the outcome, and the outcome on the page. **You may never award `peer` or
+`collective`, and never write a verification mark.** Those need a second person, and a model
+granting them would make the ladder meaningless.
 
 A **second frontier model** reading a page is a real signal and is recorded separately, in
 `machine_checks:` — never in `validation`:
@@ -66,12 +107,12 @@ machine_checks:
 agreeing is weaker evidence than it feels like — they were trained on overlapping corpora
 and fail in correlated ways, and neither has a stake in being wrong. A `disputes` entry is
 a **declaration, not a resolution**, exactly like `contradicts:`: it stands until a person
-decides, and may not be deleted by the model that disagrees with it. Run the `cross-check`
-skill; `python3 tools/cross_check.py --check` gates it, and refuses any `validated_by`
+decides, and may not be deleted by the model that disagrees with it. The `lint` skill's
+"A second model's read" says how to run one; `python3 tools/cross_check.py --check` gates it, and refuses any `validated_by`
 that names something model-shaped — the one-line shortcut that would turn the whole
 gravity protection into decoration.
 
-Validation feeds the gravity weighting: unvalidated material is admitted, indexed and
+Validation feeds the gravity weighting, and a default `self` weighs as `self`. Unvalidated material is admitted, indexed and
 searchable, but does not yet move the corpus's centre. That is the protection against a
 large body of well-formed but out-of-date thinking dragging the whole model backwards.
 

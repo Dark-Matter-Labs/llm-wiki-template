@@ -29,7 +29,8 @@ names, files the notes and proposes the change.
    **Meetings filed from the d.INO app** arrive already saved in `raw/`, with a `meeting_title` field:
    - a transcript in `raw/transcripts/`;
    - the person's spoken reflection in `raw/reflections/`, `type: reflection`, which names its transcript or
-     meeting file in `about:`;
+     meeting file in `about:`. Since 24 November 2026 it may hold a check-in from before the meeting: a
+     "Going in" section, then "Afterwards". Either can be missing;
    - for a Google Meet call, a file in `raw/meetings/` with `transcript: google-meet` and
      `status: transcript-to-fetch`.
 
@@ -49,17 +50,37 @@ names, files the notes and proposes the change.
    project and place. Link the names that match a page. Where a transcript probably misheard a name,
    write it as given and add "(probably X, unconfirmed)". Never correct a name silently. Ask the
    owner only about names that change a decision or a next step.
-6. **Write one summary page per call.** Follow the ingest skill for the page's details and tier.
-   Ask the tier once for the batch. With no answer, use this wiki's default. Use this shape:
+6. **Write one summary page per call.** Follow the ingest skill for the page's details, tier and validation.
+   Ask the tier once for the batch. With no answer, use this wiki's default. When every person on a call is a
+   colleague and the call is about shared work, suggest `internal` in that question ("these are team calls:
+   for colleagues?"). A call with someone outside Dark Matter Labs, or a personal one, keeps the default.
+   Added 23 November 2026: most team calls stayed private only because nobody was asked. Use this shape:
    - **Present**, then one line on what the source is and its known faults.
    - **Decisions**, numbered, each with its citation.
    - **Discussion**, by topic, and only what bears on the work.
    - **Next steps**, a table with the columns Who, What, Stream and State.
    - **Open questions**, each with the person who raised it.
-   For a meeting filed from the d.INO app, add two sections after Open questions:
+   For a meeting filed from the d.INO app, add these sections after Open questions:
    - **In <name>'s words**, when the person recorded a reflection. Quote it word for word as a blockquote,
      cite its `raw/reflections/` file, and add nothing. It is never blended into the summary, the Decisions or
-     the Next steps.
+     the Next steps. When it has "Going in", quote that first and the reflection after, under those two
+     headings, so what the person wanted sits beside how it went.
+   - **<name>'s actions**, when the reflection has "Going in". Asked for by Indy on 24 November 2026. The
+     phone apps and d.INO Home read this table and ask <name> "Is this yours to do?", so keep its form exact:
+
+     ```
+     ## <Name>'s actions
+
+     | Action | Kind | Due | Source | State |
+     | --- | --- | --- | --- | --- |
+     | Send Darko the pilot note | Committed | 2026-11-28 | transcript 00:12:30 | Proposed |
+     ```
+
+     Add `actions_for: <their GitHub login>` to the page's details. `Kind` is `Committed` or `Follow up`.
+     `Due` is an ISO date, or blank. Every row starts `Proposed`; only <name> changes it, to `Accepted` or
+     `Declined`, from the app. Only what <name> said yes to, on the call or in the reflection. With none, write
+     "None heard" and no table. Never add the actions to the commitments page yourself: the app does that on
+     <name>'s yes. Design: `wiki-voice/docs/superpowers/specs/2026-11-24-daybook-design.md`.
    - **Claude's reading**: what the meeting may mean for the work, and how it bears on pages in the wiki.
      Head it as interpretation, and keep every claim in it tied to the transcript or the reflection.
 7. **Fill the Who column with care.** A name goes in Who only when that person said yes on the
@@ -78,8 +99,7 @@ names, files the notes and proposes the change.
     - **xCO casing inside an inline quotation.** Only a blockquote is exempt. Paraphrase a quote that says "XO".
     - **A quotation split across a line break** in the source cannot be found. Quote a shorter run on one line.
     - **Stray files.** Add the pages by name. Never "add everything", which sweeps in local files.
-11. **Propose the change.** Put the work on its own branch and open a pull request. In a personal
-    wiki, ask once: "Shall I merge this? That saves it into your wiki". In a commons, propose and stop.
+11. **Propose the change.** Finish as `.claude/rules/pushing.md` and `finishing.md` say.
 
 ## Output
 

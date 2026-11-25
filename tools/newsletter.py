@@ -117,7 +117,38 @@ def arrivals(nodes, since, until):
             continue
         by_origin[n.get("origin") or "(written here)"] = \
             by_origin.get(n.get("origin") or "(written here)", 0) + 1
-    return dict(sorted(by_origin.items(), key=lambda kv: -kv[1]))
+    return dict(sorted(by_origin.items()))   # alphabetical: biggest-first reads as a ranking
+
+
+def shared_pulse(cuts, since, until, top=8):
+    """New in the shared wikis this month, and the same two figures for last month.
+
+    Asked for by Gurden on 23 November 2026: celebrate what arrives, and share how the federation
+    is used, without a scorecard. So the contributing wikis are named alphabetically with no count
+    beside them, nobody is named for not contributing, and the figures are the group's totals.
+    """
+    prev_until = since - dt.timedelta(days=1)
+
+    def window(a, b):
+        new, wikis, total = {}, set(), 0
+        for name, nodes in cuts.items():
+            for n in nodes:
+                ts = str(n.get("timestamp") or "")[:10]
+                if not (a.isoformat() <= ts <= b.isoformat()):
+                    continue
+                total += 1
+                if n.get("origin") and n["origin"] != name:
+                    wikis.add(n["origin"])
+                if n.get("title"):
+                    new.setdefault(name, []).append((ts, n["title"]))
+        return new, wikis, total
+
+    new, wikis, total = window(since, until)
+    _, prev_wikis, prev_total = window(prev_until.replace(day=1), prev_until)
+    return {"new": {k: [t for _, t in sorted(v, reverse=True)[:top]] for k, v in sorted(new.items())},
+            "contributing_wikis": sorted(wikis),
+            "pages": total, "pages_last_month": prev_total,
+            "wikis": len(wikis), "wikis_last_month": len(prev_wikis)}
 
 
 def _tool(path, args, cwd=None, timeout=300):
@@ -330,6 +361,7 @@ def gather(year, month):
     # not named, where it is moving, what is actually committed, and what it had to correct.
     # The counts above say how much arrived, which is the least surprising thing about a month.
     cuts = commons_cuts()
+    material["shared"] = shared_pulse(cuts, since, until)
     material["signals"] = {
         "patterns": patterns_now(),
         "trajectory": trajectory(since, until),
@@ -380,10 +412,25 @@ def render(m):
     out.append(f"  {m['federation']['pages_dated_this_month_across_the_commons']} page(s) dated "
                f"this month across {len(m['commons'])} commons")
     out.append("")
+    out += _render_shared(m.get("shared") or {})
     out += _render_signals(m.get("signals") or {})
     out.append("  This is material, not an issue. `newsletter` writes the issue from it —")
     out.append("  and a person reads that before it goes anywhere.")
     return "\n".join(out)
+
+
+def _render_shared(s):
+    """New in the shared wikis: credit by wiki, alphabetical, and the group's own month-on-month."""
+    if not s:
+        return []
+    out = ["  New in the shared wikis",
+           f"     {s['pages']} page(s) this month (last month {s['pages_last_month']}), "
+           f"shared from {s['wikis']} wiki(s) (last month {s['wikis_last_month']})"]
+    if s["contributing_wikis"]:
+        out.append("     with thanks to " + ", ".join(s["contributing_wikis"]))
+    for name, titles in s["new"].items():
+        out.append(f"     {name}: " + "; ".join(titles))
+    return out + [""]
 
 
 def _render_signals(s):

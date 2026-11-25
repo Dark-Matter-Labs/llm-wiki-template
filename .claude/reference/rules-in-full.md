@@ -240,7 +240,7 @@ phrasal verbs, the same reason `raw/` is never edited.
 
 They apply to wording a person wrote or has stood behind. That covers four cases:
 
-1. a page at `validation: self`, `peer` or `collective`
+1. a page at `validation: self` (not a default one), `peer` or `collective`
 2. a person's own draft or document
 3. a style guide
 4. any text where a person has asked to see changes as suggestions

@@ -142,5 +142,5 @@ For admins, and for how access is set up, see `SHARING-AND-ACCESS.md`.
 
 ## More guides
 
-Short guides on one topic each are in [guides/](guides/README.md): adding to the wiki, your lens, calls and
-commitments, asking the wiki, and what to do when something goes wrong.
+Short guides on one topic each are in [guides/](guides/README.md): adding to the wiki, calls and
+commitments, asking the wiki, what to do when something goes wrong, and the words you may meet.

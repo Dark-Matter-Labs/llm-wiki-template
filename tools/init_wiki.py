@@ -50,6 +50,8 @@ import ast
 import json
 import os
 import pathlib
+import re
+import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -167,6 +169,21 @@ def known_federation(root=None) -> set[str]:
             | ({data["source"]} if data.get("source") else set()))
 
 
+def repo_name(root):
+    """The repository's name on GitHub, from the origin remote; the folder name when there is none.
+
+    A second working copy (a git worktree, or a clone into another folder) is a legitimate place to
+    work, and its folder name says nothing about which wiki it is. The origin remote does.
+    """
+    try:
+        url = subprocess.run(["git", "-C", str(root), "remote", "get-url", "origin"],
+                             capture_output=True, text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return root.name
+    name = re.split(r"[/:]", url.rstrip("/"))[-1]
+    return re.sub(r"\.git$", "", name) or root.name
+
+
 def _model_shaped(name: str):
     """Delegate to cross_check.py, or say we could not check.
 
@@ -268,7 +285,7 @@ def check(root=None) -> Report:
     # What it READS. Absent means the two directions are the same, which is true of every
     # wiki written before the fields were split.
     downs = list(fed["reads_from"]) if "reads_from" in fed else list(ups)
-    repo_dir = root.name
+    repo_dir = repo_name(root)
 
     if role not in ROLES:
         r.fail(f"role `{role}` is not one of {', '.join(ROLES)}")

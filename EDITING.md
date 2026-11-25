@@ -96,6 +96,10 @@ useful and correct — add `validated_by: [your name]` alongside it. This is one
 things only a person can do: Claude may propose `self` but can never award `peer` or
 `collective`, because a model granting them would make the whole ladder meaningless.
 
+Since 19 November 2026, a page Claude writes at your request starts at `self` with
+`validation_note: default`. That line means you asked for the page but have not read it
+through. Delete the line when you have, and the page counts as yours for real.
+
 ---
 
 ## What you can't break

@@ -67,8 +67,9 @@ All three are needed. Every read-out that counts human confirmation counts it **
 confirmation without `validated_at` is recorded in the file and missing from every report. `EDITING.md`
 walks through doing this in GitHub's web editor.
 
-Claude may set `machine` and may *propose* `self`. It may never set `peer` or `collective`, and the
-gates refuse any `validated_by` that names a model.
+In a personal wiki, Claude sets `self` with `validation_note: default` on a page the owner asked for, and
+leaves a critical page at `machine` until the owner says yes (`.claude/reference/page-fields.md`). It may
+never set `peer` or `collective`, and the gates refuse any `validated_by` that names a model.
 
 ---
 

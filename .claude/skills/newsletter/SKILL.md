@@ -1,6 +1,6 @@
 ---
 name: newsletter
-description: "Write the monthly issue of what the wikis learned. Fires on the first working day of the month, and on \"write the newsletter\"."
+description: "Write the monthly issue of what the wikis learned. \"write the newsletter\", \"this month's issue\"."
 ---
 
 # The monthly newsletter
@@ -145,6 +145,13 @@ Then, and only then, the ordinary movements, in rough order of interest: a posit
 a decision that closed an argument; what came in. The last of those is least surprising and goes
 last, briefly.
 
+**New in the shared wikis, and thanks.** End with a short section from `shared` (added 23 November
+2026). Name three to five of its `new` pages a colleague would want to open. Then one line of
+thanks to the `contributing_wikis`, in the order given, which is alphabetical. Then the group's
+pulse in one sentence: pages and wikis this month against last month. Never put a count beside a
+wiki, never order wikis by size, and never name a wiki or person for sharing nothing. This is
+credit, not a scorecard.
+
 ## Hard rules
 
 - **Nothing `private`.** Not its body, not its title, not a link to it, not a paraphrase. The
@@ -190,10 +197,9 @@ last, briefly.
 7. **Run the draft back through `ai-detox`.** The mechanical half is the banned words. The half
    that matters is the shapes: the recap paragraph, the closing offer, the rule of three, the
    "not X but Y", the sentence whose only job is to say the last one mattered.
-8. **Log it** — `## [YYYY-MM-DD] rebuild | newsletter — <month>` — and run
-   `python3 tools/sync_log_index.py`.
-9. **Run `python3 tools/gates.py` last, and fix what it reports** in the issue or the log entry,
-   then run it again. On 2 October eight of nine drafts failed their wiki's checks after the
+8. **Log it** — `## [YYYY-MM-DD] rebuild | newsletter — <month>`.
+9. **Finish as `.claude/rules/pushing.md` says,** and fix what the checks report in the issue or the log entry.
+   On 2 October eight of nine drafts failed their wiki's checks after the
    writing was done: banned words in the log entry more often than in the issue, a missing frontmatter
    field, a stale page count. Fix only what you wrote. A banned phrase inside someone's quoted
    words stays as they said it; say so in the log entry and leave that one failure for a person.

@@ -1,6 +1,6 @@
 ---
 name: leads
-description: "Suggest organisations to approach for a goal, with reason, source and any warm route. \"find leads\", \"who funds X\". Never contacts anyone; a private card only on a yes."
+description: "Suggest organisations to approach for a goal, with reason, source and any warm route. \"find leads\", \"who funds X\"."
 ---
 
 # Leads: who is worth approaching, and why

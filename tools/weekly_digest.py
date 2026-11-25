@@ -271,7 +271,8 @@ def gather(week_ending, online=True):
         n = nodes.get(slug)
         if n and shown(n, commons):
             rows[how].append({"title": n["title"], "type": n.get("type") or "page",
-                              "description": clean(n.get("description"), visible_titles) or ""})
+                              "description": clean(n.get("description"), visible_titles) or "",
+                              "visibility": n.get("visibility") or "private"})
     m = {"week_ending": week_ending.isoformat(), "since": since.isoformat(),
          "visibility": "internal" if commons else "private",
          "added": rows["added"], "changed": rows["changed"],
@@ -358,11 +359,52 @@ def render(m):
     return "\n".join(out).rstrip() + "\n"
 
 
+OPEN_TIERS = {"internal", "unlisted", "public"}
+
+
+def render_slack(m, wiki):
+    """The week as a short Slack message, asked for by Gurden on 24 November 2026: owners did not open the weekly
+    proposal (37 of 41 saved by him in a batch). Slack is outside the wiki, so no private page is named, only
+    counted. Hunches, commitments and questions may come from private pages, so they are counted too."""
+    a, b = dt.date.fromisoformat(m["since"]), dt.date.fromisoformat(m["week_ending"])
+    span = (f"{a.day} to {b.day} {b:%B}" if (a.year, a.month) == (b.year, b.month)
+            else f"{a.day} {a:%B} to {b.day} {b:%B}")
+    moved = m["added"] + m["changed"]
+    named = [p["title"] for p in moved if p.get("visibility") in OPEN_TIERS]
+    hidden = len(moved) - len(named)
+    lines = [f"Your wiki this week ({wiki}, {span})", ""]
+    head = f"• {len(moved)} page{'s' if len(moved) != 1 else ''} new or changed"
+    if hidden:
+        head += f", {hidden} of them private and not named here"
+    lines.append(head + ".")
+    if named:
+        more = f", and {len(named) - 5} more" if len(named) > 5 else ""
+        lines.append("  " + ", ".join(f'"{t}"' for t in named[:5]) + more + ".")
+    counts = [(len(m["hunches"]), "hunch added", "hunches added"),
+              (len(m["commitments_due"]), "commitment due in the next seven days", "commitments due in the next seven days"),
+              (sum(len(q["items"]) + q["more"] for q in m["questions"]), "open question on those pages",
+               "open questions on those pages"),
+              (len(m["proposals"] or []), "proposal waiting for your yes", "proposals waiting for your yes")]
+    for n, one, many in counts:
+        if n:
+            lines.append(f"• {n} {one if n == 1 else many}.")
+    for t in m["worth_sharing"] or []:
+        if not t.get("held_unknown") and t["pages"]:
+            more = f", and {t['more']} more" if t["more"] else ""
+            lines.append(f"• Could go up to {t['commons']}: " + ", ".join(f'"{x}"' for x in t["pages"]) + f"{more}.")
+    private_team = sum(len(t["pages"]) + t["more"] for t in m.get("could_open") or [])
+    if private_team:
+        lines.append(f"• {private_team} private " + ("page looks" if private_team == 1 else "pages look") + " like team material.")
+    lines += ["", 'For the full list, private pages included, ask Claude in your wiki: "show my weekly digest".']
+    return "\n".join(lines)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="This wiki's week, counted from its history.")
     ap.add_argument("--week-ending", help="YYYY-MM-DD, the last day of the week; default today")
     ap.add_argument("--json", action="store_true", help="the material as JSON")
     ap.add_argument("--write", action="store_true", help="write wiki/digest/<week-ending>.md")
+    ap.add_argument("--slack", action="store_true", help='the week as a Slack message, JSON {"text": ...}; no private title')
     a = ap.parse_args(argv)
     try:
         week_ending = dt.date.fromisoformat(a.week_ending) if a.week_ending else dt.date.today()
@@ -375,6 +417,10 @@ def main(argv=None):
         return 0
     if m["quiet"]:
         print(f"No page moved between {m['since']} and {m['week_ending']}: no digest written.")
+        return 0
+    if a.slack:
+        print(json.dumps({"text": render_slack(m, os.environ.get("GITHUB_REPOSITORY", ROOT.name).split("/")[-1])},
+                         ensure_ascii=False))
         return 0
     page = render(m)
     if not a.write:

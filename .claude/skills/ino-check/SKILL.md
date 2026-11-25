@@ -1,6 +1,6 @@
 ---
 name: ino-check
-description: "Ask whether a piece of work knows its question and what would change its mind. Fires before a proposal, brief, deck or published page leaves the session, and on \"run the INO check\". Reports, never gates."
+description: "Ask whether a piece of work knows its question and what would change its mind. \"run the INO check\", \"is this inquiry-native\", or before a proposal, deck or published page leaves."
 ---
 
 # INO check
@@ -50,7 +50,7 @@ A document that fails 2, 3 and 5 is a plan. That is sometimes right, and it shou
    reads as a plan, or in between. No score.
 4. **Propose, do not insert.** For each missing mark, draft the sentence that would carry it, in the
    author's words where the page is theirs. On a page a person has stood behind (`validation: self` or
-   above), show it as a provisional block, as `.claude/rules/plain-register.md` requires. On a
+   above, but not a default `self`), show it as a provisional block, as `.claude/rules/plain-register.md` requires. On a
    `machine` page, add it and say so.
    **The mark most often missing is "what would change our mind"** (5 of 81 pieces of work in the team wiki
    on 22 October 2026). Draft it in this shape, adapted from nvk/llm-wiki's thesis mode: *What would change

@@ -65,4 +65,5 @@ knowledge they're actually after and answer that instead.
 ## Rules
 - Index first, then drill. Don't brute-force read everything.
 - Never invent a citation. If it's your inference, label it.
-- A filed answer must carry frontmatter and a `confidence` like any other page.
+- A filed answer must carry frontmatter and a `confidence` like any other page. Set its `validation` as
+  `.claude/reference/page-fields.md` says: `self` by default when the owner asked for it.

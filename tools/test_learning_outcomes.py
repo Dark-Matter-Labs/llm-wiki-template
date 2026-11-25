@@ -152,11 +152,13 @@ def main():
                           validated_by="[Robyn Bennett]", validated_at="2026-06-20",
                           body="A claim (raw/x.pdf){✓ Robyn 2026-06-21}. Another (raw/y.pdf){✓ Indy 2026-01-01}.\n"))
         r.write("m", page("Machine", visibility="internal", validation="machine", validated_at="2026-06-20"))
+        r.write("d", page("Default", visibility="internal", validation="self", validated_by="[Indy Johar]",
+                          validated_at="2026-06-20", validation_note="default"))
         r.commit(T0)
         r.activate()
         v = lo.build(datetime.date(2026, 6, 1), datetime.date(2026, 6, 30), "internal")
         s = v["stood_behind"]
-        check("a human validation dated in the window counts; a machine page does not",
+        check("a human validation dated in the window counts; a machine page and a default self do not",
               [x["page"] for x in s["validations"]] == ["Validated"], str(s["validations"]))
         check("verification marks are counted by their own date, not the page's",
               s["claims_verified"] == 1, str(s))

@@ -17,6 +17,7 @@ import json
 import os
 import pathlib
 import sys
+import subprocess
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -127,6 +128,22 @@ def main():
         check("a wiki still calling itself the template is caught",
               fails_with(r, "directory"),
               "it would contribute as llm-wiki-template, and nothing else would say so")
+
+    # A second working copy (a worktree, or a clone into another folder) is named by its remote.
+    with tempfile.TemporaryDirectory() as t:
+        root = wiki(t, "alex-worktree", name="alex-llm-wiki")
+        subprocess.run(["git", "init", "-q", str(root)], check=True)
+        subprocess.run(["git", "-C", str(root), "remote", "add", "origin",
+                        "git@github.com:Dark-Matter-Labs/alex-llm-wiki.git"], check=True)
+        r = iw.check(root)
+        check("a working copy in another folder is named by its GitHub remote",
+              not fails_with(r, "directory"),
+              "worktrees failed this check on every push, so it was ignored")
+        subprocess.run(["git", "-C", str(root), "remote", "set-url", "origin",
+                        "https://github.com/Dark-Matter-Labs/llm-wiki-template"], check=True)
+        check("a copy still pointing at the template's remote is caught",
+              fails_with(iw.check(root), "directory"),
+              "it would contribute under the wrong name")
 
     with tempfile.TemporaryDirectory() as t:
         r = iw.check(wiki(t, "some-commons", role="commons", ups=(), export=SPOKE_EXPORT))

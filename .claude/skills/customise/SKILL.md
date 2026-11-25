@@ -39,12 +39,9 @@ It never gets Robyn's rooms.
    - Lens switches and names go in `design/lens/settings.json`. That file is this wiki's own.
 6. **Mark it done.** In `design/customisations.json`, change the entry's `state` to `done`.
    Add `done_at` (the date) and `done_by` ("Claude for <owner>"). Keep the entry. Never delete it.
-7. **Check before sending.** Follow `.claude/rules/pushing.md`: regenerate, run `python3 tools/gates.py`, push once.
-8. **Log it.** Append `## [YYYY-MM-DD] rebuild | customisation: <name>` to today's log file.
-   Then run `python3 tools/sync_log_index.py`.
-9. **Propose it.** Say what a reader will now find, in plain words. Then ask: "Shall I merge this? That saves it into
-   your wiki."
-10. **Offer one next step.** If the change touched the lens, offer `lens-refresh`. The lens shows it only after a
+7. **Log it.** Append `## [YYYY-MM-DD] rebuild | customisation: <name>` to today's log file.
+8. **Propose it.** Say what a reader will now find, in plain words. Finish as `.claude/rules/pushing.md` and `finishing.md` say.
+9. **Offer one next step.** If the change touched the lens, offer `lens-refresh`. The lens shows it only after a
     rebuild and lock. d.INO Home shows most customisations as soon as the change is saved.
 
 ## What each one needs from the owner
@@ -53,7 +50,7 @@ It never gets Robyn's rooms.
 |---|---|---|
 | Hunches | Which pages hold the open routes? | Write `design/lens/hunches.json`, each hunch anchored to its page. |
 | Key terms | Nothing. Offer the ten most-linked concepts as a start. | Write `wiki/glossary.md`, one `### Term` each, ending `See [[page]]`. |
-| Checked against sources | Which pages do people rely on most? | Run the `cross-check` skill on those pages. |
+| Checked against sources | Which pages do people rely on most? | Run a second model's read on those pages (`lint`). |
 | Figures on source summaries | Which sources carry their argument in a diagram? | Capture the figures into `design/lens/figures/`, listed in `figures.json`. |
 | Published pages elsewhere | Which pages are on other sites? | List them in `design/lens/external-pages.json`. Never a password or a private link. |
 | Links colleagues shared | Which channels? | Stop if this chat cannot read them. Say what access is needed. |
@@ -92,4 +89,4 @@ For a customisation not in this table, follow the entry's own `setup` line.
 - d.INO Home's Templates page, which writes `design/customisations.json`.
 - `tools/waiting.py`, which names requests not set up yet.
 - `design/lens/SPEC.md`: what each lens setting does.
-- `lens-refresh`, `cross-check`, `.claude/rules/pushing.md`, `.claude/rules/finishing.md`.
+- `lens-refresh`, `lint`, `.claude/rules/pushing.md`, `.claude/rules/finishing.md`.

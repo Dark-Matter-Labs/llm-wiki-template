@@ -39,11 +39,12 @@ than a dossier. It serves one meeting or audience and uses only what the wiki ho
 7. **Check it.**
    - Plain register: 25 words or fewer per sentence, no semicolons, active voice.
    - Run `python3 tools/house_rules.py` where this wiki has it.
+   - Where the brief interprets someone else's document, check `.claude/reference/source-proportion.md`.
    - For a brief leaving Dark Matter Labs, run the `publish-check` skill. Fix what it finds, or tell the owner.
 8. **Propose it.** Do one of these, as the owner prefers:
    - a wiki page (`type: synthesis`, `derivation: synthesis`), with its index row and a `query` entry in today's log
    - a document through a document connector, where this wiki has one
-   Make a draft, open a proposed change, and ask: "Shall I merge this? That saves it into your wiki."
+   Finish as `.claude/rules/pushing.md` and `finishing.md` say.
 
 ## Output
 

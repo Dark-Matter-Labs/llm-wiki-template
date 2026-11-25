@@ -16,7 +16,7 @@ How it works. A source in raw/ names its web address in its opening lines (`Sour
 checks compare against it. Sign-in-only services (Google Docs, Notion, Slack, claude.ai, Otter) are listed as not
 checkable rather than fetched.
 
-What it never does. It never edits raw/: a changed page is saved as a NEW source file by the `source-refresh`
+What it never does. It never edits raw/: a changed page is saved as a NEW source file by the `lint`
 skill, and only after a person has looked. (nvk/llm-wiki's refresh overwrites the raw file, which breaks its own
 rule that raw is immutable; this one does not.) It does not judge what changed; it only says that something did.
 Not for CI: it reads the network, and pages change for trivial reasons a person must weigh.

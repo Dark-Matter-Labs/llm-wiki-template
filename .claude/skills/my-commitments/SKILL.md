@@ -1,6 +1,6 @@
 ---
 name: my-commitments
-description: "Keep the owner's open commitments current from plain statements, sorted by their categories and horizons, and refresh the views that show them. Fires on \"update my commitments\", \"that's done\", \"I'm not doing X any more\", \"I've to set up a call with…\", \"move that to next month\", \"what am I on the hook for\", \"what's on my plate this week\", \"sweep my email for things I promised\". Changes only the commitments page and the views built from it, and asks before saving."
+description: "Keep the owner's open commitments current from plain statements. \"update my commitments\", \"that's done\", \"what am I on the hook for\", \"move that to next month\"."
 ---
 
 # My commitments
@@ -39,8 +39,8 @@ The point is small and practical. A person says "that's done" in plain words, an
    Cite it from the page.
 6. Refresh the lens commitments box, where this wiki's lens has one, with the `lens-refresh` skill.
    The team stand-up page is separate. It reads call summaries, not this personal list.
-7. Add an `ingest` entry to today's log, run `python3 tools/sync_log_index.py`, and open the proposed change.
-8. Report, then ask "Shall I merge this? That saves it into your wiki".
+7. Add an `ingest` entry to today's log.
+8. Report. Finish as `.claude/rules/pushing.md` and `finishing.md` say.
 
 ## Output
 

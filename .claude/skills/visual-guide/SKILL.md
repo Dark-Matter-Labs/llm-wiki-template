@@ -44,8 +44,8 @@ which guide applies, answer from this list and the wiki's `design/federation.jso
    <owner>)". If nobody does, write "Maker not stated". Never guess.
 6. **Cascade.** Link the project's page, the organisation's page and any other guide the project follows. Add one
    index row and a log entry: `## [YYYY-MM-DD] ingest | <Project> visual guide`.
-7. **Run the checks and propose.** Run `tools/house_rules.py`, `tools/quote_check.py --check` on the page, and
-   `tools/gates.py`. In a personal wiki, ask "Shall I merge this?". In a team wiki, propose and stop.
+7. **Run the checks and propose.** Run `tools/house_rules.py` and `tools/quote_check.py --check` on the page.
+   Finish as `.claude/rules/pushing.md` and `finishing.md` say.
 
 ## The page's shape
 

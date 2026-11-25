@@ -1,6 +1,6 @@
 ---
 name: learn
-description: "Turn a verified recurring pattern into a skill. Fires when the same correction or workaround appears a third time, and on \"make that a skill\". Always asks the owner to verify first."
+description: "Turn a recurring correction or workaround into a skill, after the owner verifies it. \"make that a skill\", \"learn this pattern\"."
 ---
 
 # Learn — verified pattern → new skill
@@ -8,6 +8,8 @@ description: "Turn a verified recurring pattern into a skill. Fires when the sam
 This is how the wiki grows its own skills without drifting. Indy's design: *"it could ask me for
 verification… then you could build verified auto-verified patterns."* The verification step is the
 whole point — it is what keeps a "learned" skill trustworthy.
+
+Offer it when the same correction or workaround appears a third time, as well as on "make that a skill".
 
 ## Method
 
@@ -18,7 +20,8 @@ whole point — it is what keeps a "learned" skill trustworthy.
    Wait for an explicit yes. No yes → stop; nothing is created. ("Maybe" / silence is not a yes.)
 3. **On yes, draft the new `SKILL.md`** in house format (frontmatter `name` + `description`; then
    purpose, method, output, rules), following the tone of the existing skills.
-4. **Register it** in the intent table in `CLAUDE.md` (and the README skills table).
+4. **Register it.** Add a row to `.claude/reference/operations.md` and an entry in `tools/skill_menu.py`, and run
+   `python3 tools/check_budgets.py`. Do not add it to `CLAUDE.md`.
 5. **Log it:** `## [YYYY-MM-DD] learn | <skill name> verified by the owner`.
 
 ## Hard rules

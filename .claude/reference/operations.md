@@ -18,7 +18,7 @@ In plain-English terms, here is when each fires:
 | "run the weekly check" (where this wiki has the skill; it needs the whole `raw/` library on this machine) | `weekly-check` |
 | "catch me up", "what's new", "weekly summary" (read the latest Thursday digest in `wiki/digest/` first: `tools/weekly_digest.py` has counted the week) | `brief`   |
 | "I have a new idea / project", "help me think"     | `office-hours` |
-| "sharpen this", "test my idea", "make this defensible" (questions only, no answers) | `sharpen` |
+| "sharpen this", "test my idea", "make this defensible" (questions only, no answers) | `office-hours`, sharpen mode |
 | "set up a wiki for X", "onboard a new option", "Santiago needs its own wiki" | `onboard` |
 | "is this ready to publish / share externally"      | `publish-check` |
 | "publish this as a web page", "make a shareable link", "put this on the site" | `publish-web` |
@@ -34,7 +34,7 @@ In plain-English terms, here is when each fires:
 | "does anyone on the team know X?", "share X's card with the team", "stop sharing X" | `crm` (with `tools/who_knows.py`) |
 | "check new requests", "assess this request", "what came in for Indy" | `inbound` (private; drafts only, never sends) |
 | "find leads", "lead generation", "who should we approach about…", "who funds…" | `leads` |
-| "cross-check this", "get a second opinion", "what would another model say" | `cross-check` |
+| "cross-check this", "get a second opinion", "what would another model say" | `lint`, "A second model's read" |
 | "run the luck generator", "who should I talk to", "who's worth a conversation" | `luck` |
 | "what don't we know", "what's unanswered", "what is the wiki waiting on" | `open_questions.py`, then `inquiry` |
 | "what patterns are emerging", "meta patterns", "what haven't we named yet" | `patterns` |
@@ -42,14 +42,15 @@ In plain-English terms, here is when each fires:
 | "ai detox", "make this sound human", "take the AI out of this" | `ai-detox` |
 | "dm style", "in our voice", "make this sound like DM" (Dm wikis only) | `dm-style-guide` |
 | "xCO voice", "in xCO's voice", "xCO tone" (and anything written for or as xCO) | `xco-voice` |
-| "did anything get lost", "check parity" — **and automatically on every rebuild** of an artifact with a countable record set | `rebuild-parity` |
+| "did anything get lost", "check parity" — **and automatically on every rebuild** of an artifact with a countable record set | `.claude/reference/rebuild-parity.md` |
 | "do the call notes", "file my call notes", "here are the notes from the call" | `call-notes` |
 | "update the overview", "the overview is out of date" — and when lint names overview drift | `overview-refresh` |
 | "update my commitments", "that's done", "what am I on the hook for" | `my-commitments` |
 | "from now on…", "always…", "make that a rule", "what rules have I set" | `rulings` |
+| "clear the validation backlog", "what needs my sign-off", "take this to the team" | `validation` |
 | "rename this", "it's now called X", "is the name right everywhere" | `rename` |
 | "update the live page", "fix the page on the site", "it looks wrong on my phone" | `live-page` |
-| "are my sources still current", "has this page changed", "refresh the sources" | `source-refresh` |
+| "are my sources still current", "has this page changed", "refresh the sources" | `lint`, "Sources that changed" |
 | "something leaked", "remove this everywhere", "retract this", "I pasted a password" | `retract` |
 | "run the INO check", "is this inquiry-native", "does this know what it's testing" — and before a theory of change, proposal, brief, deck or published page leaves the wiki | `ino-check` |
 | "refresh the lens", "the lens doesn't show my new page", "relock the lens" | `lens-refresh` (only in a wiki with a lens) |
@@ -58,8 +59,8 @@ In plain-English terms, here is when each fires:
 | "add this style guide", "capture our visual guide", "which style guide do we use" | `visual-guide` |
 | "help me imagine", "what could this be", "I don't know what I want yet", before designing | `imagine` |
 | "design this", "make the page or cards", "make it look good", "it looks too AI" | `design-brief` |
-| "review this design", "does this look AI-made", "is this on brand" | `design-critic` |
-| "am I over-reading this", "is this extrapolation" — **and automatically whenever the wiki's analysis sits beside someone else's document** | `source-proportion` |
+| "review this design", "does this look AI-made", "is this on brand" | `design-brief`, "The critic" |
+| "am I over-reading this", "is this extrapolation" — **and automatically whenever the wiki's analysis sits beside someone else's document** | `.claude/reference/source-proportion.md` |
 
 Published web pages live in `docs/` and are served by GitHub Pages at
 `https://dark-matter-labs.github.io/indy-llm-wiki/` (styled with the xCO design system).

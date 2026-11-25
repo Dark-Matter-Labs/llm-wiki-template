@@ -137,6 +137,23 @@ def main():
         got = ids(root)
         check("a long gap since the last visit suggests catching up", "catch-up" in got, str(got))
 
+    # more repairs than rebuilds this month suggests metacognition, where the wiki has it
+    with tempfile.TemporaryDirectory() as t:
+        root = fresh(t)
+        for i in range(6):
+            log(root, "2026-09-20", "repair")
+        log(root, "2026-09-21", "rebuild")
+        check("more repairs than rebuilds is not offered without the metacognition skill",
+              "metacognition" not in ids(root, limit=None), str(ids(root, limit=None)))
+        skill = root / ".claude" / "skills" / "metacognition" / "SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text("---\nname: metacognition\n---\n")
+        check("more repairs than rebuilds in 30 days suggests looking at how the wiki is used",
+              "metacognition" in ids(root, limit=None), str(ids(root, limit=None)))
+        for i in range(6):
+            log(root, "2026-09-22", "rebuild")
+        check("...but not when building outweighs fixing", "metacognition" not in ids(root, limit=None))
+
     # the waiting count defers to waiting.py where it can answer
     with tempfile.TemporaryDirectory() as t:
         root = fresh(t)
